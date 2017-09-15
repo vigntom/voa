@@ -13,7 +13,22 @@
     "yarn": "1.0.1"
   },
   "scripts": {
-    "start": "heroku local"
+    "start": "heroku local",
+    "test": "NODE_ENV=test ava"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "standard": "^10.0.3",
+    "supertest": "^3.0.0",
+    "tern": "^0.21.0"
+  },
+  "ava": {
+    "files": ["test/*.test.js"],
+    "source": ["app/*.js"],
+    "tap": false,
+    "color": true,
+    "fail-fast": true,
+    "verbose": false
+  }
 }
