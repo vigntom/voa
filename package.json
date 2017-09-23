@@ -9,8 +9,8 @@
   "author": "Aleksandr Ignatyev <vigntom.2708@gmail.com>",
   "engines": {
     "node": "8.5.0",
-    "npm": "5.3.0",
-    "yarn": "1.0.1"
+    "npm": "5.4.2",
+    "yarn": "1.0.2"
   },
   "scripts": {
     "start": "heroku local",
@@ -24,11 +24,27 @@
     "tern": "^0.21.0"
   },
   "ava": {
-    "files": ["test/*.test.js"],
-    "source": ["app/*.js"],
+    "files": [
+      "test/*.test.js"
+    ],
+    "source": [
+      "app/*.js"
+    ],
     "tap": false,
     "color": true,
     "fail-fast": true,
     "verbose": false
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "bunyan": "^1.8.12",
+    "compression": "^1.7.0",
+    "csurf": "^1.9.0",
+    "debug": "^3.0.1",
+    "dotenv": "^4.0.0",
+    "express": "^4.15.4",
+    "express-validator": "^4.2.0",
+    "helmet": "^3.8.1",
+    "throng": "^4.0.0"
   }
 }
