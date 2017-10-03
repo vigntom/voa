@@ -21,7 +21,8 @@
     "ava": "^0.22.0",
     "standard": "^10.0.3",
     "supertest": "^3.0.0",
-    "tern": "^0.21.0"
+    "tern": "^0.21.0",
+    "webpack": "^3.6.0"
   },
   "ava": {
     "files": [
@@ -45,6 +46,7 @@
     "express": "^4.15.4",
     "express-validator": "^4.2.0",
     "helmet": "^3.8.1",
+    "hjs": "^0.0.6",
     "throng": "^4.0.0"
   }
 }

@@ -1,5 +1,5 @@
 const log = require('./app/lib/logger')
-const app = require('./app/index')
+const app = require('./app/server')
 const throng = require('throng')
 
 const port = process.env.PORT || 5000

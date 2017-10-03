@@ -1,7 +1,7 @@
 import {} from 'dotenv/config'
 import req2server from 'supertest'
 import test from 'ava'
-import server from './../app/index'
+import server from './../app/server'
 
 test.cb('Server starts', t => {
   req2server(server)
