@@ -1,4 +1,5 @@
 const bunyan = require('bunyan')
+const debugStream = require('bunyan-debug-stream')
 const fs = require('fs')
 const path = require('path')
 
@@ -22,10 +23,12 @@ function createLogger (env) {
         period: logPeriod,
         count: logCount,
         level: logLevel
-      }, {
-        level: 'info',
-        stream: process.stdout
-      }]
+      }
+      // , {
+      //   level: 'info',
+      //   stream: process.stdout
+      // }
+      ]
     })
   }
 
@@ -40,11 +43,13 @@ function createLogger (env) {
       path: path.join(logDir, `${nodeEnv}.log`)
     }, {
       level: 'info',
-      stream: process.stdout
-    }, {
-      level: 'error',
-      stream: process.stderr
-    }]
+      type: 'raw',
+      stream: debugStream({
+        basepath: __dirname,
+        forceColor: true
+      })
+    }],
+    serializers: debugStream.serializers
   })
 }
 

@@ -10,15 +10,16 @@
   "engines": {
     "node": "8.5.0",
     "npm": "5.4.2",
-    "yarn": "1.0.2"
+    "yarn": "1.1.0"
   },
   "scripts": {
-    "start": "heroku local",
+    "server": "heroku local",
     "test": "NODE_ENV=test ava"
   },
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.22.0",
+    "bunyan-debug-stream": "^1.0.8",
     "standard": "^10.0.3",
     "supertest": "^3.0.0",
     "tern": "^0.21.0",
@@ -42,7 +43,6 @@
     "compression": "^1.7.0",
     "csurf": "^1.9.0",
     "debug": "^3.0.1",
-    "dotenv": "^4.0.0",
     "express": "^4.15.4",
     "express-validator": "^4.2.0",
     "helmet": "^3.8.1",

@@ -1,9 +1,9 @@
 const { join } = require('path')
 const express = require('express')
 // const compression = require('compression')
-const bodyParser = require('body-parser')
-const helmet = require('helmet')
-const validator = require('express-validator')
+// const bodyParser = require('body-parser')
+// const helmet = require('helmet')
+// const validator = require('express-validator')
 
 // const env = process.env.NODE_ENV || 'development'
 
