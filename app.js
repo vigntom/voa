@@ -1,34 +1,53 @@
-const log = require('./app/lib/logger')
-const app = require('./app/server')
+const path = require('path')
+const server = require('./app/server')
 const throng = require('throng')
+const config = require('./config.json')
+const createLogger = require('./lib/logger')
 
-const port = process.env.PORT || 5000
+const appConfig = Object.assign(config, {
+  root: __dirname,
+  log_dir: path.resolve(__dirname, 'log'),
+  port: process.env.PORT || 5000,
+  env: process.env.NODE_ENV || 'development'
+})
+
+const log = createLogger(appConfig)
+const app = server({ log, config: appConfig })
+
 const workers = process.env.WEB_CONCURRENCY || 1
-const env = process.env.NODE_ENV
 
-if (env !== 'test') {
-  throng({
-    workers,
-    master () {
-      log.info(`Application mode ${env}`)
-    },
+switch (config.env) {
+  case 'production':
+    throng({
+      workers,
+      master () {
+        log.info(`Application mode ${config.env}`)
+      },
 
-    start (id) {
-      process.on('SIGTERM', () => {
-        log.info(`Worker ${id} stopped`)
-        process.exit()
-      })
+      start (id) {
+        process.on('SIGTERM', () => {
+          log.info(`Worker ${id} stopped`)
+          process.exit()
+        })
 
-      app.listen(port, () => {
-        log.info(`Listening on port ${port} (id=${id})`)
-      })
-    }
+        app.listen(config.port, () => {
+          log.info(`Listening on port ${config.port} (id=${id})`)
+        })
+      }
 
-  })
-} else {
-  log.info(`Application starting in ${env} mode`)
+    })
 
-  app.listen(port, () => {
-    log.info(`Listening on ${port}`)
-  })
+    break
+
+  case 'test':
+    break
+
+  default:
+    log.info(`Application starting in ${config.env} mode`)
+
+    app.listen(config.port, () => {
+      log.info(`Listening on ${config.port}`)
+    })
 }
+
+module.exports = app

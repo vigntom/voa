@@ -1,33 +1,26 @@
-const { join } = require('path')
+const path = require('path')
 const express = require('express')
-// const compression = require('compression')
-// const bodyParser = require('body-parser')
-// const helmet = require('helmet')
-// const validator = require('express-validator')
+const router = require('./components/router')
+const compression = require('compression')
+const bodyParser = require('body-parser')
+const helmet = require('helmet')
+const validator = require('express-validator')
 
-// const env = process.env.NODE_ENV || 'development'
+function createApp ({ config, log }) {
+  const app = express()
 
-const app = express()
+  app.use(express.static(path.resolve(config.root, 'public')))
+  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(validator())
+  app.use(helmet())
 
-app.set('view engine', 'hjs')
-app.set('views', join(__dirname, 'views'))
+  if (config.env === 'production') {
+    app.use(compression())
+  }
 
-app.use(express.static('public'))
+  app.use('/', router(log))
 
-// app.use(bodyParser.json())
-// app.use(bodyParser.urlencoded({ extended: false }))
-// app.use(validator())
-// app.use(helmet())
+  return app
+}
 
-// app.use(express.static(path.join(__dirname, 'build', 'public')))
-
-// if (env === 'production') {
-//   app.use(compression())
-// }
-
-app.get('/', (req, res) => {
-  // res.render('index', { application: 'Hello!' })
-  res.render('index')
-})
-
-module.exports = app
+module.exports = createApp

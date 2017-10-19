@@ -13,13 +13,16 @@
     "yarn": "1.1.0"
   },
   "scripts": {
-    "server": "heroku local",
-    "test": "NODE_ENV=test ava"
+    "start": "heroku local",
+    "server": "nodemon --watch app --watch public --exec 'heroku local' --signal SIGTERM",
+    "test": "NODE_ENV=test ava",
+    "test:watch": "NODE_ENV=test ava --watch"
   },
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.22.0",
     "bunyan-debug-stream": "^1.0.8",
+    "nodemon": "^1.12.1",
     "standard": "^10.0.3",
     "supertest": "^3.0.0",
     "tern": "^0.21.0",
@@ -29,13 +32,16 @@
     "files": [
       "test/*.test.js"
     ],
+    "require": [
+      "./test/helpers/setup-browser-env.js"
+    ],
     "source": [
       "app/*.js"
     ],
     "tap": false,
     "color": true,
     "fail-fast": true,
-    "verbose": false
+    "verbose": true
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -46,7 +52,9 @@
     "express": "^4.15.4",
     "express-validator": "^4.2.0",
     "helmet": "^3.8.1",
-    "hjs": "^0.0.6",
+    "hyperscript": "^2.0.2",
+    "hyperscript-helpers": "^3.0.3",
+    "ramda": "^0.25.0",
     "throng": "^4.0.0"
   }
 }

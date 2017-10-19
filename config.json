@@ -1,0 +1,12 @@
+{
+  "name": "voa",
+  "production": {
+    "log_level": "info"
+  },
+  "development": {
+    "log_level": "debug"
+  },
+  "test": {
+    "log_level": "error"
+  }
+}
