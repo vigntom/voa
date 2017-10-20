@@ -21,6 +21,8 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.22.0",
+    "browser-env": "^3.2.1",
+    "jquery": "^3.2.1",
     "nodemon": "^1.12.1",
     "standard": "^10.0.3",
     "supertest": "^3.0.0",

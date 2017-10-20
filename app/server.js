@@ -9,6 +9,8 @@ const validator = require('express-validator')
 function createApp ({ config, log }) {
   const app = express()
 
+  log.debug(`app params: ${app}`)
+
   app.use(express.static(path.resolve(config.root, 'public')))
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(validator())
