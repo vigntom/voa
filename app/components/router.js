@@ -1,6 +1,6 @@
 const express = require('express')
 const staticPagesRouter = require('./static/router')
-const layout = require('./layout/app')
+const layout = require('./layouts/app')
 const home = require('./static/home')
 
 function componentsRouter (log) {
@@ -12,7 +12,7 @@ function componentsRouter (log) {
   })
 
   router.get('/', (req, res) => {
-    res.send(layout(home))
+    res.render('application', layout(home))
   })
 
   router.use('/static', staticPagesRouter(layout))

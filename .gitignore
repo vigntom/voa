@@ -61,3 +61,5 @@ typings/
 .tern-port
 
 tmp/*
+
+public/assets

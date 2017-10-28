@@ -1,7 +1,7 @@
 const path = require('path')
 const server = require('./app/server')
 const throng = require('throng')
-const config = require('./config.json')
+const config = require('./config/app.json')
 const createLogger = require('./lib/logger')
 
 const appConfig = Object.assign(config, {
