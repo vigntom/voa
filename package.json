@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "heroku local",
-    "heroku-postinstall": "webpack",
+    "heroku-postbuild": "webpack",
     "server": "nodemon --watch 'app' --watch 'public' --ext 'js,ejs,json' --exec 'heroku local' --signal SIGTERM",
     "test": "NODE_ENV=test ava",
     "test:watch": "NODE_ENV=test ava --watch"
