@@ -24,6 +24,10 @@ function createApp ({ config, log }) {
 
   app.use('/', router(log))
 
+  if (config.env === 'development') {
+    require('reload')(app)
+  }
+
   app.use((req, res, next) => {
     log.warn(`404: Page(${req.url}) not found`)
     res.status(404)

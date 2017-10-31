@@ -14,9 +14,8 @@
   },
   "scripts": {
     "start": "heroku local",
-    "prestart": "webpack",
     "heroku-postinstall": "webpack",
-    "server": "nodemon --watch app --watch public --exec 'yarn start' --signal SIGTERM",
+    "server": "nodemon --watch 'app' --watch 'public' --ext 'js,ejs,json' --exec 'heroku local' --signal SIGTERM",
     "test": "NODE_ENV=test ava",
     "test:watch": "NODE_ENV=test ava --watch"
   },
@@ -26,6 +25,7 @@
     "browser-env": "^3.2.1",
     "jquery": "^3.2.1",
     "nodemon": "^1.12.1",
+    "reload": "^2.2.2",
     "standard": "^10.0.3",
     "supertest": "^3.0.0",
     "tern": "^0.21.0",
