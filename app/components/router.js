@@ -1,6 +1,6 @@
 const express = require('express')
 const staticPagesRouter = require('./static/router')
-const layout = require('./layouts/app')
+const layout = require('./layouts/layout')
 const home = require('./static/home')
 
 function componentsRouter (log) {
