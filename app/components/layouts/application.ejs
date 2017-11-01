@@ -3,10 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <title><%= title %></title>
+    <script src="/public/assets/application.js" defer></script>
+
+    <% if (env === 'development') { %>
+      <script src="/reload/reload.js" async></script>
+    <% } %>
   </head>
   <body>
     <%- content %>
-    <script src="/public/assets/application.js"></script>
-    <script src="/reload/reload.js"></script>
   </body>
 </html>

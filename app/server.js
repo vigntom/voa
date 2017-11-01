@@ -22,7 +22,7 @@ function createApp ({ config, log }) {
     app.use(compression())
   }
 
-  app.use('/', router(log))
+  app.use('/', router(config, log))
 
   if (config.env === 'development') {
     require('reload')(app)
