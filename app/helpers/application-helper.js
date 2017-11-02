@@ -1,6 +1,6 @@
 const h = require('hyperscript')
 const { div } = require('hyperscript-helpers')(h)
-const layout = require('../../assets/javascript/layout')
+const layout = require('../assets/javascript/layout')
 
 function fullTitle (pageTitle = '') {
   const baseTitle = 'Vote Application'

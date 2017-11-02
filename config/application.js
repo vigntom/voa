@@ -1,6 +1,6 @@
 const path = require('path')
 const express = require('express')
-const router = require('./components/router')
+const router = require('./router')
 const compression = require('compression')
 const bodyParser = require('body-parser')
 const helmet = require('helmet')
@@ -10,7 +10,7 @@ function createApp ({ config, log }) {
   const app = express()
 
   app.set('view engine', 'ejs')
-  app.set('views', path.resolve(config.root, 'app', 'components', 'layouts'))
+  app.set('views', path.resolve(config.root, 'app', 'view', 'layouts'))
 
   app.use('/public', express.static(path.resolve(config.root, 'public')))
 

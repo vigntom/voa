@@ -12,21 +12,17 @@ module.exports = {
     filename: '[name].js',
     path: pathToAssets
   },
+  devtool: 'eval',
   module: {
     rules: [{
+      test: /\.jsx?$/,
+      loader: 'babel-loader'
+    }, {
       test: /\.(scss)$/,
       use: [
         'style-loader',
         'css-loader',
-        {
-          loader: 'postcss-loader',
-          options: {
-            plugins: () => ([
-              require('precss'),
-              require('autoprefixer')
-            ])
-          }
-        },
+        'postcss-loader',
         'sass-loader'
       ]
     }]

@@ -1,5 +1,5 @@
 const path = require('path')
-const server = require('./app/server')
+const server = require('./config/application')
 const throng = require('throng')
 const config = require('./config/app.json')
 const createLogger = require('./lib/logger')
