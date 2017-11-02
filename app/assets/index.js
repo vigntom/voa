@@ -1,5 +1,4 @@
 import 'bootstrap'
 import './javascript/layout'
 import './javascript/home'
-import './stylesheets/_custom.scss'
 import './stylesheets/main.scss'

@@ -1,0 +1,19 @@
+@import "utils";
+
+.bg-dark-lighter {
+  background: lighten($gray-800, 10%);
+  color: $gray-300;
+
+  &.form-control:focus {
+    background: lighten($gray-800, 20%);
+    color: $gray-300;
+  }
+}
+
+.border-top {
+  border-top: 1px $gray-300 solid;
+}
+
+.footer {
+  font-size: .9rem;
+}

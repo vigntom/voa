@@ -20,7 +20,7 @@ function componentsRouter (config, log) {
   })
 
   getTo('/', layout(home))
-  getTo('/static/about', layout(about))
+  getTo('/about', layout(about))
 
   return router
 }

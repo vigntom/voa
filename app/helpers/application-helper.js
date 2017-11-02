@@ -12,7 +12,7 @@ function fullTitle (pageTitle = '') {
 
 module.exports = function createLayout (env) {
   return params => {
-    const page = div('#application', [layout, params.content])
+    const page = layout(params.content)
 
     return {
       env,
