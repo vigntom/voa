@@ -1,3 +1,3 @@
-#Voting App
+# Voting App
 
-freeCodeCamp Dynamic Web Application Project
+## freeCodeCamp Dynamic Web Application Project

@@ -1,7 +1,6 @@
 const path = require('path')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const { DllPlugin, DefinePlugin } = require('webpack')
-const CompressionPlugin = require('compression-webpack-plugin')
 
 module.exports = function vendorConfig (dstPath) {
   return {
@@ -24,8 +23,7 @@ module.exports = function vendorConfig (dstPath) {
         path: path.join(dstPath, 'vendor', '[name]-manifest.json'),
         name: '[name]_[hash]'
       }),
-      new ManifestPlugin({ fileName: 'vendor/manifest.json' }),
-      new CompressionPlugin({ test: /.(js|css)$/ })
+      new ManifestPlugin({ fileName: 'vendor/manifest.json' })
     ]
   }
 }

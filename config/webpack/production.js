@@ -3,7 +3,6 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const ChunkManifestPlugin = require('chunk-manifest-webpack-plugin')
 const WebpackMd5Hash = require('webpack-md5-hash')
-const CompressionPlugin = require('compression-webpack-plugin')
 const webpack = require('webpack')
 const path = require('path')
 const { DefinePlugin, DllReferencePlugin } = webpack
@@ -51,7 +50,6 @@ module.exports = function productionConfig (dstPath) {
         filename: 'chunk-manifest.json',
         manifestVariable: 'webpackManifest'
       }),
-      new CompressionPlugin({ test: /.(js|css)$/ }),
       new DllReferencePlugin({
         context: '.',
         manifest: require(path.join(dstPath, 'vendor', 'utils-manifest.json'))
