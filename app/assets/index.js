@@ -1,4 +1,3 @@
-import 'bootstrap'
-import './javascript/layout'
 import './javascript/home'
+import './javascript/layout'
 import './stylesheets/main.scss'

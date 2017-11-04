@@ -1,39 +1,46 @@
+const path = require('path')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const webpack = require('webpack')
-const { resolve } = require('path')
+const merge = require('webpack-merge')
+const { ProvidePlugin } = webpack
 
-const pathToAssets = resolve(__dirname, 'public', 'assets')
+const srcPath = path.resolve(__dirname, 'app', 'assets')
+const dstPath = path.resolve(__dirname, 'public', 'assets')
 
-module.exports = {
-  entry: {
-    application: resolve(__dirname, 'app', 'assets', 'index.js')
-  },
+const config = {
+  context: srcPath,
   output: {
-    filename: '[name].js',
-    path: pathToAssets
+    path: dstPath
   },
-  devtool: 'eval',
   module: {
     rules: [{
       test: /\.jsx?$/,
       loader: 'babel-loader'
-    }, {
-      test: /\.(scss)$/,
-      use: [
-        'style-loader',
-        'css-loader',
-        'postcss-loader',
-        'sass-loader'
-      ]
     }]
   },
   plugins: [
-    new CleanWebpackPlugin([pathToAssets]),
-    new webpack.ProvidePlugin({
+    new CleanWebpackPlugin([dstPath], { exclude: ['vendor'] }),
+    new ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
       'window.jquery': 'jquery',
       Popper: ['popper.js', 'default']
     })
   ]
+}
+
+module.exports = function buildConfig (env) {
+  function envOrDefaultConfig (env) {
+    const concreteEnvs = ['production', 'vendor']
+    const envConfig = env =>
+      require(path.resolve('config', 'webpack', env))
+
+    if (concreteEnvs.includes(env)) {
+      return envConfig(env)(dstPath)
+    }
+
+    return envConfig('development')(dstPath)
+  }
+
+  return merge(config, envOrDefaultConfig(env))
 }
