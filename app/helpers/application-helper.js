@@ -1,5 +1,6 @@
-const h = require('hyperscript')
-const path = require('path')
+// const path = require('path')
+const { renderToString, renderToStaticMarkup } = require('react-dom/server')
+const h = require('react-hyperscript')
 const { script, link } = require('hyperscript-helpers')(h)
 const layout = require('../assets/javascript/layout')
 
@@ -11,6 +12,18 @@ function fullTitle (pageTitle = '') {
   return pageTitle + ' | ' + baseTitle
 }
 
+function StyleSheetLink ({ href }) {
+  return link({ href, rel: 'stylesheet' })
+}
+
+function JavascriptInclude (params) {
+  const options = { src: params.src }
+  if (params.defer !== undefined) { options.defer = '' }
+  if (params.async !== undefined) { options.async = '' }
+
+  return script(options)
+}
+
 function createAssetsList (env) {
   if (env === 'production') {
     const manifest = require('../../public/assets/manifest.json')
@@ -19,18 +32,19 @@ function createAssetsList (env) {
 
     const js = manifestList.filter(x => /.jsx?$/.test(x))
     const css = manifestList.filter(x => /.css$/.test(x))
-    const jsList = js.map(name => script({ src: `/public/assets/${name}` }))
-    const cssList = css.map(name =>
-      link({
-        href: `/public/assets/${name}`,
-        rel: 'stylesheet' }
-      )
+
+    const jsList = js.map(
+      name => JavascriptInclude({ src: `/public/assets/${name}` })
     )
 
-    return jsList.concat(cssList).map(x => x.outerHTML).join('')
+    const cssList = css.map(
+      name => StyleSheetLink({ href: `/public/assets/$name` })
+    )
+
+    return jsList.concat(cssList).map(x => renderToStaticMarkup(x)).join('')
   }
 
-  return script({ src: '/public/assets/application.js' }).outerHTML
+  return renderToStaticMarkup(script({ src: '/public/assets/application.js' }))
 }
 
 module.exports = function createLayout (env) {
@@ -41,7 +55,7 @@ module.exports = function createLayout (env) {
       env,
       title: fullTitle(params.title),
       assets: createAssetsList(env),
-      content: page.outerHTML
+      content: renderToString(page)
     }
   }
 }

@@ -41,9 +41,6 @@
     "popper.js": "^1.12.6",
     "postcss-loader": "^2.0.8",
     "precss": "^2.0.0",
-    "ramda": "^0.25.0",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
     "reload": "^2.2.2",
     "sass-loader": "^6.0.6",
     "standard": "^10.0.3",
@@ -84,8 +81,11 @@
     "express": "^4.15.4",
     "express-validator": "^4.2.0",
     "helmet": "^3.8.1",
-    "hyperscript": "^2.0.2",
     "hyperscript-helpers": "^3.0.3",
+    "ramda": "^0.25.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-hyperscript": "^3.0.0",
     "throng": "^4.0.0"
   }
 }

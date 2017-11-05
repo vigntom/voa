@@ -1,11 +1,11 @@
-const h = require('hyperscript')
+const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 
-const { header, footer, div, a, nav, button, span, form, input, small } = hh(h)
+const { header, footer, div, a, nav, button, span, form, input } = hh(h)
 
-function createHeader () {
-  return header(
-    nav('.navbar.navbar-expand-lg.navbar-dark.bg-dark',
+function CreateHeader () {
+  return header([
+    nav('.navbar.navbar-expand-lg.navbar-dark.bg-dark', [
       div('.container', [
         a('.navbar-brand', { href: '#' }, 'VoA'),
         button('.navbar-toggler', {
@@ -33,12 +33,12 @@ function createHeader () {
           ])
         ])
       ])
-    )
-  )
+    ])
+  ])
 }
 
-function createFooter (url) {
-  return footer('.footer.container.py-3',
+function CreateFooter (props) {
+  return footer('.footer.container.py-3', [
     nav('.row.py-3.border-top', [
       div('.col-lg.text-muted.px-0', [
         'The ',
@@ -51,9 +51,9 @@ function createFooter (url) {
         a('.pl-3', { href: '#' }, 'Contact')
       ])
     ])
-  )
+  ])
 }
 
-module.exports = function layout (page) {
-  return div('#application', [createHeader(), page, createFooter()])
+module.exports = function Layout ({ page }) {
+  return div('#application', [CreateHeader(), page(), CreateFooter()])
 }

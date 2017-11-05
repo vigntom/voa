@@ -1,4 +1,5 @@
 const path = require('path')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const { DllPlugin, DefinePlugin } = require('webpack')
 
@@ -7,8 +8,7 @@ module.exports = function vendorConfig (dstPath) {
     entry: {
       'utils': ['ramda'],
       'bootstrap': ['bootstrap'],
-      'react': ['react', 'react-dom'],
-      'hyperscript': ['hyperscript', 'hyperscript-helpers']
+      'react': ['react', 'react-dom']
     },
     output: {
       filename: 'vendor/[name].bundle.js',
@@ -16,6 +16,7 @@ module.exports = function vendorConfig (dstPath) {
     },
     devtool: 'source-map',
     plugins: [
+      new CleanWebpackPlugin([path.join(dstPath, 'vendor')]),
       new DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
