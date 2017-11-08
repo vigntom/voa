@@ -3,11 +3,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const ChunkManifestPlugin = require('chunk-manifest-webpack-plugin')
 const WebpackMd5Hash = require('webpack-md5-hash')
-const webpack = require('webpack')
-const path = require('path')
-const { DefinePlugin, DllReferencePlugin } = webpack
 
-module.exports = function productionConfig (dstPath) {
+module.exports = function productionConfig ({ dstPath }) {
   return {
     entry: {
       application: './index.js'
@@ -32,11 +29,6 @@ module.exports = function productionConfig (dstPath) {
       }]
     },
     plugins: [
-      new DefinePlugin({
-        'process.env': {
-          'NODE_ENV': JSON.stringify('production')
-        }
-      }),
       new UglifyJsPlugin({
         sourceMap: true,
         parallel: true
@@ -49,22 +41,6 @@ module.exports = function productionConfig (dstPath) {
       new ChunkManifestPlugin({
         filename: 'chunk-manifest.json',
         manifestVariable: 'webpackManifest'
-      }),
-      new DllReferencePlugin({
-        context: '.',
-        manifest: require(path.join(dstPath, 'vendor', 'utils-manifest.json'))
-      }),
-      new DllReferencePlugin({
-        context: '.',
-        manifest: require(path.join(dstPath, 'vendor', 'bootstrap-manifest.json'))
-      }),
-      new DllReferencePlugin({
-        context: '.',
-        manifest: require(path.join(dstPath, 'vendor', 'react-manifest.json'))
-      }),
-      new DllReferencePlugin({
-        context: '.',
-        manifest: require(path.join(dstPath, 'vendor', 'hyperscript-manifest.json'))
       })
     ]
   }

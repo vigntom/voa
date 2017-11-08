@@ -17,9 +17,10 @@
     "server": "nodemon --watch 'app' --watch 'config' --watch 'public' --ext 'js,ejs,json' --exec 'heroku local' --signal SIGTERM",
     "test": "NODE_ENV=test ava",
     "test:watch": "NODE_ENV=test ava --watch",
-    "build:vendor": "webpack --env=vendror",
-    "build:dev": "webpack --env=development --watch",
-    "build": "webpack --env=production"
+    "build": "webpack --env.production",
+    "build:vendor": "webpack --env.production --env.vendor",
+    "build:dev": "webpack --env.development",
+    "build:dev:vendor": "webpack --env.development --env.vendor"
   },
   "license": "MIT",
   "devDependencies": {

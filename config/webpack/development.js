@@ -1,8 +1,8 @@
 const { DefinePlugin } = require('webpack')
 
-module.exports = function developmentConfig () {
+module.exports = function developmentConfig ({ dstPath }) {
   return {
-    entry: ['./index.js', 'bootstrap'],
+    entry: './index.js',
     output: {
       filename: 'application.js'
     },
@@ -20,9 +20,7 @@ module.exports = function developmentConfig () {
     },
     plugins: [
       new DefinePlugin({
-        'process.env': {
-          'NODE_ENV': JSON.stringify('development')
-        }
+        'process.env': { 'NODE_ENV': JSON.stringify('development') }
       })
     ]
   }

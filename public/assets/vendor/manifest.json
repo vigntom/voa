@@ -1,8 +1,0 @@
-{
-  "bootstrap.js": "vendor/bootstrap.bundle.js",
-  "bootstrap.js.map": "vendor/bootstrap.bundle.js.map",
-  "react.js": "vendor/react.bundle.js",
-  "react.js.map": "vendor/react.bundle.js.map",
-  "utils.js": "vendor/utils.bundle.js",
-  "utils.js.map": "vendor/utils.bundle.js.map"
-}

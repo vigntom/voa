@@ -1,30 +1,41 @@
 const path = require('path')
+const merge = require('webpack-merge')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
-const ManifestPlugin = require('webpack-manifest-plugin')
 const { DllPlugin, DefinePlugin } = require('webpack')
 
-module.exports = function vendorConfig (dstPath) {
-  return {
+module.exports = function vendorConfig ({ env, dstPath }) {
+  const config = {
     entry: {
       'utils': ['ramda'],
       'bootstrap': ['bootstrap'],
       'react': ['react', 'react-dom']
     },
     output: {
-      filename: 'vendor/[name].bundle.js',
+      path: dstPath,
+      filename: 'vendor/[name].dll.js',
       library: '[name]_[hash]'
     },
-    devtool: 'source-map',
     plugins: [
       new CleanWebpackPlugin([path.join(dstPath, 'vendor')]),
       new DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('production')
+        'process.env.NODE_ENV': JSON.stringify(env)
       }),
       new DllPlugin({
         path: path.join(dstPath, 'vendor', '[name]-manifest.json'),
         name: '[name]_[hash]'
-      }),
-      new ManifestPlugin({ fileName: 'vendor/manifest.json' })
+      })
     ]
   }
+
+  if (env === 'production') {
+    const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+
+    return merge(config, {
+      plugins: [
+        new UglifyJsPlugin({ parallel: true })
+      ]
+    })
+  }
+
+  return config
 }
