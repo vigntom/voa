@@ -7,7 +7,11 @@ test.cb('Should get home', t => {
 })
 
 test.cb('Should get about', t => {
-  req2server(server).get('/static/about').expect(200, t.end)
+  req2server(server).get('/about').expect(200, t.end)
+})
+
+test.cb('Should get contact', t => {
+  req2server(server).get('/contact').expect(200, t.end)
 })
 
 test.cb('Should get not found', t => {

@@ -7,7 +7,7 @@ function CreateHeader () {
   return header([
     nav('.navbar.navbar-expand-lg.navbar-dark.bg-dark', [
       div('.container', [
-        a('.navbar-brand', { href: '#' }, 'VoA'),
+        a('.navbar-brand', { href: '/' }, 'VoA'),
         button('.navbar-toggler', {
           type: 'button',
           'data-toggle': 'collapse',
@@ -42,13 +42,13 @@ function CreateFooter (props) {
     nav('.row.py-3.border-top', [
       div('.col-lg.text-muted.px-0', [
         'The ',
-        a({ href: '#' }, 'Votting Application'),
+        a({ href: '/' }, 'Votting Application'),
         ' by ',
         a({ href: 'https://www.freecodecamp.org/vigntom2708' }, 'Aleksandr Ignatyev')
       ]),
       nav('.col-lg.text-right.px-0', [
-        a('.pl-3', { href: '#' }, 'About'),
-        a('.pl-3', { href: '#' }, 'Contact')
+        a('.pl-3', { href: '/about' }, 'About'),
+        a('.pl-3', { href: '/contact' }, 'Contact')
       ])
     ])
   ])

@@ -61,9 +61,6 @@
     "require": [
       "./test/helpers/setup-browser-env.js"
     ],
-    "source": [
-      "app/*.js"
-    ],
     "tap": false,
     "color": true,
     "fail-fast": true,
