@@ -82,6 +82,7 @@
     "express-validator": "^4.2.0",
     "helmet": "^3.8.1",
     "hyperscript-helpers": "^3.0.3",
+    "mongoose": "^4.13.1",
     "ramda": "^0.25.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
