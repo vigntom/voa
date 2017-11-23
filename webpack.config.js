@@ -30,15 +30,15 @@ function basicConfig ({ env, srcPath, dstPath }) {
         Popper: ['popper.js', 'default']
       }),
       new DllReferencePlugin({
-        context: '.',
+        context: path.join(dstPath),
         manifest: require(path.join(dstPath, 'vendor', 'utils-manifest.json'))
       }),
       new DllReferencePlugin({
-        context: '.',
+        context: path.join(dstPath),
         manifest: require(path.join(dstPath, 'vendor', 'bootstrap-manifest.json'))
       }),
       new DllReferencePlugin({
-        context: '.',
+        context: path.join(dstPath),
         manifest: require(path.join(dstPath, 'vendor', 'react-manifest.json'))
       })
     ]

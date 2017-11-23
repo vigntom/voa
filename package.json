@@ -8,7 +8,7 @@
   },
   "author": "Aleksandr Ignatyev <vigntom.2708@gmail.com>",
   "engines": {
-    "node": "8.9.0",
+    "node": "8.9.1",
     "npm": "5.4.2",
     "yarn": "1.2.1"
   },
@@ -17,10 +17,12 @@
     "server": "nodemon --watch 'app' --watch 'config' --watch 'public' --ext 'js,ejs,json' --exec 'heroku local' --signal SIGTERM",
     "test": "NODE_ENV=test ava",
     "test:watch": "NODE_ENV=test ava --watch",
-    "build": "webpack --env.production",
-    "build:vendor": "webpack --env.production --env.vendor",
-    "build:dev": "webpack --env.development",
-    "build:dev:vendor": "webpack --env.development --env.vendor"
+    "build": "webpack --env.production --progress",
+    "build:vendor": "webpack --env.production --env.vendor --progress",
+    "build:full": "yarn build:vendor && yarn build",
+    "build:dev": "webpack --env.development --progress",
+    "build:dev:vendor": "webpack --env.development --env.vendor",
+    "build:dev:full": "yarn build:dev:vendor && yarn build:dev"
   },
   "license": "MIT",
   "devDependencies": {
