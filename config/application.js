@@ -1,5 +1,6 @@
 const path = require('path')
 const express = require('express')
+const createDbConnection = require('../lib/db')
 const router = require('./router')
 const compression = require('compression')
 const bodyParser = require('body-parser')
@@ -8,6 +9,8 @@ const validator = require('express-validator')
 
 function createApp ({ config, log }) {
   const app = express()
+
+  createDbConnection(log)
 
   app.set('view engine', 'ejs')
   app.set('views', path.resolve(config.root, 'app', 'view', 'layouts'))
