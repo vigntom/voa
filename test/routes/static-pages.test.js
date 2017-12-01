@@ -1,5 +1,6 @@
+import '../helpers/setup-browser-env'
 import req2server from 'supertest'
-import server from '../index'
+import server from '../../index'
 import test from 'ava'
 
 test.cb('Should get home', t => {
