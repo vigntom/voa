@@ -21,6 +21,7 @@
     "build:vendor": "webpack --env.production --env.vendor --progress",
     "build:full": "yarn build:vendor && yarn build",
     "build:dev": "webpack --env.development --progress",
+    "build:dev:watch": "webpack --env.development --progress --watch",
     "build:dev:vendor": "webpack --env.development --env.vendor",
     "build:dev:full": "yarn build:dev:vendor && yarn build:dev",
     "heroku-postbuild": "yarn build:full"
@@ -29,6 +30,7 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "browser-env": "^3.2.1",
+    "dotenv": "^4.0.0",
     "nodemon": "^1.12.1",
     "reload": "^2.2.2",
     "standard": "^10.0.3",
@@ -40,6 +42,7 @@
       "test/*.test.js"
     ],
     "require": [
+      "./test/helpers/setup-env.js",
       "./test/helpers/setup-browser-env.js"
     ],
     "tap": false,
