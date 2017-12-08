@@ -4,6 +4,8 @@ const uniqueValidator = require('mongoose-unique-validator')
 const { isEmail, isLength } = require('validator')
 const bcrypt = require('bcrypt')
 
+const cost = 10
+
 const userSchema = new Schema({
   username: {
     type: String,
@@ -29,26 +31,31 @@ const userSchema = new Schema({
 })
 
 userSchema.virtual('password')
-  .get(() => this._password)
-  .set(createPasswordDigest)
+  .get(function () { return this._password })
+  .set(function (value) { this._password = value })
 
 userSchema.virtual('passwordConfirmation')
-  .get(() => this._passwordConfirmation)
-  .set(rememberPasswordConfirmation)
+  .get(function () { return this._passwordConfirmation })
+  .set(function (value) { this._passwordConfirmation = value })
+
+userSchema.pre('validate', function (next) {
+  const user = this
+
+  bcrypt.hash(user.password, cost, function (err, hash) {
+    if (err) { return next(err) }
+
+    user.passwordDigest = hash
+    next()
+  })
+})
+
+userSchema.pre('update', function (next) {
+  this.options.runValidators = true
+  next()
+})
 
 userSchema.path('email').validate(emailValidator)
 userSchema.path('passwordDigest').validate(passwordDigestValidator)
-
-function createPasswordDigest (value) {
-  const salt = bcrypt.genSaltSync()
-
-  this._password = value
-  this.passwordDigest = bcrypt.hashSync(value, salt)
-}
-
-function rememberPasswordConfirmation (value) {
-  this._passwordConfirmation = value
-}
 
 function passwordDigestValidator (value) {
   if (this.isNew && !this._password) {
