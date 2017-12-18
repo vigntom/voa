@@ -2,8 +2,6 @@ import test from 'ava'
 import db from '../helpers/database'
 import User from '../../app/models/user'
 
-db.setup(User)
-
 const login = {
   username: 'foo',
   email: 'foo@example.com',
@@ -112,45 +110,40 @@ test.cb('email should not be too long', t => {
   })
 }())
 
-test.serial.cb('username should be unique', t => {
-  const user = new User(login)
-
-  function validate (v) {
-    t.truthy(v.errors.username)
-    t.end()
-  }
-
-  function saveAndValidate (err) {
-    const clone = new User(login)
-
-    t.ifError(err)
-    clone.validate(validate)
-  }
-
-  user.save(saveAndValidate)
-})
-
-test.serial.cb('email should be unique', t => {
-  const user = new User(login)
-
-  function validate (v) {
-    t.truthy(v.errors.username)
-    t.end()
-  }
-
-  function saveAndValidate (err) {
-    const clone = new User(login)
-
-    t.ifError(err)
-    clone.validate(validate)
-  }
-
-  user.save(saveAndValidate)
-})
-
 test('email should be lowercase', t => {
   const email = 'FOO1@exAmpLE.CoM'
   const user = new User(Object.assign({}, login, { email }))
 
   t.is(user.email, email.toLowerCase())
+})
+
+test.cb('password should be present', t => {
+  const user = new User(login)
+  user.password = user.passwordConfirmation = '    '
+
+  user.validate(v => {
+    t.truthy(v.errors.password)
+    t.end()
+  })
+})
+
+test.cb('password should have a minimum length', t => {
+  const user = new User(login)
+  user.password = user.passwordConfirmation = 'abcde'
+
+  user.validate(v => {
+    t.truthy(v.errors.password)
+    t.end()
+  })
+})
+
+test.cb('password and confirmation should match', t => {
+  const user = new User(login)
+  user.password = 'password'
+  user.passwordConfirmation = 'mismatch'
+
+  user.validate(v => {
+    t.truthy(v.errors.password)
+    t.end()
+  })
 })

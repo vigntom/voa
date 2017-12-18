@@ -23,12 +23,13 @@ const userSchema = new Schema({
     lowercase: true
   },
   passwordDigest: {
-    type: String,
-    required: true
+    type: String
   }
 }, {
   timestamps: true
 })
+
+userSchema.plugin(uniqueValidator)
 
 userSchema.virtual('password')
   .get(function () { return this._password })
@@ -38,38 +39,10 @@ userSchema.virtual('passwordConfirmation')
   .get(function () { return this._passwordConfirmation })
   .set(function (value) { this._passwordConfirmation = value })
 
-userSchema.pre('validate', function (next) {
-  const user = this
-
-  bcrypt.hash(user.password, cost, function (err, hash) {
-    if (err) { return next(err) }
-
-    user.passwordDigest = hash
-    next()
-  })
-})
-
-userSchema.pre('update', function (next) {
-  this.options.runValidators = true
-  next()
-})
-
 userSchema.path('email').validate(emailValidator)
-userSchema.path('passwordDigest').validate(passwordDigestValidator)
 
-function passwordDigestValidator (value) {
-  if (this.isNew && !this._password) {
-    this.invalidate('password', "Password can't be blank")
-  }
-
-  if (!isLength(this._password, { min: 6 })) {
-    this.invalidate('password', 'Password is too short (minimum is 6 characters)')
-  }
-
-  if (this._password !== this._passwordConfirmation) {
-    this.invalidate('passwordConfirmation', "Confirmation doesn't match passwrod")
-  }
-}
+userSchema.pre('validate', passwordValidator)
+userSchema.pre('save', createDigitalPassword)
 
 function emailValidator (value) {
   if (!isEmail(value)) {
@@ -77,6 +50,32 @@ function emailValidator (value) {
   }
 }
 
-userSchema.plugin(uniqueValidator)
+function passwordValidator (next) {
+  if (this.isNew && !this.password) {
+    this.invalidate('password', "Password can't be blank")
+  }
+
+  if (!isLength(this.password, { min: 6 })) {
+    this.invalidate('password', 'Password is too short (minimum is 6 characters)')
+  }
+
+  if (this.password !== this.passwordConfirmation) {
+    this.invalidate('password', "Confirmation doesn't match password")
+  }
+
+  return next()
+}
+
+function createDigitalPassword (next) {
+  const user = this
+
+  function hashAsDigitalPassword (err, hash) {
+    if (err) { return next(err) }
+    user.passwordDigest = hash
+    return next()
+  }
+
+  return bcrypt.hash(user.password, cost, hashAsDigitalPassword)
+}
 
 module.exports = mongoose.model('User', userSchema)
