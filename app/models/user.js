@@ -78,4 +78,34 @@ function createDigitalPassword (next) {
   return bcrypt.hash(user.password, cost, hashAsDigitalPassword)
 }
 
-module.exports = mongoose.model('User', userSchema)
+userSchema.statics.authenticate = function (identifier, password, cb) {
+  const error = 'User or passord are wrong'
+
+  function authenticateByEmail (email, password, cb) {
+    return User.findOne({ email })
+      .exec((err, user) => {
+        if (err) { return cb(err) }
+        if (!user) { return cb(new Error(error)) }
+        return authenticate(password, user, cb)
+      })
+  }
+
+  function authenticate (password, user, cb) {
+    return bcrypt.compare(password, user.passwordDigest, (err, res) => {
+      if (err) { return cb(err) }
+      if (res) { return cb(null, user) }
+      return cb(new Error(error))
+    })
+  }
+
+  return User.findOne({ username: identifier })
+    .exec((err, user) => {
+      if (err) { return cb(err) }
+      if (!user) { return authenticateByEmail(identifier, password, cb) }
+      return authenticate(password, user, cb)
+    })
+}
+
+const User = mongoose.model('User', userSchema)
+
+module.exports = User

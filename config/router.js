@@ -1,42 +1,25 @@
 const express = require('express')
-const { fullTitle } = require('../app/helpers/application-helper')
-const createAssetsList = require('../lib/assets-list')
-const layout = require('../app/assets/javascript/layout')
-const home = require('../app/assets/javascript/home')
-const about = require('../app/assets/javascript/about')
-const contact = require('../app/assets/javascript/contact')
-const { renderToString } = require('react-dom/server')
+const staticRouter = require('../app/routers/static')
+const usersRouter = require('../app/routers/users')
 
-const router = express.Router()
-
-function createLayoutFills (env) {
-  return ({ title, content }) => ({
-    env,
-    title: fullTitle(title),
-    assets: createAssetsList(env),
-    content: renderToString(layout({ page: content }))
-  })
-}
-
-function getTo (route, page) {
-  return router.get(route, (req, res) => {
-    res.render('application', page)
-  })
-}
-
-function componentsRouter (config, log) {
-  const fill = createLayoutFills(config.env)
+function routes (bParser, csrfProtection) {
+  const router = express.Router()
 
   router.use((req, res, next) => {
+    const log = req.app.locals.log
     log.debug(req.method, req.url)
+    req.app.locals.messages = req.flash()
     next()
   })
 
-  getTo('/', fill({ title: 'Home', content: home }))
-  getTo('/about', fill({ title: 'About', content: about }))
-  getTo('/contact', fill({ title: 'Contact', content: contact }))
+  router.get('/', csrfProtection, staticRouter.home())
+  router.get('/about', staticRouter.about())
+  router.get('/contact', staticRouter.contact())
+  router.get('/signup', csrfProtection, usersRouter.actions.new())
+
+  router.use('/users', usersRouter.router(bParser, csrfProtection))
 
   return router
 }
 
-module.exports = componentsRouter
+module.exports = routes

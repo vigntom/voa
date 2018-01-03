@@ -5,6 +5,6 @@ const { div, h1 } = hh(h)
 
 module.exports = function About () {
   return div('.main', [
-    h1('About page')
+    h1('.page-header', 'About page')
   ])
 }

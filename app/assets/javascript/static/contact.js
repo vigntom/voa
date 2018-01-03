@@ -5,6 +5,6 @@ const { div, h1 } = hh(h)
 
 module.exports = function Contact () {
   return div('.main', [
-    h1('Contact page')
+    h1('.page-header', 'Contact page')
   ])
 }

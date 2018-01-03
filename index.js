@@ -3,6 +3,7 @@ const server = require('./config/application')
 const throng = require('throng')
 const config = require('./config/app.json')
 const createLogger = require('./lib/logger')
+const createDbConnection = require('./lib/db')
 
 const appConfig = Object.assign(config, {
   root: __dirname,
@@ -13,8 +14,9 @@ const appConfig = Object.assign(config, {
 
 const log = createLogger(appConfig)
 const app = server({ log, config: appConfig })
-
 const workers = process.env.WEB_CONCURRENCY || 1
+
+createDbConnection(log)
 
 switch (config.env) {
   case 'production':

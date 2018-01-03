@@ -1,10 +1,10 @@
 import test from 'ava'
-import db from '../helpers/database'
+import '../helpers/database'
 import User from '../../app/models/user'
 
 const login = {
-  username: 'foo',
-  email: 'foo@example.com',
+  username: 'test',
+  email: 'test@example.com',
   password: 'abc123',
   passwordConfirmation: 'abc123'
 }

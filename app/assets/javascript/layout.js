@@ -28,8 +28,8 @@ function CreateHeader () {
               }),
               button('.btn btn-outline-success my-2 my-sm-0', { type: 'submit' }, 'Search')
             ]),
-            a('.nav-item.nav-link', { href: '#' }, 'Sign in'),
-            a('.nav-item.nav-link', { href: '#' }, 'Sign up')
+            a('.nav-item.nav-link', { href: '/signin' }, 'Sign in'),
+            a('.nav-item.nav-link', { href: '/signup' }, 'Sign up')
           ])
         ])
       ])
@@ -37,9 +37,9 @@ function CreateHeader () {
   ])
 }
 
-function CreateFooter (props) {
-  return footer('.footer.container.py-3', [
-    nav('.row.py-3.border-top', [
+function Footer (props) {
+  return footer('.container-fluid.py-3', [
+    nav('.row.mx-0.py-3.border-top', [
       div('.col-lg.text-muted.px-0', [
         'The ',
         a({ href: '/' }, 'Votting Application'),
@@ -54,6 +54,20 @@ function CreateFooter (props) {
   ])
 }
 
-module.exports = function Layout ({ page }) {
-  return div('#application', [CreateHeader(), page(), CreateFooter()])
+function MessageDesk (messages) {
+  const msgTypes = Object.keys(messages)
+  const alert = msgType => div(`.alert.alert-${msgType}`, messages[msgType])
+
+  if (msgTypes.length > 0) { return div(msgTypes.map(alert)) }
+
+  return null
+}
+
+module.exports = function Layout ({ page, messages }) {
+  return div('#application', [
+    CreateHeader(),
+    MessageDesk(messages),
+    page,
+    Footer()
+  ])
 }

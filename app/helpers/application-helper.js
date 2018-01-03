@@ -1,3 +1,6 @@
+const layout = require('../assets/javascript/layout')
+const { renderToString } = require('react-dom/server')
+
 function fullTitle (pageTitle = '') {
   const baseTitle = 'Vote Application'
 
@@ -6,4 +9,11 @@ function fullTitle (pageTitle = '') {
   return pageTitle + ' | ' + baseTitle
 }
 
-module.exports = { fullTitle }
+function fill ({ title, page }) {
+  return {
+    title: fullTitle(title),
+    content: messages => renderToString(layout({ page, messages }))
+  }
+}
+
+module.exports = { fullTitle, fill }
