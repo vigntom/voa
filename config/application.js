@@ -3,7 +3,6 @@ const express = require('express')
 const compression = require('compression')
 const bodyParser = require('body-parser')
 const helmet = require('helmet')
-// const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 const csrf = require('csurf')
 const flash = require('connect-flash')
@@ -24,7 +23,6 @@ function createApp ({ config, log }) {
   app.use('/public', express.static(path.resolve(config.root, 'public')))
 
   app.use(helmet())
-  // app.use(cookieParser())
   app.use(cookieSession({
     name: 'session',
     keys: ['test']
