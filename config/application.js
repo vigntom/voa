@@ -16,7 +16,7 @@ function createApp ({ config, log }) {
   app.locals.title = 'Votting Application'
   app.locals.log = log
   app.locals.env = config.env
-  app.locals.assets = createAssetsList()
+  app.locals.assets = createAssetsList(config.env)
 
   app.set('view engine', 'ejs')
   app.set('views', path.resolve(config.root, 'app', 'view', 'layouts'))
