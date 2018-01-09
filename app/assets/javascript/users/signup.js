@@ -4,31 +4,47 @@ const pluralize = require('pluralize')
 
 const { div, ul, li, form, label, input, small, button } = hh(h)
 
-function ErrorMsg (errors) {
-  if (!Array.isArray(errors)) { return null }
+function FormFor (selector, params, children) {
+  const defaultParams = { acceptCharset: 'UTF-8', method: 'post' }
+  const formParams = Object.assign({}, defaultParams, params)
+
+  return form(selector, formParams, children)
+}
+
+function Token ({ id, value }) {
+  return input({ type: 'hidden', id, name: '_csrf', value })
+}
+
+function ErrorMsg (err) {
+  if (!err) { return null }
+
+  const errors = Object.values(err)
 
   return div('.error-msg', [
     div('.alert.alert-danger',
-      `The form contains ${pluralize('error', errors.length)}`
+      `The form contains ${pluralize('error', errors.length, true)}`
     ),
     ul(errors.map(msg => li(msg.message)))
   ])
 }
 
+function maybeErrorField (name, errors) {
+  if (!errors) { return '' }
+  if (errors[name]) { return 'is-invalid' }
+  return 'is-valid'
+}
+
 function SignUp ({ user, errors, csrfToken }) {
-  return form('#new-user.new-user', {
-    acceptCharset: 'UTF-8',
-    action: '/users',
-    method: 'post'
-  }, [
-    input({ type: 'hidden', id: 'csrf', name: '_csrf', value: csrfToken }),
+  return FormFor('#new-user.new-user', { action: '/users' }, [
+    Token({ id: 'csrf', value: csrfToken }),
     ErrorMsg(errors),
     div('.form-group', [
       label({ htmlFor: 'signup-username' }, 'Username'),
       input('#signup-username.form-control', {
         name: 'username',
-        value: user.username,
-        placeholder: 'Pic a username'
+        defaultValue: user.username,
+        placeholder: 'Pic a username',
+        className: maybeErrorField('username', errors)
       })
     ]),
     div('.form-group', [
@@ -36,8 +52,9 @@ function SignUp ({ user, errors, csrfToken }) {
       input('#signup-email.form-control', {
         name: 'email',
         type: 'email',
-        value: user.email,
-        placeholder: 'Enter email'
+        defaultValue: user.email,
+        placeholder: 'Enter email',
+        className: maybeErrorField('email', errors)
       })
     ]),
     div('.form-group', [
@@ -46,7 +63,8 @@ function SignUp ({ user, errors, csrfToken }) {
         name: 'password',
         type: 'password',
         'aria-describedby': 'password-help',
-        placeholder: 'Password'
+        placeholder: 'Password',
+        className: maybeErrorField('password', errors)
       }),
       small('#password-help.form-text.text-muted',
         'Use at least one letter, one number and six characters.'

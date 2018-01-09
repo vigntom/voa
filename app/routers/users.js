@@ -50,10 +50,7 @@ const actions = {
     const user = new User(R.pick(userFields, req.body))
 
     return user.save((err, who) => {
-      if (err) {
-        const errors = R.values(err.errors)
-        return actions.new(user, errors)(req, res)
-      }
+      if (err) { return actions.new(user, err.errors)(req, res) }
 
       req.flash('success', 'Welcome to the Votting Application')
       return res.redirect(`/users/${who.id}`)
