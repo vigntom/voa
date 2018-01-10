@@ -58,14 +58,14 @@ const actions = {
   }
 }
 
-function createUserRouter (bParser, csrfProtection) {
+function createUserRouter () {
   const router = express.Router()
 
   router.get('/', actions.index())
-  router.get('/new', csrfProtection, actions.new())
+  router.get('/new', actions.new())
   router.get('/:id', actions.show())
 
-  router.post('/', bParser.urlencoded, csrfProtection, actions.create())
+  router.post('/', actions.create())
 
   return router
 }

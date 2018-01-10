@@ -1,4 +1,4 @@
-import '../helpers/setup-browser-env'
+import '../helpers/setup-env'
 import req2server from 'supertest'
 import server from '../../index'
 import test from 'ava'

@@ -29,12 +29,13 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.22.0",
-    "browser-env": "^3.2.1",
     "dotenv": "^4.0.0",
+    "jsdom": "^11.5.1",
     "nodemon": "^1.14.8",
     "reload": "^2.2.2",
     "standard": "^10.0.3",
-    "supertest": "^3.0.0"
+    "supertest": "^3.0.0",
+    "zombie": "^5.0.7"
   },
   "ava": {
     "tap": false,

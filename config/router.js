@@ -2,7 +2,7 @@ const express = require('express')
 const staticRouter = require('../app/routers/static')
 const usersRouter = require('../app/routers/users')
 
-function routes (bParser, csrfProtection) {
+function routes () {
   const router = express.Router()
 
   router.use((req, res, next) => {
@@ -12,12 +12,12 @@ function routes (bParser, csrfProtection) {
     next()
   })
 
-  router.get('/', csrfProtection, staticRouter.home())
+  router.get('/', staticRouter.home())
   router.get('/about', staticRouter.about())
   router.get('/contact', staticRouter.contact())
-  router.get('/signup', csrfProtection, usersRouter.actions.new())
+  router.get('/signup', usersRouter.actions.new())
 
-  router.use('/users', usersRouter.router(bParser, csrfProtection))
+  router.use('/users', usersRouter.router())
 
   return router
 }

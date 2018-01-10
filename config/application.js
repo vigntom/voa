@@ -27,19 +27,18 @@ function createApp ({ config, log }) {
     name: 'session',
     keys: ['test']
   }))
+
+  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(bodyParser.json())
+  app.use(csrf({ cookie: false }))
+
   app.use(flash())
 
   if (config.env === 'production') {
     app.use(compression())
   }
 
-  const bParser = {
-    urlencoded: bodyParser.urlencoded({ extended: false })
-  }
-
-  const csrfProtection = csrf({ cookie: false })
-
-  app.use('/', routes(bParser, csrfProtection))
+  app.use('/', routes())
 
   if (config.env === 'development') {
     require('reload')(app)
