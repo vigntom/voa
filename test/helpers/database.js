@@ -1,4 +1,3 @@
-require('./setup-env')
 require('../../index')
 const test = require('ava')
 

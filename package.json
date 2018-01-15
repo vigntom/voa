@@ -34,13 +34,15 @@
     "nodemon": "^1.14.8",
     "reload": "^2.2.2",
     "standard": "^10.0.3",
-    "supertest": "^3.0.0",
-    "zombie": "^5.0.7"
+    "supertest": "^3.0.0"
   },
   "ava": {
     "tap": false,
     "color": true,
-    "verbose": true
+    "verbose": true,
+    "require": [
+      "./test/helpers/setup-env.js"
+    ]
   },
   "dependencies": {
     "autoprefixer": "^7.1.6",
