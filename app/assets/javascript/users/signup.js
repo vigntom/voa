@@ -1,19 +1,9 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const pluralize = require('pluralize')
+const { FormFor, Token } = require('../../../helpers/view-helper')
 
-const { div, ul, li, form, label, input, small, button } = hh(h)
-
-function FormFor (selector, params, children) {
-  const defaultParams = { acceptCharset: 'UTF-8', method: 'post' }
-  const formParams = Object.assign({}, defaultParams, params)
-
-  return form(selector, formParams, children)
-}
-
-function Token ({ id, value }) {
-  return input({ type: 'hidden', id, name: '_csrf', value })
-}
+const { div, ul, li, label, input, small, button } = hh(h)
 
 function ErrorMsg (err) {
   if (!err) { return null }
@@ -79,13 +69,7 @@ function SignUp ({ user, errors, csrfToken }) {
         placeholder: 'Confirmation'
       })
     ]),
-    div('.form-check', [
-      label('.form-check-label', [
-        input('.form-check-input', { type: 'checkbox' }),
-        'Check me out'
-      ])
-    ]),
-    button('.btn.btn-block.btn-primary', { type: 'submit' }, 'Signup for VoA')
+    button('.btn.btn-block.btn-primary.my-4', { type: 'submit' }, 'Signup for VoA')
   ])
 }
 

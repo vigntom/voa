@@ -1,3 +1,13 @@
+html {
+  background: none;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  min-height: 100%;
+}
+
 .bg-dark-lighter {
   background: lighten($gray-800, 10%);
   color: $gray-300;
@@ -16,12 +26,11 @@
   margin-top: .75em;
 }
 
-.footer {
-  font-size: .9rem;
-}
-
 .page-header {
   margin: 1em;
   text-align: center;
 }
 
+.footer {
+  font-size: .9em;
+}

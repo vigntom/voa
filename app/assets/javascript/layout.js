@@ -28,7 +28,7 @@ function CreateHeader () {
               }),
               button('.btn btn-outline-success my-2 my-sm-0', { type: 'submit' }, 'Search')
             ]),
-            a('.nav-item.nav-link', { href: '/signin' }, 'Sign in'),
+            a('.nav-item.nav-link', { href: '/login' }, 'Log In'),
             a('.nav-item.nav-link', { href: '/signup' }, 'Sign up')
           ])
         ])
@@ -38,7 +38,7 @@ function CreateHeader () {
 }
 
 function Footer (props) {
-  return footer('.container-fluid.py-3', [
+  return footer('.footer.bg-light.container-fluid', [
     nav('.row.mx-0.py-3.border-top', [
       div('.col-lg.text-muted.px-0', [
         'The ',
