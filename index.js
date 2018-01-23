@@ -1,19 +1,17 @@
-const path = require('path')
 const server = require('./config/application')
 const throng = require('throng')
-const config = require('./config/app.json')
-const createLogger = require('./lib/logger')
+const log = require('./lib/logger')
 const createDbConnection = require('./lib/db')
 
-const appConfig = Object.assign(config, {
+const config = {
   root: __dirname,
-  log_dir: path.resolve(__dirname, 'log'),
   port: process.env.PORT || 5000,
-  env: process.env.NODE_ENV || 'development'
-})
+  env: process.env.NODE_ENV || 'development',
+  key1: process.env.SECRET_KEY1,
+  key2: process.env.SECRET_KEY2
+}
 
-const log = createLogger(appConfig)
-const app = server({ log, config: appConfig })
+const app = server({ config })
 const workers = process.env.WEB_CONCURRENCY || 1
 
 createDbConnection(log)

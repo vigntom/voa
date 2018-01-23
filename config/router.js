@@ -1,12 +1,12 @@
 const express = require('express')
 const staticRouter = require('../app/routers/static')
 const usersRouter = require('../app/routers/users')
+const log = require('../lib/logger')
 
 function routes () {
   const router = express.Router()
 
   router.use((req, res, next) => {
-    const log = req.app.locals.log
     log.debug(req.method, req.url)
     req.app.locals.messages = req.flash()
     next()

@@ -8,14 +8,18 @@ const csrf = require('csurf')
 const flash = require('connect-flash')
 const routes = require('./router')
 const createAssetsList = require('../lib/assets-list')
+const log = require('../lib/logger')
 
-function createApp ({ config, log }) {
+function createApp ({ config }) {
   const app = express()
 
   app.locals.title = 'Votting Application'
-  app.locals.log = log
   app.locals.env = config.env
   app.locals.assets = createAssetsList(config.env)
+
+  if (config.key1.length + config.key2.length < 256) {
+    throw new Error('Broken secret keys')
+  }
 
   app.set('view engine', 'ejs')
   app.set('views', path.resolve(config.root, 'app', 'view', 'layouts'))
@@ -24,8 +28,8 @@ function createApp ({ config, log }) {
 
   app.use(helmet())
   app.use(cookieSession({
-    name: 'session',
-    keys: ['test']
+    name: 'voa-session',
+    keys: [config.key1, config.key2]
   }))
 
   app.use(bodyParser.urlencoded({ extended: false }))
