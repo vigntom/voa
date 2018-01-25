@@ -32,6 +32,7 @@ function createApp ({ config }) {
   }
 
   if (config.env === 'production') {
+    app.set('trust proxy', 1)
     sessionOptions.cookie.secure = true
   }
 
