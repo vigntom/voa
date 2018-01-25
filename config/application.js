@@ -1,7 +1,6 @@
 const path = require('path')
 const express = require('express')
 const compression = require('compression')
-const bodyParser = require('body-parser')
 const helmet = require('helmet')
 const session = require('express-session')
 const csrf = require('csurf')
@@ -42,8 +41,8 @@ function createApp ({ config }) {
   app.use('/public', express.static(path.resolve(config.root, 'public')))
 
   app.use(helmet())
-  app.use(bodyParser.urlencoded({ extended: false }))
-  app.use(bodyParser.json())
+  app.use(express.urlencoded({ extended: false }))
+  app.use(express.json())
   app.use(session(sessionOptions))
   app.use(csrf({ cookie: false }))
   app.use(methodOverride('_method'))
