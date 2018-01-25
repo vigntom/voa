@@ -18,6 +18,7 @@ module.exports = function New ({ csrfToken }) {
             }),
             input('#session-password.form-control.my-3', {
               name: 'password',
+              type: 'password',
               placeholder: 'Password'
             }),
             div('.form-check', [

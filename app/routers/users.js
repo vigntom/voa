@@ -3,6 +3,7 @@ const { fill } = require('../helpers/application-helper')
 const usersView = require('../assets/javascript/users')
 const User = require('../models/user')
 const R = require('ramda')
+const { logIn } = require('../helpers/sessions-helper')
 
 const actions = {
   index: () => (req, res, next) => {
@@ -45,15 +46,18 @@ const actions = {
     return res.render('application', view)
   },
 
-  create: () => (req, res) => {
+  create: () => (req, res, next) => {
     const userFields = ['username', 'email', 'password', 'passwordConfirmation']
     const user = new User(R.pick(userFields, req.body))
 
     return user.save((err, who) => {
       if (err) { return actions.new(user, err.errors)(req, res) }
 
-      req.flash('success', 'Welcome to the Votting Application')
-      return res.redirect(`/users/${who.id}`)
+      return logIn(req, user.id, err => {
+        if (err) { next(err) }
+        req.session.flash = { success: 'Welcome to the Votting Application' }
+        return res.redirect(`/users/${who.id}`)
+      })
     })
   }
 }
@@ -70,7 +74,6 @@ function createUserRouter () {
   return router
 }
 
-module.exports = {
-  actions,
+module.exports = Object.assign({}, actions, {
   router: createUserRouter
-}
+})

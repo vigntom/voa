@@ -3,12 +3,14 @@ const express = require('express')
 const compression = require('compression')
 const bodyParser = require('body-parser')
 const helmet = require('helmet')
-const cookieSession = require('cookie-session')
+const session = require('express-session')
 const csrf = require('csurf')
-const flash = require('connect-flash')
 const routes = require('./router')
 const createAssetsList = require('../lib/assets-list')
 const log = require('../lib/logger')
+const methodOverride = require('method-override')
+const MongoStore = require('connect-mongo')(session)
+const mongoose = require('mongoose')
 
 function createApp ({ config }) {
   const app = express()
@@ -17,8 +19,21 @@ function createApp ({ config }) {
   app.locals.env = config.env
   app.locals.assets = createAssetsList(config.env)
 
-  if (config.key1.length + config.key2.length < 256) {
+  if (config.secretKey.length < 128) {
     throw new Error('Broken secret keys')
+  }
+
+  const sessionOptions = {
+    name: 'voa-session',
+    secret: config.secretKey,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 30000 },
+    store: new MongoStore({ mongooseConnection: mongoose.connection })
+  }
+
+  if (config.env === 'production') {
+    sessionOptions.cookie.secure = true
   }
 
   app.set('view engine', 'ejs')
@@ -27,16 +42,11 @@ function createApp ({ config }) {
   app.use('/public', express.static(path.resolve(config.root, 'public')))
 
   app.use(helmet())
-  app.use(cookieSession({
-    name: 'voa-session',
-    keys: [config.key1, config.key2]
-  }))
-
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json())
+  app.use(session(sessionOptions))
   app.use(csrf({ cookie: false }))
-
-  app.use(flash())
+  app.use(methodOverride('_method'))
 
   if (config.env === 'production') {
     app.use(compression())

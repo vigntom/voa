@@ -11,10 +11,15 @@ function fullTitle (pageTitle = '') {
   return pageTitle + ' | ' + baseTitle
 }
 
-function fill ({ title, page }) {
+function fill ({ title, page, notice = {} }) {
   return {
     title: fullTitle(title),
-    content: messages => renderToString(layout({ page, messages }))
+    content: session => renderToString(
+      layout({
+        page,
+        notice,
+        session
+      }))
   }
 }
 

@@ -10,8 +10,9 @@
     <% if (env === 'development') { %>
       <script src="/reload/reload.js" async></script>
     <% } %>
+    <meta name="csrf-token" content="<%- csrfToken %>">
   </head>
   <body>
-    <%- content(messages) %>
+    <%- content(session) %>
   </body>
 </html>

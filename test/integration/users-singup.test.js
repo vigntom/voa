@@ -4,8 +4,13 @@ import { JSDOM } from 'jsdom'
 import app from '../../index'
 import request from 'supertest'
 import test from 'ava'
+import mongoose from 'mongoose'
 
 db.setup(User)
+
+test.after.always(() => {
+  return mongoose.connection.db.collection('sessions').drop()
+})
 
 function createDoc (textAsHtml) {
   const dom = new JSDOM(textAsHtml)

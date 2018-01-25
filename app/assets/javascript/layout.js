@@ -3,7 +3,40 @@ const hh = require('hyperscript-helpers')
 
 const { header, footer, div, a, nav, button, span, form, input } = hh(h)
 
-function CreateHeader () {
+function SignNavbar () {
+  return div('.navbar-nav', [
+    a('.nav-link', { href: '/login' }, 'Log In'),
+    a('.nav-link', { href: '/signup' }, 'Sign up')
+  ])
+}
+
+function AccountMenu (id) {
+  return div('.navbar-nav', [
+    a('.nav-link', { href: '/users' }, 'Users'),
+    div('.dropdown', [
+      a('#profileDropdown.nav-link.dropdown-toggle', {
+        href: '#',
+        'data-toggle': 'dropdown',
+        'aria-haspopup': 'true',
+        'aria-expanded': 'false'
+      }, 'Account'),
+      div('.dropdown-menu', { 'aria-labelledby': 'profileDropdown' }, [
+        a('.dropdown-item', { href: `/users/${id}` }, 'Profile'),
+        a('.dropdown-item', { href: '#' }, 'Settings'),
+        div('.dropdown-divider'),
+        a('.dropdown-item', {
+          href: '/logout',
+          'data-method': 'delete'
+        }, 'Logout')
+      ])
+    ])
+  ])
+}
+
+function Header (session) {
+  const id = session.userId
+  const isDefined = x => typeof x === 'string' && x.length > 0
+
   return header([
     nav('.navbar.navbar-expand-lg.navbar-dark.bg-dark', [
       div('.container', [
@@ -28,8 +61,7 @@ function CreateHeader () {
               }),
               button('.btn btn-outline-success my-2 my-sm-0', { type: 'submit' }, 'Search')
             ]),
-            a('.nav-item.nav-link', { href: '/login' }, 'Log In'),
-            a('.nav-item.nav-link', { href: '/signup' }, 'Sign up')
+            isDefined(id) ? AccountMenu(id) : SignNavbar()
           ])
         ])
       ])
@@ -56,16 +88,18 @@ function Footer (props) {
 
 function MessageDesk (messages) {
   const msgTypes = Object.keys(messages)
-  const alert = msgType => div(`.alert.alert-${msgType}`, messages[msgType])
+  const alert = msgType => div(`.alert.alert-${msgType}.mx-2.my-3`, messages[msgType])
 
   if (msgTypes.length > 0) { return div(msgTypes.map(alert)) }
 
   return null
 }
 
-module.exports = function Layout ({ page, messages }) {
+module.exports = function Layout ({ page, notice, session }) {
+  const messages = Object.assign({}, session.flash, notice)
+
   return div('#application', [
-    CreateHeader(),
+    Header(session),
     MessageDesk(messages),
     page,
     Footer()

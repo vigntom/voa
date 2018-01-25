@@ -7,8 +7,7 @@ const config = {
   root: __dirname,
   port: process.env.PORT || 5000,
   env: process.env.NODE_ENV || 'development',
-  key1: process.env.SECRET_KEY1,
-  key2: process.env.SECRET_KEY2
+  secretKey: process.env.SECRET_KEY
 }
 
 const app = server({ config })
