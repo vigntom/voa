@@ -22,8 +22,14 @@ const actions = {
       }
 
       logIn(req, user.id, err => {
-        if (err) { next(err) }
-        res.redirect(`/users/${user.id}`)
+        const { rememberMe } = req.body
+        if (err) { return next(err) }
+
+        if (rememberMe && rememberMe === '1') {
+          req.session.cookie.maxAge = 2 * 365 * 24 * 3600000
+        }
+
+        return res.redirect(`/users/${user.id}`)
       })
     })
   },

@@ -23,7 +23,11 @@ module.exports = function New ({ csrfToken }) {
             }),
             div('.form-check', [
               label('.form-check-label', [
-                input('.form-check-input', { type: 'checkbox' }),
+                input('.form-check-input', {
+                  name: 'rememberMe',
+                  type: 'checkbox',
+                  value: 1
+                }),
                 'Remember me on this computer'
               ])
             ]),

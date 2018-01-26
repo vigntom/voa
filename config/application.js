@@ -27,7 +27,7 @@ function createApp ({ config }) {
     secret: config.secretKey,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 30000 },
+    cookie: {},
     store: new MongoStore({ mongooseConnection: mongoose.connection })
   }
 
