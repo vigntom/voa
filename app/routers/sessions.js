@@ -35,8 +35,9 @@ const actions = {
   },
 
   delete (req, res) {
-    req.session.destroy()
-    return res.redirect('/')
+    return req.session.destroy(() => {
+      return res.redirect('/')
+    })
   }
 }
 
