@@ -15,14 +15,14 @@ function routes () {
     next()
   })
 
-  router.get('/', staticRouter.home())
-  router.get('/about', staticRouter.about())
-  router.get('/contact', staticRouter.contact())
-  router.get('/signup', usersRouter.new())
+  router.get('/', staticRouter.to('home'))
+  router.get('/about', staticRouter.to('about'))
+  router.get('/contact', staticRouter.to('contact'))
+  router.get('/signup', usersRouter.to('new'))
 
-  router.get('/login', sessionsRouter('new'))
-  router.post('/login', sessionsRouter('create'))
-  router.delete('/logout', sessionsRouter('delete'))
+  router.get('/login', sessionsRouter.to('new'))
+  router.post('/login', sessionsRouter.to('create'))
+  router.delete('/logout', sessionsRouter.to('delete'))
 
   router.use('/users', usersRouter.router())
 

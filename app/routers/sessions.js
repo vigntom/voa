@@ -41,4 +41,6 @@ const actions = {
   }
 }
 
-module.exports = routing.create(actions, view)
+module.exports = {
+  to: routing.create(actions, view)
+}

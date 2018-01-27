@@ -4,54 +4,73 @@ const usersView = require('../assets/javascript/users')
 const User = require('../models/user')
 const R = require('ramda')
 const { logIn } = require('../helpers/sessions-helper')
+const routing = require('../../lib/routing')
 
-const actions = {
-  index: () => (req, res, next) => {
-    const title = 'Users'
+const renderer = res => page => res.render('application', page)
 
-    return User.find({}, (err, users) => {
-      if (err) { next(err) }
-      const view = fill({ title, page: usersView.index({ users }) })
-
-      return res.render('application', view)
+const view = {
+  index (users) {
+    return fill({
+      title: 'Users',
+      page: usersView.index({ users })
     })
   },
 
-  show: (objId) => (req, res, next) => {
-    const title = 'Show Users'
-    const params = req.params
-    const id = objId || params.id
+  show (user) {
+    return fill({
+      title: 'Show Users',
+      page: usersView.show({ user })
+    })
+  },
+
+  new (csrfToken, user = new User(), errors) {
+    return fill({
+      title: 'Signup',
+      page: usersView.new({ csrfToken, user, errors })
+    })
+  },
+
+  edit (csrfToken, user, errors) {
+    return fill({
+      title: 'Edit User',
+      page: usersView.edit({ csrfToken, user, errors })
+    })
+  }
+}
+
+const actions = {
+  index (req, res, next) {
+    return User.find({}, (err, users) => {
+      if (err) { next(err) }
+      return renderer(res)(view.index(users))
+    })
+  },
+
+  show (req, res, next) {
+    const id = req.params.id
     const isObjectId = /^[a-f0-9]{24}$/i.test(id)
 
     if (!isObjectId) { return next('route') }
 
     return User.findById(id, (err, user) => {
       if (err) { return next(err) }
-      const view = fill({ title, page: usersView.show({ user }) })
 
-      return res.render('application', view)
+      return renderer(res)(view.show(user))
     })
   },
 
-  new: (user, errors) => (req, res) => {
-    const title = 'Signup'
-    const params = {
-      user: user || new User(),
-      errors: errors,
-      csrfToken: req.csrfToken()
-    }
-
-    const view = fill({ title, page: usersView.new(params) })
-
-    return res.render('application', view)
+  new (req, res) {
+    return res.render('application', view.new(req.csrfToken()))
   },
 
-  create: () => (req, res, next) => {
+  create (req, res, next) {
     const userFields = ['username', 'email', 'password', 'passwordConfirmation']
     const user = new User(R.pick(userFields, req.body))
 
     return user.save((err, who) => {
-      if (err) { return actions.new(user, err.errors)(req, res) }
+      if (err) {
+        return renderer(res)(view.new(req.csrfToken(), user, err.errors))
+      }
 
       return logIn(req, user.id, err => {
         if (err) { next(err) }
@@ -59,17 +78,27 @@ const actions = {
         return res.redirect(`/users/${who.id}`)
       })
     })
+  },
+
+  edit (req, res, next) {
+    return User.findById(req.params.id, (err, user) => {
+      if (err) { return next(err) }
+
+      return renderer(res)(view.edit(user))
+    })
   }
 }
+
+const to = routing.create(actions, view)
 
 function createUserRouter () {
   const router = express.Router()
 
-  router.get('/', actions.index())
-  router.get('/new', actions.new())
-  router.get('/:id', actions.show())
+  router.get('/', to('index'))
+  router.get('/new', to('new'))
+  router.get('/:id', to('show'))
 
-  router.post('/', actions.create())
+  router.post('/', to('create'))
 
   return router
 }
@@ -77,3 +106,8 @@ function createUserRouter () {
 module.exports = Object.assign({}, actions, {
   router: createUserRouter
 })
+
+module.exports = {
+  to,
+  router: createUserRouter
+}

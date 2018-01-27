@@ -10,7 +10,7 @@ const userSchema = new Schema({
   username: {
     type: String,
     unique: true,
-    required: "Name can't be blank",
+    required: "Username can't be blank",
     trim: true,
     maxlength: 50
   },

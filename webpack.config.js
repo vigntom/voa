@@ -13,6 +13,7 @@ function basicConfig ({ env, srcPath, dstPath }) {
     module: {
       rules: [{
         test: /\.jsx?$/,
+        exclude: /node_modules/,
         loader: 'babel-loader'
       }]
     },
