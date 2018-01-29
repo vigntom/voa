@@ -11,9 +11,12 @@ $(document).on('click', 'a[data-method]', function (e) {
   const csrf = $('meta[name="csrf-token"]').attr('content')
   const href = e.target.getAttribute('href')
   const method = e.target.getAttribute('data-method')
-  const form = $(`<form method="post" action="${href}?_method=${method}"></form>`)
+  const form = $(`<form method="post" action="${href}"></form>`)
 
   form.hide()
+    .append(
+      `<input name="_method" value="${method}" type="hidden" />`
+    )
     .append(
       `<input name="_csrf" value="${csrf}" type="hidden" />`
     ).appendTo('body')

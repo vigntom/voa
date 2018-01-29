@@ -22,7 +22,7 @@ function AccountMenu (id) {
       }, 'Account'),
       div('.dropdown-menu', { 'aria-labelledby': 'profileDropdown' }, [
         a('.dropdown-item', { href: `/users/${id}` }, 'Profile'),
-        a('.dropdown-item', { href: '#' }, 'Settings'),
+        a('.dropdown-item', { href: `/users/${id}/edit` }, 'Settings'),
         div('.dropdown-divider'),
         a('.dropdown-item', {
           href: '/logout',

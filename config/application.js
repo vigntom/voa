@@ -18,7 +18,7 @@ function createApp ({ config }) {
   app.locals.env = config.env
   app.locals.assets = createAssetsList(config.env)
 
-  if (config.secretKey.length < 128) {
+  if (config.secretKey && config.secretKey.length < 128) {
     throw new Error('Broken secret keys')
   }
 
@@ -40,13 +40,18 @@ function createApp ({ config }) {
   app.set('views', path.resolve(config.root, 'app', 'view', 'layouts'))
 
   app.use('/public', express.static(path.resolve(config.root, 'public')))
-
   app.use(helmet())
   app.use(express.urlencoded({ extended: false }))
   app.use(express.json())
   app.use(session(sessionOptions))
   app.use(csrf({ cookie: false }))
-  app.use(methodOverride('_method'))
+  app.use(methodOverride((req, res) => {
+    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+      const method = req.body._method
+      delete req.body._method
+      return method
+    }
+  }))
 
   if (config.env === 'production') {
     app.use(compression())

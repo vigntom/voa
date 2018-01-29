@@ -8,6 +8,11 @@ const routing = require('../../lib/routing')
 
 const renderer = res => page => res.render('application', page)
 
+function userParams (params) {
+  const userFields = ['username', 'email', 'password', 'passwordConfirmation']
+  return R.pick(userFields, params)
+}
+
 const view = {
   index (users) {
     return fill({
@@ -64,8 +69,7 @@ const actions = {
   },
 
   create (req, res, next) {
-    const userFields = ['username', 'email', 'password', 'passwordConfirmation']
-    const user = new User(R.pick(userFields, req.body))
+    const user = new User(userParams(req.body))
 
     return user.save((err, who) => {
       if (err) {
@@ -84,8 +88,32 @@ const actions = {
     return User.findById(req.params.id, (err, user) => {
       if (err) { return next(err) }
 
-      return renderer(res)(view.edit(user))
+      return renderer(res)(view.edit(req.csrfToken(), user))
     })
+  },
+
+  update (req, res, next) {
+    const id = req.session.userId
+
+    function updateUser (err, user) {
+      if (err) { return next(err) }
+
+      user.set(userParams(req.body))
+      user.save((err) => {
+        if (err && err.errors) {
+          return renderer(res)(view.edit(req.csrfToken(), user, err.errors))
+        }
+
+        if (err) {
+          return next(err)
+        }
+
+        req.session.flash = { success: 'Profile updated' }
+        return res.redirect(`/users/${user.id}`)
+      })
+    }
+
+    return User.findById(id, updateUser)
   }
 }
 
@@ -97,8 +125,10 @@ function createUserRouter () {
   router.get('/', to('index'))
   router.get('/new', to('new'))
   router.get('/:id', to('show'))
+  router.get('/:id/edit', to('edit'))
 
   router.post('/', to('create'))
+  router.patch('/:id', to('update'))
 
   return router
 }

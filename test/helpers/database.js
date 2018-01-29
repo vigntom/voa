@@ -1,10 +1,13 @@
-require('../../index')
-const test = require('ava')
+import test from 'ava'
+import mongoose from 'mongoose'
+import MongoServer from 'mongodb-memory-server'
 
-function setup (model) {
-  const clearModel = () => model.remove().exec()
+test.before('Start MongoDB Server', t => {
+  const mongod = new MongoServer()
 
-  test.after.always(clearModel)
-}
-
-module.exports = { setup }
+  return mongod.getConnectionString()
+    .then(uri => {
+      mongoose.Promise = Promise
+      return mongoose.connect(uri, { useMongoClient: true })
+    })
+})

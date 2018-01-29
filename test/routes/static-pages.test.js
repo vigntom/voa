@@ -2,18 +2,26 @@ import request from 'supertest'
 import server from '../../index'
 import test from 'ava'
 
-test.cb('Should get home', t => {
-  request(server).get('/').expect(200, t.end)
+test('Should get home', t => {
+  return request(server)
+    .get('/')
+    .then(res => t.is(res.statusCode, 200))
 })
 
-test.cb('Should get about', t => {
-  request(server).get('/about').expect(200, t.end)
+test('Should get about', t => {
+  return request(server)
+    .get('/about')
+    .then(res => t.is(res.statusCode, 200))
 })
 
-test.cb('Should get contact', t => {
-  request(server).get('/contact').expect(200, t.end)
+test('Should get contact', t => {
+  return request(server)
+    .get('/contact')
+    .then(res => t.is(res.statusCode, 200))
 })
 
-test.cb('Should get not found', t => {
-  request(server).get('/notFoundPage').expect(404, t.end)
+test('Should get not found', t => {
+  return request(server)
+    .get('/notFoundPage')
+    .then(res => t.is(res.statusCode, 404))
 })

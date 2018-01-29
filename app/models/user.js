@@ -51,6 +51,13 @@ function emailValidator (value) {
 }
 
 function passwordValidator (next) {
+  const digestPresent = !this.isNew && this.passwordDigest
+  const rawPasswordEmpty = !(this.password || this.passwordConfirmation)
+
+  if (digestPresent && rawPasswordEmpty) {
+    return next()
+  }
+
   if (this.isNew && !this.password) {
     this.invalidate('password', "Password can't be blank")
   }
@@ -61,6 +68,7 @@ function passwordValidator (next) {
 
   if (this.password !== this.passwordConfirmation) {
     this.invalidate('password', "Confirmation doesn't match password")
+    this.invalidate('passwordConfirmation', "Confirmation doesn't match password")
   }
 
   return next()

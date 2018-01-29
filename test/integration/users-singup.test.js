@@ -1,26 +1,26 @@
-import db from '../helpers/database'
+import '../helpers/database'
 import User from '../../app/models/user'
-import { JSDOM } from 'jsdom'
 import app from '../../index'
+import { createDoc, csrf } from '../helpers/client'
 import request from 'supertest'
 import test from 'ava'
-import mongoose from 'mongoose'
 
-db.setup(User)
+const username = `user-login-${Date.now()}`
 
-test.after.always(() => {
-  return mongoose.connection.db.collection('sessions').drop()
+const login = {
+  username,
+  email: `${username}@example.com`,
+  password: 'password',
+  passwordConfirmation: 'password'
+}
+
+test.before(() => {
+  return User.create(login)
 })
 
-function createDoc (textAsHtml) {
-  const dom = new JSDOM(textAsHtml)
-  return dom.window.document
-}
-
-function csrf (textAsHtml) {
-  const selector = 'input[name="_csrf"]'
-  return createDoc(textAsHtml).querySelector(selector).value
-}
+test.after.always(() => {
+  return User.remove()
+})
 
 test.cb('Invalid singup', t => {
   const agent = request.agent(app)
@@ -41,21 +41,28 @@ test.cb('Invalid singup', t => {
     return agent
       .get('/users/new')
       .then(res => {
-        return agent
-          .post('/users')
-          .send({ _csrf: csrf(res.text) })
-          .then(res => {
-            t.is(res.statusCode, 200)
-            t.is(createDoc(res.text).title, 'Signup | Vote Application')
+        return agent.post('/users').send({ _csrf: csrf(res.text) })
+      })
+      .then(res => {
+        const doc = createDoc(res.text)
 
-            User.count({}, assert)
-          })
+        t.is(res.statusCode, 200)
+        t.is(doc.title, 'Signup | Vote Application')
+        t.truthy(doc.querySelector('div.error-msg'))
+        t.truthy(doc.querySelector('input.is-invalid'))
+
+        User.count({}, assert)
+      })
+      .catch(err => {
+        t.end(err)
       })
   })
 })
 
 test.cb('Valid signup', t => {
   const agent = request.agent(app)
+
+  const username = `user-signup-${Date.now()}`
 
   function assertDiff (expected) {
     return (err, value) => {
@@ -67,34 +74,37 @@ test.cb('Valid signup', t => {
 
   User.count({}, (err, count) => {
     const assert = assertDiff(count)
+    const loginData = html => ({
+      _csrf: csrf(html),
+      username,
+      email: `${username}@example.com`,
+      password: 'password',
+      passwordConfirmation: 'password'
+    })
 
     t.ifError(err)
 
     return agent
       .get('/users/new')
+      .then(res => (
+        agent
+        .post('/users')
+        .send(loginData(res.text))
+      ))
       .then(res => {
-        const currentAgent = agent
-          .post('/users')
-          .send({
-            _csrf: csrf(res.text),
-            username: 'validSignup',
-            email: 'validSignup@example.com',
-            password: 'qwe123',
-            passwordConfirmation: 'qwe123'
-          })
+        t.is(res.statusCode, 302)
+        t.regex(res.header.location, /users\//)
 
-        currentAgent.redirects().then(res => {
-          t.is(res.statusCode, 200)
-          t.is(createDoc(res.text).title, 'Show Users | Vote Application')
-          t.end()
-        })
+        return agent.get(res.header.location)
+      })
+      .then(res => {
+        t.is(res.statusCode, 200)
+        t.is(createDoc(res.text).title, 'Show Users | Vote Application')
 
-        currentAgent.then(res => {
-          t.is(res.statusCode, 302)
-          t.regex(res.header.location, /\users\//)
-
-          User.count({}, assert)
-        })
+        User.count({}, assert)
+      })
+      .catch(err => {
+        t.end(err)
       })
   })
 })

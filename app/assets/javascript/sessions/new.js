@@ -1,6 +1,6 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { FormFor, Token } = require('../../../helpers/view-helper')
+const { FormFor } = require('../../../helpers/view-helper')
 
 const { div, h1, p, a, label, input, button } = hh(h)
 
@@ -10,7 +10,7 @@ module.exports = function New ({ csrfToken }) {
     div('.d-flex.justify-content-center', [
       div('.w-30', [
         FormFor('#new-session.new-session', { action: '/login' }, [
-          Token({ id: 'csrf', value: csrfToken }),
+          input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
           div('.form-group', [
             input('#session-user.form-control.my-3', {
               name: 'user',

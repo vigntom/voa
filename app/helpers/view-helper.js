@@ -1,6 +1,7 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { input, form } = hh(h)
+const pluralize = require('pluralize')
+const { form, div, ul, li } = hh(h)
 
 function FormFor (selector, params, children) {
   const defaultParams = { acceptCharset: 'UTF-8', method: 'post' }
@@ -9,11 +10,27 @@ function FormFor (selector, params, children) {
   return form(selector, formParams, children)
 }
 
-function Token ({ id, value }) {
-  return input({ type: 'hidden', id, name: '_csrf', value })
+function ErrorMsg (err) {
+  if (!err) { return null }
+
+  const errors = Object.values(err)
+
+  return div('.error-msg', [
+    div('.alert.alert-danger',
+      `The form contains ${pluralize('error', errors.length, true)}`
+    ),
+    ul(errors.map(msg => li(msg.message)))
+  ])
+}
+
+function maybeErrorField (name, errors) {
+  if (!errors) { return '' }
+  if (errors[name]) { return 'is-invalid' }
+  return 'is-valid'
 }
 
 module.exports = {
   FormFor,
-  Token
+  ErrorMsg,
+  maybeErrorField
 }

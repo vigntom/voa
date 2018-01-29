@@ -1,32 +1,12 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const pluralize = require('pluralize')
-const { FormFor, Token } = require('../../../helpers/view-helper')
+const { FormFor, ErrorMsg, maybeErrorField } = require('../../../helpers/view-helper')
 
-const { div, ul, li, label, input, small, button } = hh(h)
-
-function ErrorMsg (err) {
-  if (!err) { return null }
-
-  const errors = Object.values(err)
-
-  return div('.error-msg', [
-    div('.alert.alert-danger',
-      `The form contains ${pluralize('error', errors.length, true)}`
-    ),
-    ul(errors.map(msg => li(msg.message)))
-  ])
-}
-
-function maybeErrorField (name, errors) {
-  if (!errors) { return '' }
-  if (errors[name]) { return 'is-invalid' }
-  return 'is-valid'
-}
+const { div, label, input, small, button } = hh(h)
 
 function SignUp ({ user, errors, csrfToken }) {
   return FormFor('#new-user.new-user', { action: '/users' }, [
-    Token({ id: 'csrf', value: csrfToken }),
+    input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
     ErrorMsg(errors),
     div('.form-group', [
       label({ htmlFor: 'signup-username' }, 'Username'),
@@ -52,7 +32,6 @@ function SignUp ({ user, errors, csrfToken }) {
       input('#signup-password.form-control', {
         name: 'password',
         type: 'password',
-        'aria-describedby': 'password-help',
         placeholder: 'Password',
         className: maybeErrorField('password', errors)
       }),
@@ -65,7 +44,6 @@ function SignUp ({ user, errors, csrfToken }) {
       input('#signup-confirmation.form-control', {
         name: 'passwordConfirmation',
         type: 'password',
-        'aria-describedby': 'password-help',
         placeholder: 'Confirmation'
       })
     ]),

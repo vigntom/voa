@@ -1,8 +1,6 @@
+import '../helpers/database'
 import test from 'ava'
-import db from '../helpers/database'
 import User from '../../app/models/user'
-
-db.setup(User)
 
 const login = {
   username: 'foo',
@@ -14,6 +12,10 @@ const login = {
 test.before(() => {
   const user = new User(login)
   return user.save()
+})
+
+test.after.always(() => {
+  return User.remove()
 })
 
 test.cb('username should be unique', t => {
