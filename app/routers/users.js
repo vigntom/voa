@@ -9,8 +9,15 @@ const routing = require('../../lib/routing')
 const renderer = res => page => res.render('application', page)
 
 function userParams (params) {
-  const userFields = ['username', 'email', 'password', 'passwordConfirmation']
-  return R.pick(userFields, params)
+  const fields = ['username', 'email', 'password', 'passwordConfirmation']
+  const pickOrblank = R.compose(
+    R.pick(fields),
+    R.merge(R.__, params),
+    R.mergeAll,
+    R.map(x => ({ [x]: '' }))
+  )
+
+  return pickOrblank(fields)
 }
 
 const view = {

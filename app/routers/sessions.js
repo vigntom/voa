@@ -5,11 +5,11 @@ const routing = require('../../lib/routing')
 const { logIn } = require('../helpers/sessions-helper')
 
 const view = {
-  new (csrfToken, notice) {
+  new (csrfToken, user = '', messages) {
     const title = 'Login'
-    const params = { csrfToken }
+    const params = { csrfToken, user, messages }
 
-    return fill({ title, notice, page: sessionsView.new(params) })
+    return fill({ title, page: sessionsView.new(params) })
   }
 }
 
@@ -18,7 +18,7 @@ const actions = {
     User.authenticate(req.body.user, req.body.password, (err, user) => {
       if (err) {
         const notice = { danger: ['Invalid username(email) or password'] }
-        return res.render('application', view.new(req.csrfToken(), notice))
+        return res.render('application', view.new(req.csrfToken(), req.body.user, notice))
       }
 
       logIn(req, user.id, err => {

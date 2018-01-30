@@ -1,5 +1,6 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
+const { MessageDesk } = require('../../helpers/view-helper')
 
 const { header, footer, div, a, nav, button, span, form, input } = hh(h)
 
@@ -84,15 +85,6 @@ function Footer (props) {
       ])
     ])
   ])
-}
-
-function MessageDesk (messages) {
-  const msgTypes = Object.keys(messages)
-  const alert = msgType => div(`.alert.alert-${msgType}.mx-2.my-3`, messages[msgType])
-
-  if (msgTypes.length > 0) { return div(msgTypes.map(alert)) }
-
-  return null
 }
 
 module.exports = function Layout ({ page, notice, session }) {
