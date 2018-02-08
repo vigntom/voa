@@ -1,10 +1,8 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { gravatarUrl } = require('../../../helpers/users-helper')
-const { FormFor, ErrorMsg, maybeErrorField } = require('../../../helpers/view-helper')
+const { FormFor, ErrorMsg, maybeErrorField, Gravatar } = require('../../../helpers/view-helper')
 
-const { div, h1, label, input, button, image, a } = hh(h)
-
+const { div, h1, label, input, button, a } = hh(h)
 function EditPage ({ user, errors, csrfToken }) {
   return div('.main', [
     h1('.page-header', 'Update your profile'),
@@ -57,7 +55,7 @@ function EditPage ({ user, errors, csrfToken }) {
         ]),
 
         div('.gravatar-edit', [
-          image('.my-2.mr-2', { src: gravatarUrl(user.email), alt: user.username }),
+          Gravatar({ user }),
           a({ href: 'http://gravatar.com/emails', target: '_blank' }, 'change')
         ])
       ])

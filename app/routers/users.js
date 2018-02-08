@@ -1,87 +1,100 @@
 const express = require('express')
-const { fill } = require('../helpers/application-helper')
-const usersView = require('../assets/javascript/users')
-const User = require('../models/user')
 const R = require('ramda')
+const validator = require('validator')
+const paginate = require('express-paginate')
+const User = require('../models/user')
+const { createView } = require('../helpers/application-helper')
 const { logIn } = require('../helpers/sessions-helper')
+const usersView = require('../assets/javascript/users')
 const routing = require('../../lib/routing')
 
 const renderer = res => page => res.render('application', page)
 
 function userParams (params) {
   const fields = ['username', 'email', 'password', 'passwordConfirmation']
-  const pickOrblank = R.compose(
+  const pickOrBlank = R.compose(
     R.pick(fields),
     R.merge(R.__, params),
     R.mergeAll,
     R.map(x => ({ [x]: '' }))
   )
 
-  return pickOrblank(fields)
+  return pickOrBlank(fields)
 }
 
 const view = {
-  index (users) {
-    return fill({
-      title: 'Users',
-      page: usersView.index({ users })
-    })
+  index (options) {
+    const page = usersView.index(options)
+    return createView({ title: 'Users', options, page })
   },
 
-  show (user) {
-    return fill({
-      title: 'Show Users',
-      page: usersView.show({ user })
-    })
+  show (options) {
+    const page = usersView.show(options)
+    return createView({ title: 'Show Users', options, page })
   },
 
-  new (csrfToken, user = new User(), errors) {
-    return fill({
-      title: 'Signup',
-      page: usersView.new({ csrfToken, user, errors })
-    })
+  new (options) {
+    const page = usersView.new(options)
+    return createView({ title: 'Signup', options, page })
   },
 
-  edit (csrfToken, user, errors) {
-    return fill({
-      title: 'Edit User',
-      page: usersView.edit({ csrfToken, user, errors })
-    })
+  edit (options) {
+    const page = usersView.edit(options)
+    return createView({ title: 'Edit User', options, page })
   }
 }
 
 const actions = {
   index (req, res, next) {
-    return User.find({}, (err, users) => {
-      if (err) { next(err) }
-      return renderer(res)(view.index(users))
+    if (!req.session.user) {
+      req.session.flash = { danger: 'Please log in' }
+      return res.redirect('/login')
+    }
+
+    return Promise.all([
+      User.find().limit(req.query.limit).skip(req.skip).lean(),
+      User.count()
+    ])
+    .then(([users, userCount]) => {
+      const pageCount = Math.ceil(userCount / req.query.limit)
+
+      res.locals.users = users
+      res.locals.pageCount = pageCount
+      res.locals.userCount = userCount
+      res.locals.pages = paginate.getArrayPages(req)(7, pageCount, req.query.page)
+
+      renderer(res)(view.index(res.locals))
     })
   },
 
   show (req, res, next) {
     const id = req.params.id
-    const isObjectId = /^[a-f0-9]{24}$/i.test(id)
 
-    if (!isObjectId) { return next('route') }
+    if (!validator.isMongoId(id)) { return next('route') }
 
-    return User.findById(id, (err, user) => {
-      if (err) { return next(err) }
-
-      return renderer(res)(view.show(user))
-    })
+    return User.findById(id)
+      .then(user => {
+        res.locals.user = user
+        renderer(res)(view.show(res.locals))
+      })
   },
 
   new (req, res) {
-    return res.render('application', view.new(req.csrfToken()))
+    res.locals.user = new User()
+    return res.render('application', view.new(res.locals))
   },
 
   create (req, res, next) {
     const user = new User(userParams(req.body))
 
     return user.save((err, who) => {
-      if (err) {
-        return renderer(res)(view.new(req.csrfToken(), user, err.errors))
+      if (err && err.errors) {
+        res.locals.user = user
+        res.locals.errors = err.errors
+        return renderer(res)(view.new(res.locals))
       }
+
+      if (err) { return next(err) }
 
       return logIn(req, user.id, err => {
         if (err) { next(err) }
@@ -92,15 +105,39 @@ const actions = {
   },
 
   edit (req, res, next) {
-    return User.findById(req.params.id, (err, user) => {
-      if (err) { return next(err) }
+    const id = req.params.id
 
-      return renderer(res)(view.edit(req.csrfToken(), user))
-    })
+    if (!validator.isMongoId(id)) { return next() }
+
+    if (!req.session.user) {
+      req.session.flash = { danger: 'Please log in' }
+      return res.redirect('/login')
+    }
+
+    if (req.session.user._id !== req.params.id) {
+      return res.redirect('/')
+    }
+
+    return User.findById(id)
+      .then(user => {
+        res.locals.user = user
+        renderer(res)(view.edit(res.locals))
+      })
   },
 
   update (req, res, next) {
-    const id = req.session.userId
+    const id = req.params.id
+
+    if (!validator.isMongoId(id)) { return next() }
+
+    if (!req.session.user) {
+      req.session.flash = { danger: 'Please log in' }
+      return res.redirect('/login')
+    }
+
+    if (req.session.user._id !== req.params.id) {
+      return res.redirect('/')
+    }
 
     function updateUser (err, user) {
       if (err) { return next(err) }
@@ -108,12 +145,12 @@ const actions = {
       user.set(userParams(req.body))
       user.save((err) => {
         if (err && err.errors) {
-          return renderer(res)(view.edit(req.csrfToken(), user, err.errors))
+          res.locals.user = user
+          res.locals.errors = err.errors
+          return renderer(res)(view.edit(res.locals))
         }
 
-        if (err) {
-          return next(err)
-        }
+        if (err) { return next(err) }
 
         req.session.flash = { success: 'Profile updated' }
         return res.redirect(`/users/${user.id}`)
@@ -121,12 +158,33 @@ const actions = {
     }
 
     return User.findById(id, updateUser)
+  },
+
+  delete (req, res, next) {
+    const id = req.params.id
+    if (!validator.isMongoId(id)) { return next() }
+
+    if (!req.session.user) {
+      req.session.flash = { danger: 'Please log in' }
+      return res.redirect('/login')
+    }
+
+    if (!req.session.user.admin) {
+      return res.redirect('/')
+    }
+
+    return User.findByIdAndRemove(id, (err, user) => {
+      if (err) { return next(err) }
+
+      req.session.flash = { success: `User '${user.username}' deleted` }
+      return res.redirect('/users')
+    })
   }
 }
 
-const to = routing.create(actions, view)
-
 function createUserRouter () {
+  const to = routing.create(actions, view)
+
   const router = express.Router()
 
   router.get('/', to('index'))
@@ -136,15 +194,9 @@ function createUserRouter () {
 
   router.post('/', to('create'))
   router.patch('/:id', to('update'))
+  router.delete('/:id', to('delete'))
 
-  return router
+  return { to, router }
 }
 
-module.exports = Object.assign({}, actions, {
-  router: createUserRouter
-})
-
-module.exports = {
-  to,
-  router: createUserRouter
-}
+module.exports = createUserRouter()

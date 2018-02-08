@@ -1,15 +1,13 @@
 const User = require('../models/user')
 const sessionsView = require('../assets/javascript/sessions')
-const { fill } = require('../helpers/application-helper')
+const { createView } = require('../helpers/application-helper')
 const routing = require('../../lib/routing')
 const { logIn } = require('../helpers/sessions-helper')
 
 const view = {
-  new (csrfToken, user = '', messages) {
-    const title = 'Login'
-    const params = { csrfToken, user, messages }
-
-    return fill({ title, page: sessionsView.new(params) })
+  new (options) {
+    const page = sessionsView.new(options)
+    return createView({ title: 'Login', options, page })
   }
 }
 
@@ -17,11 +15,12 @@ const actions = {
   create (req, res, next) {
     User.authenticate(req.body.user, req.body.password, (err, user) => {
       if (err) {
-        const notice = { danger: ['Invalid username(email) or password'] }
-        return res.render('application', view.new(req.csrfToken(), req.body.user, notice))
+        res.locals.flash = { danger: ['Invalid username(email) or password'] }
+        res.locals.user = req.body.user
+        return res.render('application', view.new(res.locals))
       }
 
-      logIn(req, user.id, err => {
+      logIn(req, user, err => {
         const { rememberMe } = req.body
         if (err) { return next(err) }
 

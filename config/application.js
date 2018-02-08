@@ -4,12 +4,13 @@ const compression = require('compression')
 const helmet = require('helmet')
 const session = require('express-session')
 const csrf = require('csurf')
-const routes = require('./router')
-const createAssetsList = require('../lib/assets-list')
-const log = require('../lib/logger')
 const methodOverride = require('method-override')
 const MongoStore = require('connect-mongo')(session)
 const mongoose = require('mongoose')
+const paginate = require('express-paginate')
+const routes = require('./router')
+const createAssetsList = require('../lib/assets-list')
+const log = require('../lib/logger')
 
 function createApp ({ config }) {
   const app = express()
@@ -27,13 +28,18 @@ function createApp ({ config }) {
     secret: config.secretKey,
     resave: false,
     saveUninitialized: false,
-    cookie: {},
-    store: new MongoStore({ mongooseConnection: mongoose.connection })
+    cookie: {}
   }
 
   if (config.env === 'production') {
     app.set('trust proxy', 1)
     sessionOptions.cookie.secure = true
+  }
+
+  if (config.env !== 'test') {
+    sessionOptions.store = new MongoStore({
+      mongooseConnection: mongoose.connection
+    })
   }
 
   app.set('view engine', 'ejs')
@@ -45,18 +51,21 @@ function createApp ({ config }) {
   app.use(express.json())
   app.use(session(sessionOptions))
   app.use(csrf({ cookie: false }))
-  app.use(methodOverride((req, res) => {
-    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
-      const method = req.body._method
-      delete req.body._method
-      return method
-    }
-  }))
+  app.use(
+    methodOverride((req, res) => {
+      if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+        const method = req.body._method
+        delete req.body._method
+        return method
+      }
+    })
+  )
 
   if (config.env === 'production') {
     app.use(compression())
   }
 
+  app.use(paginate.middleware(10, 50))
   app.use('/', routes())
 
   if (config.env === 'development') {
@@ -70,7 +79,9 @@ function createApp ({ config }) {
   })
 
   app.use((err, req, res, next) => {
-    if (err.code !== 'EBADCSRFTOKEN') { return next(err) }
+    if (err.code !== 'EBADCSRFTOKEN') {
+      return next(err)
+    }
 
     log.warn(`422: Can't verify csrf token authenticity`)
     res.status(422)
@@ -78,7 +89,9 @@ function createApp ({ config }) {
   })
 
   app.use((err, req, res, next) => {
-    if (res.headersSend) { return next(err) }
+    if (res.headersSend) {
+      return next(err)
+    }
 
     log.warn('500: ', err.stack)
     res.status(500)

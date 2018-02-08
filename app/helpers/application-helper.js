@@ -14,13 +14,21 @@ function fullTitle (pageTitle = '') {
 function fill ({ title, page, notice = {} }) {
   return {
     title: fullTitle(title),
-    content: session => renderToString(
+    content: (session, paginate) => renderToString(
       layout({
         page,
         notice,
-        session
+        session,
+        paginate
       }))
   }
 }
 
-module.exports = { fullTitle, fill }
+function createView ({ title, options, page }) {
+  return {
+    title: fullTitle(title),
+    content: renderToString(layout({ options, page }))
+  }
+}
+
+module.exports = { fullTitle, fill, createView }

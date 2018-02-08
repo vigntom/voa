@@ -1,6 +1,5 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { MessageDesk } = require('../../helpers/view-helper')
 
 const { header, footer, div, a, nav, button, span, form, input } = hh(h)
 
@@ -34,10 +33,7 @@ function AccountMenu (id) {
   ])
 }
 
-function Header (session) {
-  const id = session.userId
-  const isDefined = x => typeof x === 'string' && x.length > 0
-
+function Header (user) {
   return header([
     nav('.navbar.navbar-expand-lg.navbar-dark.bg-dark', [
       div('.container', [
@@ -62,7 +58,7 @@ function Header (session) {
               }),
               button('.btn btn-outline-success my-2 my-sm-0', { type: 'submit' }, 'Search')
             ]),
-            isDefined(id) ? AccountMenu(id) : SignNavbar()
+            user ? AccountMenu(user._id) : SignNavbar()
           ])
         ])
       ])
@@ -87,12 +83,9 @@ function Footer (props) {
   ])
 }
 
-module.exports = function Layout ({ page, notice, session }) {
-  const messages = Object.assign({}, session.flash, notice)
-
+module.exports = function Layout ({ options, page }) {
   return div('#application', [
-    Header(session),
-    MessageDesk(messages),
+    Header(options.session.user),
     page,
     Footer()
   ])

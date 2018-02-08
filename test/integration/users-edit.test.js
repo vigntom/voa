@@ -1,5 +1,5 @@
 import '../helpers/database'
-import { createDoc, csrf } from '../helpers/client'
+import { createDoc, csrf, ua } from '../helpers/client'
 import User from '../../app/models/user'
 import app from '../../index'
 import request from 'supertest'
@@ -28,16 +28,9 @@ test.after.always(() => {
 test('Unsuccessful edit', t => {
   const agent = request.agent(app)
 
-  return agent
-    .get('/login')
-    .then(res => agent
-      .post('/login')
-      .send({
-        _csrf: csrf(res.text),
-        user: login.username,
-        password: login.password
-      }))
-    .then(res => agent.get(res.header.location))
+  return agent.get('/')
+    .then(ua.logInAsUser(agent, login))
+    .then(ua.followRedirect(agent))
     .then(res => {
       return agent
         .patch(`/users/${activeUser.id}`)
@@ -50,21 +43,15 @@ test('Unsuccessful edit', t => {
     .then(res => {
       const doc = createDoc(res.text)
       t.is(doc.title, 'Edit User | Vote Application')
+      t.truthy(doc.querySelector('.alert.alert-danger'))
     })
 })
 
 test('Successfull edit', t => {
   const agent = request.agent(app)
-  return agent
-    .get('/login')
-    .then(res => agent
-      .post('/login')
-      .send({
-        _csrf: csrf(res.text),
-        user: login.username,
-        password: login.password
-      }))
-    .then(res => agent.get(res.header.location))
+  return agent.get('/')
+    .then(ua.logInAsUser(agent, login))
+    .then(ua.followRedirect(agent))
     .then(res => agent
       .patch(`/users/${activeUser.id}`)
       .send({

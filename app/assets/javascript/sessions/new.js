@@ -4,12 +4,12 @@ const { FormFor, MessageDesk } = require('../../../helpers/view-helper')
 
 const { div, h1, p, a, label, input, button } = hh(h)
 
-module.exports = function New ({ csrfToken, user, messages = {}}) {
+module.exports = function New ({ csrfToken, user, flash }) {
   return div('.main', [
     h1('.page-header', 'Log in'),
     div('.d-flex.justify-content-center', [
       div('.w-30', [
-        MessageDesk(messages),
+        MessageDesk(flash),
         FormFor('#new-session.new-session', { action: '/login' }, [
           input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
           div('.form-group', [

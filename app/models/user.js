@@ -24,6 +24,10 @@ const userSchema = new Schema({
   },
   passwordDigest: {
     type: String
+  },
+  admin: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

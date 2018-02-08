@@ -1,24 +1,27 @@
-const { fill } = require('../helpers/application-helper')
+const { createView } = require('../helpers/application-helper')
 const staticView = require('../assets/javascript/static')
 const User = require('../models/user')
 const routing = require('../../lib/routing')
 
 const view = {
-  home (csrfToken) {
-    const params = { user: new User(), csrfToken }
-    return fill({ title: 'Home', page: staticView.home(params) })
+  home (options) {
+    return createView({ title: 'Home', options, page: staticView.home(options) })
   },
 
-  about () {
-    return fill({ title: 'About', page: staticView.about() })
+  about (options) {
+    return createView({ title: 'About', options, page: staticView.about(options) })
   },
 
-  contact () {
-    return fill({ title: 'Contact', page: staticView.contact() })
+  contact (options) {
+    return createView({ title: 'Contact', options, page: staticView.contact(options) })
   }
 }
 
 const actions = {
+  home (req, res) {
+    res.locals.user = new User()
+    return res.render('application', view.home(res.locals))
+  }
 }
 
 module.exports = {

@@ -1,8 +1,8 @@
 module.exports = {
-  logIn (req, userId, cb) {
+  logIn (req, user, cb) {
     req.session.regenerate(err => {
       if (err) { return cb(err) }
-      req.session.userId = userId
+      req.session.user = user
       return cb()
     })
   }

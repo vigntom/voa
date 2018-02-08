@@ -1,7 +1,14 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const pluralize = require('pluralize')
-const { form, div, ul, li } = hh(h)
+const crypto = require('crypto')
+const { form, div, ul, li, image } = hh(h)
+
+function md5 (string) {
+  return crypto.createHash('md5')
+    .update(string)
+    .digest('hex')
+}
 
 function FormFor (selector, params, children) {
   const defaultParams = { acceptCharset: 'UTF-8', method: 'post' }
@@ -31,15 +38,25 @@ function MessageDesk (messages) {
 
   return null
 }
+
 function maybeErrorField (name, errors) {
   if (!errors) { return '' }
   if (errors[name]) { return 'is-invalid' }
   return 'is-valid'
 }
 
+function gravatarUrl (email, size = 80) {
+  return `https://secure.gravatar.com/avatar/${md5(email)}?s=${size}`
+}
+
+function Gravatar ({ user, size }) {
+  return image('.gravatar', { src: gravatarUrl(user.email, size), alt: user.username })
+}
+
 module.exports = {
   FormFor,
   ErrorMsg,
   MessageDesk,
-  maybeErrorField
+  maybeErrorField,
+  Gravatar
 }

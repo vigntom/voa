@@ -1,13 +1,14 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { gravatarUrl } = require('../../../helpers/users-helper')
+const { Gravatar, MessageDesk } = require('../../../helpers/view-helper')
 
-const { div, h1, image, span } = hh(h)
+const { div, h1, span } = hh(h)
 
-module.exports = function Index ({ user }) {
+module.exports = function Index ({ user, flash }) {
   return div('.main.container-fluid', [
+    MessageDesk(flash),
     h1([
-      image({ src: gravatarUrl(user.email), alt: user.username }),
+      Gravatar({ user }),
       span('.ml-1', user.username)
     ])
   ])

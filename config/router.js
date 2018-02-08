@@ -9,8 +9,9 @@ function routes () {
 
   router.use((req, res, next) => {
     log.debug(req.method, req.url)
-    res.locals.session = Object.assign({}, req.session)
     res.locals.csrfToken = req.csrfToken()
+    res.locals.flash = Object.assign({}, req.session.flash)
+    res.locals.session = req.session
     req.session.flash = {}
     next()
   })
@@ -24,7 +25,7 @@ function routes () {
   router.post('/login', sessionsRouter.to('create'))
   router.delete('/logout', sessionsRouter.to('delete'))
 
-  router.use('/users', usersRouter.router())
+  router.use('/users', usersRouter.router)
 
   return router
 }
