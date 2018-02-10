@@ -33,10 +33,9 @@ const createUser = () => User.create({
 })
 
 const createUsers = () => R.times(fakeUser, 100)
+
 User.remove({})
   .then(() => createAdmin())
   .then(() => createUser())
   .then(() => Promise.all(createUsers()))
-  .then(() => {
-    return mongoose.connection.close()
-  })
+  .then(() => mongoose.connection.close())

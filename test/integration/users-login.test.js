@@ -1,24 +1,11 @@
 import '../helpers/database'
-import User from '../../app/models/user'
 import app from '../../index'
 import { createDoc, csrf, ua } from '../helpers/client'
 import request from 'supertest'
 import test from 'ava'
+import users from '../fixtures/users'
 
-const login = {
-  username: 'testUser1',
-  email: 'testUser1@example.com',
-  password: 'password',
-  passwordConfirmation: 'password'
-}
-
-test.before(() => {
-  return User.create(login)
-})
-
-test.after.always(() => {
-  return User.remove()
-})
+const login = users.bob
 
 test('Login with valid information followed by logout', t => {
   const agent = request.agent(app)

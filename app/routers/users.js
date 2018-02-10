@@ -65,6 +65,7 @@ const actions = {
 
       renderer(res)(view.index(res.locals))
     })
+    .catch(next)
   },
 
   show (req, res, next) {
@@ -77,6 +78,7 @@ const actions = {
         res.locals.user = user
         renderer(res)(view.show(res.locals))
       })
+      .catch(next)
   },
 
   new (req, res) {
@@ -123,6 +125,7 @@ const actions = {
         res.locals.user = user
         renderer(res)(view.edit(res.locals))
       })
+      .catch(next)
   },
 
   update (req, res, next) {
@@ -173,12 +176,12 @@ const actions = {
       return res.redirect('/')
     }
 
-    return User.findByIdAndRemove(id, (err, user) => {
-      if (err) { return next(err) }
-
-      req.session.flash = { success: `User '${user.username}' deleted` }
-      return res.redirect('/users')
-    })
+    return User.findByIdAndRemove(id)
+      .then(user => {
+        req.session.flash = { success: `User '${user.username}' deleted` }
+        return res.redirect('/users')
+      })
+      .catch(next)
   }
 }
 

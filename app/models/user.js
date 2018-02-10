@@ -81,13 +81,19 @@ function passwordValidator (next) {
 function createDigitalPassword (next) {
   const user = this
 
-  function hashAsDigitalPassword (err, hash) {
+  return digitalPassword(user.password, (err, hash) => {
     if (err) { return next(err) }
     user.passwordDigest = hash
     return next()
-  }
+  })
+}
 
-  return bcrypt.hash(user.password, cost, hashAsDigitalPassword)
+function digitalPassword (password, cb) {
+  return bcrypt.hash(password, cost, cb)
+}
+
+userSchema.statics.digitalPassword = function (password) {
+  return bcrypt.hash(password, cost)
 }
 
 userSchema.statics.authenticate = function (identifier, password, cb) {

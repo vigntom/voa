@@ -5,21 +5,6 @@ import { createDoc, ua } from '../helpers/client'
 import request from 'supertest'
 import test from 'ava'
 
-const login = {
-  username: 'testUser1',
-  email: 'testUser1@example.com',
-  password: 'password',
-  passwordConfirmation: 'password'
-}
-
-test.before(() => {
-  return User.create(login)
-})
-
-test.after.always(() => {
-  return User.remove()
-})
-
 test('Invalid singup', t => {
   const agent = request.agent(app)
 
@@ -64,8 +49,8 @@ test('Valid signup', t => {
   return User.count({})
     .then(count => {
       const loginData = {
-        username: 'testUser2',
-        email: 'testUser2@example.com',
+        username: 'newUser',
+        email: 'newUser@example.com',
         password: 'password',
         passwordConfirmation: 'password'
       }

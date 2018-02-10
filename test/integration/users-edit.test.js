@@ -4,25 +4,16 @@ import User from '../../app/models/user'
 import app from '../../index'
 import request from 'supertest'
 import test from 'ava'
+import users from '../fixtures/users'
 
 let activeUser
-
-const login = {
-  username: 'user-for-edit',
-  email: 'user-for-edit@example.com',
-  password: 'password',
-  passwordConfirmation: 'password'
-}
+const login = users.bob
 
 test.before(t => {
-  return User.create(login)
+  return User.findOne({ username: login.username })
     .then(user => {
       activeUser = user
     })
-})
-
-test.after.always(() => {
-  return User.remove()
 })
 
 test('Unsuccessful edit', t => {
@@ -33,7 +24,7 @@ test('Unsuccessful edit', t => {
     .then(ua.followRedirect(agent))
     .then(res => {
       return agent
-        .patch(`/users/${activeUser.id}`)
+          .patch(`/users/${activeUser._id}`)
         .send({
           _csrf: csrf(res.text),
           username: '',
