@@ -13,15 +13,9 @@ test.before('Start MongoDB Server', t => {
       return mongoose.connect(uri, { useMongoClient: true })
     })
     .then(() => {
-      return Promise.all(Object.values(users).map(user => {
-        return User.digitalPassword(user.password)
-          .then(hash => {
-            return Object.assign({}, user, {
-              passwordConfirmation: user.password,
-              passwordDigest: hash
-            })
-          })
-      }))
+      return Object.values(users).map(
+        user => Object.assign({}, user, { passwordConfirmation: user.password })
+      )
     })
     .then(data => {
       return User.insertMany(data)

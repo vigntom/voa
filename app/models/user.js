@@ -1,8 +1,10 @@
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema
 const uniqueValidator = require('mongoose-unique-validator')
 const { isEmail, isLength } = require('validator')
 const bcrypt = require('bcrypt')
+const crypto = require('crypto')
+
+const Schema = mongoose.Schema
 
 const cost = 10
 
@@ -14,6 +16,7 @@ const userSchema = new Schema({
     trim: true,
     maxlength: 50
   },
+
   email: {
     type: String,
     unique: true,
@@ -22,12 +25,27 @@ const userSchema = new Schema({
     maxlength: 255,
     lowercase: true
   },
+
   passwordDigest: {
     type: String
   },
+
   admin: {
     type: Boolean,
     default: false
+  },
+
+  activationDigest: {
+    type: String
+  },
+
+  activated: {
+    type: Boolean,
+    default: false
+  },
+
+  activatedAt: {
+    type: Date
   }
 }, {
   timestamps: true
@@ -43,10 +61,14 @@ userSchema.virtual('passwordConfirmation')
   .get(function () { return this._passwordConfirmation })
   .set(function (value) { this._passwordConfirmation = value })
 
-userSchema.path('email').validate(emailValidator)
+userSchema.virtual('activationToken')
+  .get(function () { return this._activationToken })
+  .set(function (value) { this._activationToken = value })
 
+userSchema.path('email').validate(emailValidator)
 userSchema.pre('validate', passwordValidator)
-userSchema.pre('save', createDigitalPassword)
+userSchema.post('validate', createDigitalPassword)
+userSchema.post('validate', createActivationDigest)
 
 function emailValidator (value) {
   if (!isEmail(value)) {
@@ -78,22 +100,39 @@ function passwordValidator (next) {
   return next()
 }
 
-function createDigitalPassword (next) {
-  const user = this
-
-  return digitalPassword(user.password, (err, hash) => {
+function createDigitalPassword (user, next) {
+  return digest(user.password, (err, hash) => {
     if (err) { return next(err) }
     user.passwordDigest = hash
     return next()
   })
 }
 
-function digitalPassword (password, cb) {
-  return bcrypt.hash(password, cost, cb)
+function newToken (n, cb) {
+  return crypto.randomBytes(n, (err, buf) => {
+    if (err) return cb(err)
+    const result = buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_')
+    return cb(null, result)
+  })
 }
 
-userSchema.statics.digitalPassword = function (password) {
-  return bcrypt.hash(password, cost)
+function digest (token, cb) {
+  return bcrypt.hash(token, cost, cb)
+}
+
+function createActivationDigest (user, next) {
+  return newToken(16, (err, token) => {
+    if (err) { return next(err) }
+
+    return digest(token, (err, hash) => {
+      if (err) { return err }
+
+      user.activationToken = token
+      user.activationDigest = hash
+
+      return next()
+    })
+  })
 }
 
 userSchema.statics.authenticate = function (identifier, password, cb) {

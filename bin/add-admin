@@ -17,7 +17,9 @@ const createAdmin = () => User.create({
   email: 'admin@example.com',
   password: 'qaz123',
   passwordConfirmation: 'qaz123',
-  admin: true
+  admin: true,
+  activated: true,
+  activated_at: Date.now()
 })
 
 User.remove()

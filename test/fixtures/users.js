@@ -6,32 +6,42 @@ const namedUsers = {
     username: 'admin',
     email: 'admin@example.com',
     password: 'password',
-    admin: true
+    admin: true,
+    activated: true,
+    activated_at: Date.now()
   },
 
   bob: {
     username: 'bob',
     email: 'bob@yahoo.com',
-    password: 'password'
+    password: 'password',
+    activated: true,
+    activated_at: Date.now()
   },
 
   sara: {
     username: 'sara',
     email: 'sara@example.org',
-    password: 'password'
+    password: 'password',
+    activated: true,
+    activated_at: Date.now()
   },
 
   den: {
     username: 'den',
     email: 'den@example.us',
-    password: 'password'
+    password: 'password',
+    activated: true,
+    activated_at: Date.now()
   }
 }
 
 const createFakeUser = () => ({
   username: faker.internet.userName(),
   email: faker.internet.email(),
-  password: 'password'
+  password: 'password',
+  activated: true,
+  activated_at: Date.now()
 })
 
 function combineUsers ([id, acc], user) {

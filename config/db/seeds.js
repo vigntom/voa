@@ -13,7 +13,9 @@ const fakeUser = () => User.create({
   username: faker.internet.userName(),
   email: faker.internet.email(),
   password: 'password',
-  passwordConfirmation: 'password'
+  passwordConfirmation: 'password',
+  activated: true,
+  activated_at: Date.now()
 })
 
 const createAdmin = () => User.create({
@@ -21,7 +23,9 @@ const createAdmin = () => User.create({
   email: 'admin@example.com',
   password: 'qwe321',
   passwordConfirmation: 'qwe321',
-  admin: true
+  admin: true,
+  activated: true,
+  activated_at: Date.now()
 })
 
 const createUser = () => User.create({
@@ -29,7 +33,9 @@ const createUser = () => User.create({
   email: 'foobar@example.com',
   password: 'qwe321',
   passwordConfirmation: 'qwe321',
-  admin: false
+  admin: false,
+  activated: true,
+  activated_at: Date.now()
 })
 
 const createUsers = () => R.times(fakeUser, 100)
