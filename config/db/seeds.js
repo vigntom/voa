@@ -4,10 +4,7 @@ require('dotenv').config({ silent: true })
 const R = require('ramda')
 const faker = require('faker')
 const User = require('../../app/models/user')
-const log = require('../../lib/logger')
-const createDbConnection = require('../../lib/db')
-
-const mongoose = createDbConnection(log)
+const db = require('../../lib/db')
 
 const fakeUser = () => User.create({
   username: faker.internet.userName(),
@@ -44,4 +41,4 @@ User.remove({})
   .then(() => createAdmin())
   .then(() => createUser())
   .then(() => Promise.all(createUsers()))
-  .then(() => mongoose.connection.close())
+  .then(() => db.connection.close())

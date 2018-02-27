@@ -1,13 +1,13 @@
 module.exports = {
   production: {
-    log: { level: 'info' }
+    log: { console: 'warn' }
   },
 
   development: {
-    log: { level: 'debug' }
+    log: { console: 'trace', file: 'debug' }
   },
 
   test: {
-    log: { level: 'error' }
+    log: { console: 'error', file: 'warn' }
   }
 }

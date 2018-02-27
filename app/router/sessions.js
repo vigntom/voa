@@ -13,11 +13,22 @@ const view = {
 
 const actions = {
   create (req, res, next) {
-    User.authenticate(req.body.user, req.body.password, (err, user) => {
+    const authenticate = User.authenticateBy('password')
+
+    authenticate(req.body.user, req.body.password, (err, user) => {
       if (err) {
         res.locals.flash = { danger: ['Invalid username(email) or password'] }
         res.locals.user = req.body.user
         return res.render('application', view.new(res.locals))
+      }
+
+      if (!user.activated) {
+        req.session.flash = { warning: [
+          'Account not activated. ',
+          'Check your email for the activation link. '
+        ]}
+
+        return res.redirect('/')
       }
 
       logIn(req, user, err => {

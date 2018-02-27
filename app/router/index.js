@@ -1,14 +1,15 @@
 const express = require('express')
-const staticRouter = require('../app/routers/static')
-const usersRouter = require('../app/routers/users')
-const sessionsRouter = require('../app/routers/sessions')
-const log = require('../lib/logger')
+const staticRouter = require('./static')
+const usersRouter = require('./users')
+const sessionsRouter = require('./sessions')
+const accountActivtionsRouter = require('./account-activations.js')
+const log = require('../../lib/logger')
 
 function routes () {
   const router = express.Router()
 
   router.use((req, res, next) => {
-    log.debug(req.method, req.url)
+    log.trace(req.method, req.url)
     res.locals.csrfToken = req.csrfToken()
     res.locals.flash = Object.assign({}, req.session.flash)
     res.locals.session = req.session
@@ -26,6 +27,7 @@ function routes () {
   router.delete('/logout', sessionsRouter.to('delete'))
 
   router.use('/users', usersRouter.router)
+  router.use('/accountActivations', accountActivtionsRouter.router)
 
   return router
 }

@@ -60,15 +60,15 @@ test('Valid signup', t => {
         .then(ua.signUpAsUser(agent, loginData))
         .then(res => {
           t.is(res.statusCode, 302)
-          t.regex(res.header.location, /users\//)
+          t.is(res.header.location, '/')
 
           return agent.get(res.header.location)
         })
         .then(res => {
           const doc = createDoc(res.text)
           t.is(res.statusCode, 200)
-          t.is(createDoc(res.text).title, 'Show Users | Vote Application')
-          t.truthy(doc.querySelector('div.alert.alert-success'))
+          t.is(createDoc(res.text).title, 'Home | Vote Application')
+          t.truthy(doc.querySelector('div.alert.alert-info'))
           return assertDiff(count)
         })
     })

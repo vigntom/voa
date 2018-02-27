@@ -9,6 +9,8 @@ const login = {
   passwordConfirmation: 'abc123'
 }
 
+const authenticate = User.authenticateBy('password')
+
 test.before(() => {
   const user = new User(login)
   return user.save()
@@ -37,7 +39,7 @@ test.cb('email should be unique', t => {
 test.cb('should not authenticate if wrong username', t => {
   const username = 'wrongfoo'
   const password = login.password
-  User.authenticate(username, password, (err, user) => {
+  authenticate(username, password, (err, user) => {
     t.truthy(err)
     t.end()
   })
@@ -46,7 +48,7 @@ test.cb('should not authenticate if wrong username', t => {
 test.cb('should not authenticate if wrong email', t => {
   const email = 'foowrong@example.com'
   const password = login.password
-  User.authenticate(email, password, (err, user) => {
+  authenticate(email, password, (err, user) => {
     t.truthy(err)
     t.end()
   })
@@ -55,7 +57,7 @@ test.cb('should not authenticate if wrong email', t => {
 test.cb('should not authenticate if wrong password', t => {
   const username = login.usernam
   const password = 'wrong'
-  User.authenticate(username, password, (err, user) => {
+  authenticate(username, password, (err, user) => {
     t.truthy(err)
     t.end()
   })
@@ -64,7 +66,7 @@ test.cb('should not authenticate if wrong password', t => {
 test.cb('should authenticate if correct username password', t => {
   const username = login.username
   const password = login.password
-  User.authenticate(username, password, (err, user) => {
+  authenticate(username, password, (err, user) => {
     t.ifError(err)
     t.end()
   })
@@ -73,7 +75,7 @@ test.cb('should authenticate if correct username password', t => {
 test.cb('should authenticate if correct email password', t => {
   const email = login.email
   const password = login.password
-  User.authenticate(email, password, (err, user) => {
+  authenticate(email, password, (err, user) => {
     t.ifError(err)
     t.end()
   })

@@ -3,10 +3,12 @@ const R = require('ramda')
 const validator = require('validator')
 const paginate = require('express-paginate')
 const User = require('../models/user')
+const ejs = require('ejs')
 const { createView } = require('../helpers/application-helper')
-const { logIn } = require('../helpers/sessions-helper')
 const usersView = require('../assets/javascript/users')
 const routing = require('../../lib/routing')
+const config = require('../../config')
+const log = require('../../lib/logger')
 
 const renderer = res => page => res.render('application', page)
 
@@ -63,6 +65,8 @@ const actions = {
       res.locals.userCount = userCount
       res.locals.pages = paginate.getArrayPages(req)(7, pageCount, req.query.page)
 
+      req.session.state = { users: req.originalUrl }
+
       renderer(res)(view.index(res.locals))
     })
     .catch(next)
@@ -98,10 +102,38 @@ const actions = {
 
       if (err) { return next(err) }
 
-      return logIn(req, user.id, err => {
-        if (err) { next(err) }
-        req.session.flash = { success: 'Welcome to the Votting Application' }
-        return res.redirect(`/users/${who.id}`)
+      const path = `${config.web.url}/accountActivations/${who.activationToken}/edit`
+      const query = 'email=' + encodeURIComponent(who.email)
+      const data = { username: who.username, url: path + '?' + query }
+      const template = {
+        html: './emails/mailer/account-activation.html.ejs',
+        text: './emails/mailer/account-activation.text.ejs'
+      }
+
+      return ejs.renderFile(template.html, data, (err, html) => {
+        if (err) { return next(err) }
+
+        return ejs.renderFile(template.text, data, (err, text) => {
+          if (err) { return next(err) }
+
+          const message = {
+            from: config.email.from,
+            to: who.email,
+            subject: 'Account activation',
+            html,
+            text
+          }
+
+          config.email.transport.sendMail(message, (err, info) => {
+            if (err) { return next(err) }
+            log.debug('mailer -> ', info.envelope)
+            log.debug('mailer -> ', info.messageId)
+            log.debug(info.message.toString())
+          })
+
+          req.session.flash = { info: 'Please check your email to activate account.' }
+          return res.redirect('/')
+        })
       })
     })
   },
@@ -179,7 +211,7 @@ const actions = {
     return User.findByIdAndRemove(id)
       .then(user => {
         req.session.flash = { success: `User '${user.username}' deleted` }
-        return res.redirect('/users')
+        return res.redirect(req.session.state.users)
       })
       .catch(next)
   }

@@ -1,11 +1,13 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const SignUp = require('../users/signup')
+const { MessageDesk } = require('../../../helpers/view-helper')
 
 const { div, h1 } = hh(h)
 
 module.exports = function Home (params) {
   return div('.jumbotron.jumbotron-fluid.bg-dark-lighter.text-light', [
+    div('.mx-4.mb-5', [MessageDesk(params.flash)]),
     div('.container-fluid', [
       div('.main.row', [
         div('.col-lg-7.align-self-center', [

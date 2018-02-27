@@ -1,52 +1,63 @@
-const server = require('./config/application')
+const path = require('path')
 const throng = require('throng')
 const log = require('./lib/logger')
-const createDbConnection = require('./lib/db')
+const config = require('./config')
+const createApp = require('./app')
+const db = require('./lib/db')
 
-const config = {
-  root: __dirname,
-  port: process.env.PORT || 5000,
-  env: process.env.NODE_ENV || 'development',
-  secretKey: process.env.SECRET_KEY
-}
-
-const app = server({ config })
-const workers = process.env.WEB_CONCURRENCY || 1
-
-createDbConnection(log)
+const app = createApp()
 
 switch (config.env) {
-  case 'production':
-    throng({
-      workers,
-      master () {
-        log.info(`Application mode ${config.env}`)
-      },
-
-      start (id) {
-        process.on('SIGTERM', () => {
-          log.info(`Worker ${id} stopped`)
-          process.exit()
-        })
-
-        app.listen(config.port, () => {
-          log.info(`Listening on port ${config.port} (id=${id})`)
-        })
-      }
-
-    })
-
-    break
-
   case 'test':
+    handleNotFound(app)
     break
 
   default:
-    log.info(`Application starting in ${config.env} mode`)
+    throng({
+      workers: config.web.concurrency || 1,
+      master: initApp,
+      grace: 1000,
 
-    app.listen(config.port, () => {
-      log.info(`Listening on ${config.port}`)
+      start (id) {
+        process.on('SIGTERM', clean(id))
+        process.on('SIGINT', clean(id))
+
+        if (config.env === 'development') { require('reload')(app) }
+
+        startApp(app, `W:(${id}) -> `)
+      }
     })
+}
+
+function initApp () {
+  log.info(`Application starting in ${config.env} mode`)
+}
+
+function handleNotFound (app) {
+  app.use((req, res, next) => {
+    log.warn(`404: Page(${req.url}) not found`)
+    res.status(404)
+    res.sendFile(path.resolve('public', '404.html'))
+  })
+
+  return app
+}
+
+function startApp (app, msg) {
+  return handleNotFound(app).listen(config.port, () => {
+    log.info(`(${msg}) Listening on ${config.web.port}`)
+  })
+}
+
+function clean (id) {
+  return () => {
+    log.info(`Worker ${id} stopped`)
+
+    return db.connection.close().then(() => {
+      log.warn(`Mongoose connection terminated`)
+      return process.exit(0)
+    })
+  }
 }
 
 module.exports = app

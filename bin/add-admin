@@ -4,11 +4,8 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config({ silent: true })
 }
 
-const createDbConnection = require('../lib/db')
-const log = require('../lib/logger')
+const db = require('../lib/db')
 const User = require('../app/models/user')
-
-const mongoose = createDbConnection(log)
 
 User.collection.drop()
 
@@ -24,4 +21,4 @@ const createAdmin = () => User.create({
 
 User.remove()
   .then(createAdmin)
-  .then(() => { mongoose.connection.close() })
+  .then(() => { db.connection.close() })

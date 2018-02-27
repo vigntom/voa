@@ -67,6 +67,7 @@ userSchema.virtual('activationToken')
 
 userSchema.path('email').validate(emailValidator)
 userSchema.pre('validate', passwordValidator)
+
 userSchema.post('validate', createDigitalPassword)
 userSchema.post('validate', createActivationDigest)
 
@@ -101,6 +102,8 @@ function passwordValidator (next) {
 }
 
 function createDigitalPassword (user, next) {
+  if (!user.password && !user.passwordConfirmation) { return next() }
+
   return digest(user.password, (err, hash) => {
     if (err) { return next(err) }
     user.passwordDigest = hash
@@ -121,6 +124,8 @@ function digest (token, cb) {
 }
 
 function createActivationDigest (user, next) {
+  if (!this.isNew) { return next() }
+
   return newToken(16, (err, token) => {
     if (err) { return next(err) }
 
@@ -135,21 +140,27 @@ function createActivationDigest (user, next) {
   })
 }
 
-userSchema.statics.authenticate = function (identifier, password, cb) {
-  function authenticate (password, user, cb) {
-    return bcrypt.compare(password, user.passwordDigest, (err, res) => {
+userSchema.statics.authenticateBy = function (attribute) {
+  const digest = `${attribute}Digest`
+
+  function authenticate (user, token, cb) {
+    return bcrypt.compare(token, user[digest], (err, res) => {
       if (err) { return cb(err) }
       if (res) { return cb(null, user) }
       return cb(new Error('User or passord are wrong'))
     })
   }
 
-  return User.findOne({ $or: [{ email: identifier }, { username: identifier }] })
-    .exec((err, user) => {
-      if (err) { return cb(err) }
-      if (!user) { return cb(new Error('User or password are wrong')) }
-      return authenticate(password, user, cb)
-    })
+  return (emailOrName, token, cb) => {
+    const query = { $or: [{ email: emailOrName }, { username: emailOrName }] }
+
+    return User.findOne(query)
+      .exec((err, user) => {
+        if (err) { return cb(err) }
+        if (!user) { return cb(new Error('Authentification failed')) }
+        return authenticate(user, token, cb)
+      })
+  }
 }
 
 const User = mongoose.model('User', userSchema)

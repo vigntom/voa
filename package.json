@@ -8,14 +8,14 @@
   },
   "author": "Aleksandr Ignatyev <vigntom.2708@gmail.com>",
   "engines": {
-    "node": "9.5.0"
+    "node": "9.6.1"
   },
   "scripts": {
     "start": "heroku local",
-    "build": "webpack --env.production --progress",
-    "build:vendor": "webpack --env.production --env.vendor --progress",
+    "build": "webpack --env.production",
+    "build:vendor": "webpack --env.production --env.vendor",
     "build:full": "yarn build:vendor && yarn build",
-    "dev:start": "nodemon --watch 'app' --watch 'config' --watch 'public' --watch 'lib' --ext 'js,ejs,json' --exec 'heroku local' --signal SIGTERM --delay 0.3",
+    "dev:start": "nodemon --watch './' --ext 'js,ejs,json' --exec 'heroku local' --signal SIGTERM --delay 0.3",
     "dev:build": "webpack --env.development --progress",
     "dev:build:watch": "webpack --env.development --progress --watch",
     "dev:build:vendor": "webpack --env.development --env.vendor",
@@ -79,6 +79,7 @@
     "mongoose": "^4.13.1",
     "mongoose-unique-validator": "^1.0.6",
     "node-sass": "^4.7.2",
+    "nodemailer": "^4.4.2",
     "pluralize": "^7.0.0",
     "popper.js": "^1.12.9",
     "postcss-loader": "^2.0.8",
@@ -90,6 +91,7 @@
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.0",
     "throng": "^4.0.0",
+    "turbolinks": "^5.1.1",
     "validator": "^9.1.2",
     "webpack": "^3.8.1",
     "webpack-manifest-plugin": "^1.3.2",
