@@ -4,6 +4,8 @@ const webpack = require('webpack')
 const merge = require('webpack-merge')
 const { DefinePlugin, ProvidePlugin, DllReferencePlugin } = webpack
 
+// process.traceDeprecation = true
+
 function basicConfig ({ env, srcPath, dstPath }) {
   return {
     context: srcPath,
