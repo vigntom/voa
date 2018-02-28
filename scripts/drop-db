@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ silent: true })
+}
+
+const db = require('../lib/db')
+
+db.connection
+  .dropDatabase()
+  .then((res) => {
+    console.log(`Dropped database '${db.connection.db.databaseName}'`)
+    db.connection.close()
+  })
+  .catch(err => console.error(err.message))

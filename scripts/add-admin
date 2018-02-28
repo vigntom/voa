@@ -7,8 +7,6 @@ if (process.env.NODE_ENV !== 'production') {
 const db = require('../lib/db')
 const User = require('../app/models/user')
 
-User.collection.drop()
-
 const createAdmin = () => User.create({
   username: 'admin',
   email: 'admin@example.com',
@@ -19,6 +17,14 @@ const createAdmin = () => User.create({
   activated_at: Date.now()
 })
 
-User.remove()
-  .then(createAdmin)
-  .then(() => { db.connection.close() })
+User.findOne({ username: 'admin' })
+  .then(user => {
+    if (user) return null
+    return createAdmin()
+  })
+  .catch(err => {
+    console.error(err.message)
+  })
+  .then(() => {
+    db.connection.close()
+  })
