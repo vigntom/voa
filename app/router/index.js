@@ -1,8 +1,9 @@
 const express = require('express')
-const staticRouter = require('./static')
-const usersRouter = require('./users')
-const sessionsRouter = require('./sessions')
-const accountActivtionsRouter = require('./account-activations.js')
+const staticPages = require('./static-pages')
+const users = require('./users')
+const sessions = require('./sessions')
+const accountActivtions = require('./account-activations')
+const passwordResets = require('./password-resets')
 const log = require('../../lib/logger')
 
 function routes () {
@@ -17,17 +18,18 @@ function routes () {
     next()
   })
 
-  router.get('/', staticRouter.to('home'))
-  router.get('/about', staticRouter.to('about'))
-  router.get('/contact', staticRouter.to('contact'))
-  router.get('/signup', usersRouter.to('new'))
+  router.get('/', staticPages.to('home'))
+  router.get('/about', staticPages.to('about'))
+  router.get('/contact', staticPages.to('contact'))
+  router.get('/signup', users.to('new'))
 
-  router.get('/login', sessionsRouter.to('new'))
-  router.post('/login', sessionsRouter.to('create'))
-  router.delete('/logout', sessionsRouter.to('delete'))
+  router.get('/login', sessions.to('new'))
+  router.post('/login', sessions.to('create'))
+  router.delete('/logout', sessions.to('delete'))
 
-  router.use('/users', usersRouter.router)
-  router.use('/accountActivations', accountActivtionsRouter.router)
+  router.use('/users', users.router)
+  router.use('/accountActivations', accountActivtions.router)
+  router.use('/passwordResets', passwordResets.router)
 
   return router
 }

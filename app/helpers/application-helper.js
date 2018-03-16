@@ -31,4 +31,14 @@ function createView ({ title, options, page }) {
   }
 }
 
-module.exports = { fullTitle, fill, createView }
+function defaultView (title, template) {
+  return options => ({
+    title: fullTitle(title),
+    content: renderToString(layout({
+      options,
+      page: template(options)
+    }))
+  })
+}
+
+module.exports = { fullTitle, fill, createView, defaultView }

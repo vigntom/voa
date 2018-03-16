@@ -3,6 +3,7 @@ const hh = require('hyperscript-helpers')
 const { FormFor, ErrorMsg, maybeErrorField, Gravatar } = require('../../../helpers/view-helper')
 
 const { div, h1, label, input, button, a } = hh(h)
+
 function EditPage ({ user, errors, csrfToken }) {
   return div('.main', [
     h1('.page-header', 'Update your profile'),

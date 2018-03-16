@@ -8,7 +8,7 @@
   },
   "author": "Aleksandr Ignatyev <vigntom.2708@gmail.com>",
   "engines": {
-    "node": "9.6.1"
+    "node": "9.8.0"
   },
   "scripts": {
     "start": "heroku local",
@@ -25,6 +25,7 @@
     "db:seed": "node ./config/db/seeds.js",
     "test": "ava",
     "test:watch": "ava --watch",
+    "secret": "node ./scripts/secret",
     "heroku-postbuild": "yarn build:full && yarn db:addAdmin"
   },
   "license": "MIT",

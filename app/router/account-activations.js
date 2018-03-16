@@ -13,14 +13,14 @@ const actions = {
     const email = req.query.email.toString()
     const token = req.params.token.toString()
 
+    if (!validator.isEmail(email)) {
+      return invalidActivationLink('Invalid email')
+    }
+
     function invalidActivationLink (msg) {
       if (msg) { log.warn(msg) }
       req.session.flash = { danger: 'Invalid activation link' }
       return res.redirect('/')
-    }
-
-    if (!validator.isEmail(email)) {
-      return invalidActivationLink('Invalid email')
     }
 
     function logInAs (user) {
@@ -42,6 +42,7 @@ const actions = {
 
     return authenticate(email, token, (err, user) => {
       if (err) { return invalidActivationLink() }
+      if (!user) { return invalidActivationLink() }
       if (user.activated) { return invalidActivationLink() }
 
       user.activated = true

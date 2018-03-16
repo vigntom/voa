@@ -46,6 +46,14 @@ const userSchema = new Schema({
 
   activatedAt: {
     type: Date
+  },
+
+  resetDigest: {
+    type: String
+  },
+
+  resetCreatedAt: {
+    type: Date
   }
 }, {
   timestamps: true
@@ -64,6 +72,10 @@ userSchema.virtual('passwordConfirmation')
 userSchema.virtual('activationToken')
   .get(function () { return this._activationToken })
   .set(function (value) { this._activationToken = value })
+
+userSchema.virtual('resetToken')
+  .get(function () { return this._resetToken })
+  .set(function (value) { this._resetToken = value })
 
 userSchema.path('email').validate(emailValidator)
 userSchema.pre('validate', passwordValidator)
@@ -130,7 +142,7 @@ function createActivationDigest (user, next) {
     if (err) { return next(err) }
 
     return digest(token, (err, hash) => {
-      if (err) { return err }
+      if (err) { return next(err) }
 
       user.activationToken = token
       user.activationDigest = hash
@@ -147,7 +159,7 @@ userSchema.statics.authenticateBy = function (attribute) {
     return bcrypt.compare(token, user[digest], (err, res) => {
       if (err) { return cb(err) }
       if (res) { return cb(null, user) }
-      return cb(new Error('User or passord are wrong'))
+      return cb(null, false)
     })
   }
 
@@ -157,10 +169,29 @@ userSchema.statics.authenticateBy = function (attribute) {
     return User.findOne(query)
       .exec((err, user) => {
         if (err) { return cb(err) }
-        if (!user) { return cb(new Error('Authentification failed')) }
+        if (!user) { return cb(null, user) } // cb(new Error('Authentification failed')) }
         return authenticate(user, token, cb)
       })
   }
+}
+
+userSchema.statics.createResetDigest = function (user, cb) {
+  return newToken(16, (err, token) => {
+    if (err) { return cb(err) }
+
+    return digest(token, (err, hash) => {
+      if (err) { return cb(err) }
+
+      user.resetToken = token
+      user.resetDigest = hash
+      user.resetCreatedAt = Date.now()
+
+      return user.save((err, result) => {
+        if (err) { return cb(err) }
+        return cb(null, user)
+      })
+    })
+  })
 }
 
 const User = mongoose.model('User', userSchema)

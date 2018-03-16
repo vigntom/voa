@@ -1,9 +1,11 @@
+const path = require('path')
 const nodemailer = require('nodemailer')
 const environment = require('./environment')
 
 const env = process.env.NODE_ENV || 'development'
 const port = process.env.PORT || 5000
 const web = createExtractor('web')
+const mailDir = path.join(__dirname, '..', 'emails', 'mailer')
 
 const config = {
   env,
@@ -32,7 +34,8 @@ const config = {
 
   email: {
     transport: emailService(env),
-    from: createExtractor('email')('from')
+    from: createExtractor('email')('from'),
+    view: name => format => path.join(mailDir, `${name}.${format}.ejs`)
   }
 }
 

@@ -1,13 +1,12 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { FormFor, ErrorMsg, maybeErrorField } = require('../../../helpers/view-helper')
+const { FormFor, maybeErrorField } = require('../../../helpers/view-helper')
 
 const { div, label, input, small, button } = hh(h)
 
 function SignUp ({ user, errors, csrfToken }) {
   return FormFor('#new-user.new-user', { action: '/users' }, [
     input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
-    ErrorMsg(errors),
     div('.form-group', [
       label({ htmlFor: 'signup-username' }, 'Username'),
       input('#signup-username.form-control', {

@@ -16,7 +16,8 @@ const actions = {
     const authenticate = User.authenticateBy('password')
 
     authenticate(req.body.user, req.body.password, (err, user) => {
-      if (err) {
+      if (err) { return next(err) }
+      if (!user) {
         res.locals.flash = { danger: ['Invalid username(email) or password'] }
         res.locals.user = req.body.user
         return res.render('application', view.new(res.locals))

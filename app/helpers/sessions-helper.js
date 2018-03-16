@@ -3,7 +3,7 @@ module.exports = {
     req.session.regenerate(err => {
       if (err) { return cb(err) }
       req.session.user = user
-      return cb()
+      return cb(null, user)
     })
   }
 }

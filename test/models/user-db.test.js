@@ -40,7 +40,8 @@ test.cb('should not authenticate if wrong username', t => {
   const username = 'wrongfoo'
   const password = login.password
   authenticate(username, password, (err, user) => {
-    t.truthy(err)
+    t.falsy(err)
+    t.falsy(user)
     t.end()
   })
 })
@@ -49,7 +50,8 @@ test.cb('should not authenticate if wrong email', t => {
   const email = 'foowrong@example.com'
   const password = login.password
   authenticate(email, password, (err, user) => {
-    t.truthy(err)
+    t.falsy(err)
+    t.falsy(user)
     t.end()
   })
 })
@@ -58,7 +60,8 @@ test.cb('should not authenticate if wrong password', t => {
   const username = login.usernam
   const password = 'wrong'
   authenticate(username, password, (err, user) => {
-    t.truthy(err)
+    t.falsy(err)
+    t.falsy(user)
     t.end()
   })
 })
@@ -67,7 +70,7 @@ test.cb('should authenticate if correct username password', t => {
   const username = login.username
   const password = login.password
   authenticate(username, password, (err, user) => {
-    t.ifError(err)
+    t.falsy(err)
     t.end()
   })
 })
@@ -76,7 +79,7 @@ test.cb('should authenticate if correct email password', t => {
   const email = login.email
   const password = login.password
   authenticate(email, password, (err, user) => {
-    t.ifError(err)
+    t.falsy(err)
     t.end()
   })
 })

@@ -9,6 +9,7 @@ const usersView = require('../assets/javascript/users')
 const routing = require('../../lib/routing')
 const config = require('../../config')
 const log = require('../../lib/logger')
+const mailer = require('../../lib/mailer')
 
 const renderer = res => page => res.render('application', page)
 
@@ -53,23 +54,31 @@ const actions = {
       return res.redirect('/login')
     }
 
-    return Promise.all([
-      User.find().limit(req.query.limit).skip(req.skip).lean(),
-      User.count()
-    ])
-    .then(([users, userCount]) => {
-      const pageCount = Math.ceil(userCount / req.query.limit)
+    return User.count()
+      .then(userCount => {
+        if (req.skip >= userCount) {
+          req.skip = req.skip - req.query.limit
+          res.locals.paginate.page = res.locals.paginate.page - 1
+        }
 
-      res.locals.users = users
-      res.locals.pageCount = pageCount
-      res.locals.userCount = userCount
-      res.locals.pages = paginate.getArrayPages(req)(7, pageCount, req.query.page)
+        return Promise.all([
+          User.find().limit(req.query.limit).skip(req.skip).lean(),
+          userCount
+        ])
+      })
+      .then(([users, userCount]) => {
+        const pageCount = Math.ceil(userCount / req.query.limit)
 
-      req.session.state = { users: req.originalUrl }
+        res.locals.users = users
+        res.locals.pageCount = pageCount
+        res.locals.userCount = userCount
+        res.locals.pages = paginate.getArrayPages(req)(7, pageCount, req.query.page)
 
-      renderer(res)(view.index(res.locals))
-    })
-    .catch(next)
+        req.session.state = { users: req.originalUrl }
+
+        renderer(res)(view.index(res.locals))
+      })
+      .catch(next)
   },
 
   show (req, res, next) {
@@ -87,7 +96,7 @@ const actions = {
 
   new (req, res) {
     res.locals.user = new User()
-    return res.render('application', view.new(res.locals))
+    return renderer(res)(view.new(res.locals))
   },
 
   create (req, res, next) {
@@ -102,39 +111,12 @@ const actions = {
 
       if (err) { return next(err) }
 
-      const path = `${config.web.url}/accountActivations/${who.activationToken}/edit`
-      const query = 'email=' + encodeURIComponent(who.email)
-      const data = { username: who.username, url: path + '?' + query }
-      const template = {
-        html: './emails/mailer/account-activation.html.ejs',
-        text: './emails/mailer/account-activation.text.ejs'
-      }
-
-      return ejs.renderFile(template.html, data, (err, html) => {
+      mailer.accountActivation(who, (err, info) => {
         if (err) { return next(err) }
-
-        return ejs.renderFile(template.text, data, (err, text) => {
-          if (err) { return next(err) }
-
-          const message = {
-            from: config.email.from,
-            to: who.email,
-            subject: 'Account activation',
-            html,
-            text
-          }
-
-          config.email.transport.sendMail(message, (err, info) => {
-            if (err) { return next(err) }
-            log.debug('mailer -> ', info.envelope)
-            log.debug('mailer -> ', info.messageId)
-            log.debug(info.message.toString())
-          })
-
-          req.session.flash = { info: 'Please check your email to activate account.' }
-          return res.redirect('/')
-        })
       })
+
+      req.session.flash = { info: 'Please check your email to activate account.' }
+      return res.redirect('/')
     })
   },
 

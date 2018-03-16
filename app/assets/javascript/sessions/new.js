@@ -2,7 +2,7 @@ const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const { FormFor, MessageDesk } = require('../../../helpers/view-helper')
 
-const { div, h1, p, a, label, input, button } = hh(h)
+const { div, h1, span, a, label, input, button } = hh(h)
 
 module.exports = function New ({ csrfToken, user, flash }) {
   return div('.main', [
@@ -30,11 +30,15 @@ module.exports = function New ({ csrfToken, user, flash }) {
                   type: 'checkbox',
                   value: 1
                 }),
-                'Remember me on this computer'
+                'Remember me',
+                span('.sep', ''),
+                a({ href: '/passwordResets/new' }, '(Forgot password?)')
               ])
             ]),
             button('.btn.btn-block.btn-primary.my-3', { type: 'submit' }, 'Log In'),
-            p(['New to VoA? ', a({ href: '/signup' }, 'Signup now!')])
+            'New to VoA?',
+            span('.sep', '/'),
+            a({ href: '/signup' }, 'Signup now!')
           ])
         ])
       ])
