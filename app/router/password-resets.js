@@ -135,7 +135,7 @@ const actions = {
       if (!confirmation) { return warnAndEdit('passwordConfirmation', user) }
       if (isExpired(user)) { return redirectWhenExpired({ req, res }) }
 
-      user.set({ password, passwordConfirmation: confirmation })
+      user.set({ password, passwordConfirmation: confirmation, resetDigest: '' })
       res.locals.user = user
 
       return user.save((err, who) => {
