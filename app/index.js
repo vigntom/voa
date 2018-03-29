@@ -15,6 +15,7 @@ const config = require('../config')
 
 function createApp () {
   const app = express()
+  const { pagination } = config.app
 
   if (config.secret.key && config.secret.key.length < 128) {
     throw new Error('Broken secret keys')
@@ -61,7 +62,7 @@ function createApp () {
   app.use(helmet())
   app.use(express.urlencoded({ extended: false }))
   app.use(express.json())
-  app.use(paginate.middleware(10, 50))
+  app.use(paginate.middleware(pagination.count, pagination.limit))
   app.use(session(sessionOptions))
   app.use(csrf({ cookie: false }))
   app.use(overrideMethods())

@@ -12,7 +12,11 @@ const config = {
   port: port,
 
   app: {
-    name: 'VoA'
+    name: 'VoA',
+    pagination: {
+      count: 10,
+      limit: 50
+    }
   },
 
   logger: environment[env].log,
