@@ -4,6 +4,7 @@ const users = require('./users')
 const sessions = require('./sessions')
 const accountActivtions = require('./account-activations')
 const passwordResets = require('./password-resets')
+const polls = require('./polls')
 const log = require('../../lib/logger')
 
 function routes () {
@@ -30,6 +31,7 @@ function routes () {
   router.use('/users', users.router)
   router.use('/accountActivations', accountActivtions.router)
   router.use('/passwordResets', passwordResets.router)
+  router.use('/polls', polls.router)
 
   return router
 }
