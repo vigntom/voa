@@ -1,10 +1,11 @@
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const ChunkManifestPlugin = require('chunk-manifest-webpack-plugin')
 const WebpackMd5Hash = require('webpack-md5-hash')
 
-module.exports = function productionConfig ({ dstPath }) {
+module.exports = function productionConfig ({ root, dstPath }) {
   return {
     entry: {
       application: './index.js'
@@ -22,13 +23,18 @@ module.exports = function productionConfig ({ dstPath }) {
             loader: 'css-loader',
             options: { modules: false, minimize: true }
           },
-            'postcss-loader',
-            'sass-loader'
+            'postcss-loader?sourceMap',
+            'resolve-url-loader',
+            'sass-loader?sourceMap'
           ]
         })
+      }, {
+        test: /\.(ttf|svg|eot|otf|woff|woff2)$/,
+        loader: 'url-loader'
       }]
     },
     plugins: [
+      new CleanWebpackPlugin(dstPath, { root }),
       new UglifyJsPlugin({
         sourceMap: true,
         parallel: true

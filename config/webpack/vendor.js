@@ -3,26 +3,26 @@ const merge = require('webpack-merge')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const { DllPlugin, DefinePlugin } = require('webpack')
 
-module.exports = function vendorConfig ({ env, dstPath }) {
+module.exports = function vendorConfig ({ root, env, dstPath }) {
   const config = {
     entry: {
-      'utils': ['ramda'],
-      'bootstrap': ['bootstrap'],
-      'react': ['react', 'react-dom']
+      'vendor': ['ramda', 'bootstrap']
     },
     output: {
-      path: dstPath,
-      filename: 'vendor/[name].dll.js',
+      path: path.join(dstPath, 'vendor'),
+      filename: '[name].dll.js',
       library: '[name]_[hash]'
     },
+    devtool: 'none',
     plugins: [
-      new CleanWebpackPlugin([path.join(dstPath, 'vendor')]),
+      new CleanWebpackPlugin(path.join(dstPath, 'vendor'), { root }),
       new DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(env)
       }),
       new DllPlugin({
-        path: path.join(dstPath, 'vendor', '[name]-manifest.json'),
-        name: '[name]_[hash]'
+        context: dstPath,
+        name: '[name]_[hash]',
+        path: path.join(dstPath, 'vendor', '[name]-manifest.json')
       })
     ]
   }

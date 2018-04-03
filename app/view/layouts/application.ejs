@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title><%= title %></title>
-    <%- assets %>
 
     <% if (env === 'development') { %>
-      <script src="/reload/reload.js" async></script>
+      <script src="/public/assets/vendor/vendor.dll.js" defer></script>
+      <script src="/reload/reload.js" defer></script>
     <% } %>
+
+    <%- assets %>
+
     <meta name="csrf-token" content="<%- csrfToken %>">
   </head>
   <body>
