@@ -20,7 +20,7 @@ const createAdmin = () => User.create({
   passwordConfirmation: 'qwe321',
   admin: true,
   activated: true,
-  activated_at: Date.now()
+  activatedAt: Date.now()
 })
 
 const createUser = () => User.create({
@@ -30,23 +30,7 @@ const createUser = () => User.create({
   passwordConfirmation: 'qwe321',
   admin: false,
   activated: true,
-  activated_at: Date.now()
-})
-
-const fakeUser = () => User.create({
-  username: faker.internet.userName(),
-  email: faker.internet.email(),
-  password: 'password',
-  passwordConfirmation: 'password',
-  activated: true,
-  activated_at: Date.now()
-})
-
-const fakePoll = (user) => Poll.create({
-  subject: faker.lorem.sentence(),
-  author: user._id,
-  choices: fakeChoices(),
-  stargazers: faker.random.number(maxGazers)
+  activatedAt: Date.now()
 })
 
 const fakeChoices = () => R.times(() => ({
@@ -60,6 +44,40 @@ const createPolls = (users) => R.times(
   () => createPoolPerUser(users),
   users.length * pollsPerUser
 )
+
+function fakeUser () {
+  const currentDate = faker.date.recent()
+  const manyYearsAgo = faker.date.past(5, currentDate)
+  const createdAt = faker.date.between(manyYearsAgo, currentDate)
+  const activatedAt = new Date(
+    createdAt.getTime() + faker.random.number({ min: 5 * 60000, max: 120 * 60000 })
+  )
+
+  return User.create({
+    username: faker.internet.userName(),
+    email: faker.internet.email(),
+    password: 'password',
+    passwordConfirmation: 'password',
+    activated: true,
+    createdAt,
+    activatedAt
+  })
+}
+
+function fakePoll (user) {
+  const currentDate = faker.date.recent()
+  const manyYearsAgo = faker.date.past(5, currentDate)
+  const createdAt = faker.date.between(manyYearsAgo, currentDate)
+
+  return Poll.create({
+    name: faker.lorem.word(),
+    description: R.replace(/^./, R.toUpper)(faker.lorem.words(faker.random.number(11))),
+    author: user._id,
+    choices: fakeChoices(),
+    stargazers: faker.random.number(maxGazers),
+    createdAt
+  })
+}
 
 function createPoolPerUser (users) {
   const userIdx = faker.random.number(users.length - 1)

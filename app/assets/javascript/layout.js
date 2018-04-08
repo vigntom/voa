@@ -12,7 +12,7 @@ function SignNavbar () {
 
 function AccountMenu (id) {
   return div('.navbar-nav', [
-    a('.nav-link', { href: '/users' }, 'Users'),
+    a('.nav-link', { href: '/polls/new' }, 'Create Poll'),
     div('.dropdown', [
       a('#profileDropdown.nav-link.dropdown-toggle', {
         href: '#',

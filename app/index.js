@@ -60,7 +60,7 @@ function createApp () {
 
   app.use('/public', express.static('public'))
   app.use(helmet())
-  app.use(express.urlencoded({ extended: false }))
+  app.use(express.urlencoded({ extended: true }))
   app.use(express.json())
   app.use(paginate.middleware(pagination.count, pagination.limit))
   app.use(session(sessionOptions))

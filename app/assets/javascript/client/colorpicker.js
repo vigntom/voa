@@ -1,0 +1,3 @@
+$('.form-colorpicker').colorpicker()
+
+/* global $ */

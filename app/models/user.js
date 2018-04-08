@@ -35,6 +35,11 @@ const userSchema = new Schema({
     default: false
   },
 
+  polls: {
+    type: Number,
+    default: 0
+  },
+
   activationDigest: {
     type: String
   },

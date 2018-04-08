@@ -1,5 +1,3 @@
-/* global $ */
-
 $.ajaxSetup({
   headers: {
     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -37,3 +35,5 @@ function guard (e) {
 
   return window.confirm(message)
 }
+
+/* global $ */

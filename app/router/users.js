@@ -3,10 +3,12 @@ const R = require('ramda')
 const validator = require('validator')
 const paginate = require('express-paginate')
 const User = require('../models/user')
+const Poll = require('../models/poll')
 const { createView } = require('../helpers/application-helper')
 const usersView = require('../assets/javascript/users')
 const routing = require('../../lib/routing')
 const mailer = require('../../lib/mailer')
+const log = require('../../lib/logger')
 
 const renderer = res => page => res.render('application', page)
 
@@ -51,25 +53,57 @@ const actions = {
       return res.redirect('/login')
     }
 
+    const sort = mkSortArg(req.query)
+
+    function mkSortArg ({ s, o }) {
+      if (o !== 'asc' && o !== 'desc') {
+        log.warn('Unknown users query options: ', o)
+        return {}
+      }
+
+      if (s === 'joined') { return { activatedAt: o } }
+      if (s === 'polls') { return { polls: o } }
+    }
+
+    function sortMenuItem ({ s, o }) {
+      if (s === 'joined') {
+        if (o === 'asc') { return 'Least recently joined' }
+        return 'Most recently joined'
+      }
+
+      if (s === 'polls') {
+        if (o === 'asc') { return 'Fewest polls' }
+        return 'Most polls'
+      }
+
+      return 'Best match'
+    }
+
     return User.count()
-      .then(userCount => {
-        if (req.skip >= userCount) {
+      .then(usersCount => {
+        if (req.skip >= usersCount) {
           req.skip = req.skip - req.query.limit
           res.locals.paginate.page = res.locals.paginate.page - 1
         }
 
+        return usersCount
+      })
+      .then(usersCount => {
         return Promise.all([
-          User.find().limit(req.query.limit).skip(req.skip).lean(),
-          userCount
+          User.find().sort(sort).limit(req.query.limit).skip(req.skip).lean(),
+          usersCount,
+          Poll.count()
         ])
       })
-      .then(([users, userCount]) => {
-        const pageCount = Math.ceil(userCount / req.query.limit)
+      .then(([users, usersCount, pollsCount]) => {
+        const pageCount = Math.ceil(usersCount / req.query.limit)
 
         res.locals.users = users
         res.locals.pageCount = pageCount
-        res.locals.userCount = userCount
-        res.locals.pages = paginate.getArrayPages(req)(7, pageCount, req.query.page)
+        res.locals.usersCount = usersCount
+        res.locals.pollsCount = pollsCount
+        res.locals.pages = paginate.getArrayPages(req)(5, pageCount, req.query.page)
+        res.locals.menuItem = sortMenuItem(req.query)
 
         req.session.state = { users: req.originalUrl }
 

@@ -12,6 +12,7 @@ function routes () {
 
   router.use((req, res, next) => {
     log.trace(req.method, req.url)
+
     res.locals.csrfToken = req.csrfToken()
     res.locals.flash = Object.assign({}, req.session.flash)
     res.locals.session = req.session
