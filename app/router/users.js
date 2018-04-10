@@ -12,18 +12,6 @@ const log = require('../../lib/logger')
 
 const renderer = res => page => res.render('application', page)
 
-function userParams (params) {
-  const fields = ['username', 'email', 'password', 'passwordConfirmation']
-  const pickOrBlank = R.compose(
-    R.pick(fields),
-    R.merge(R.__, params),
-    R.mergeAll,
-    R.map(x => ({ [x]: '' }))
-  )
-
-  return pickOrBlank(fields)
-}
-
 const view = {
   index (options) {
     const page = usersView.index(options)
@@ -223,7 +211,7 @@ const actions = {
 
     return User.findByIdAndRemove(id)
       .then(user => {
-        req.session.flash = { success: `User '${user.username}' deleted` }
+        req.session.flash = { success: `User '${user.username}' is deleted` }
         return res.redirect(req.session.state.users)
       })
       .catch(next)
@@ -245,6 +233,18 @@ function createUserRouter () {
   router.delete('/:id', to('delete'))
 
   return { to, router }
+}
+
+function userParams (params) {
+  const fields = ['username', 'email', 'password', 'passwordConfirmation']
+  const pickOrBlank = R.compose(
+    R.pick(fields),
+    R.merge(R.__, params),
+    R.mergeAll,
+    R.map(x => ({ [x]: '' }))
+  )
+
+  return pickOrBlank(fields)
 }
 
 module.exports = createUserRouter()

@@ -66,7 +66,7 @@ $half-offset: 3px;
   line-height: 1;
 }
 
-.list-group-i {
+.list-group-item {
   color: $primary;
 
   &:hover {
@@ -132,3 +132,20 @@ $half-offset: 3px;
     display: none;
   }
 }
+
+.poll-show {
+  h1 {
+    font-size: 1.5em;
+    font-weight: 400;
+  }
+
+  h2 {
+    font-size: 1.3em;
+    font-weight: 400;
+  }
+}
+
+.chart-container {
+  position: relative;
+}
+

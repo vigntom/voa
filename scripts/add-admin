@@ -14,7 +14,7 @@ const createAdmin = () => User.create({
   passwordConfirmation: 'qaz123',
   admin: true,
   activated: true,
-  activated_at: Date.now()
+  activatedAt: Date.now()
 })
 
 User.findOne({ username: 'admin' })

@@ -167,7 +167,7 @@ function SortGroup (options) {
   const { users, polls, pollsCount, usersCount } = options
 
   function maybeSelected (cond) {
-    const style = '.list-group-item.list-group-item-action'
+    const style = '.list-group-item'
     if (cond) { return style + '.selected' }
     return style
   }

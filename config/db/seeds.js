@@ -3,6 +3,7 @@ require('dotenv').config({ silent: true })
 
 const R = require('ramda')
 const faker = require('faker')
+const mongoose = require('mongoose')
 const User = require('../../app/models/user')
 const Poll = require('../../app/models/poll')
 const db = require('../../lib/db')
@@ -11,7 +12,7 @@ const fakeAccounts = 100
 const pollsPerUser = 3
 const maxGazers = 1000
 const fakeChoicesLimits = { min: 2, max: 9 }
-const fakeVotesLimits = { min: 1, max: 1000 }
+const fakeVotesLimits = { min: 1, max: 100 }
 
 const createAdmin = () => User.create({
   username: 'admin',
@@ -33,9 +34,16 @@ const createUser = () => User.create({
   activatedAt: Date.now()
 })
 
-const fakeChoices = () => R.times(() => ({
-  key: faker.lorem.word(),
-  value: faker.random.number(fakeVotesLimits)
+const fakeChoices = () => R.times(i => ({
+  name: faker.lorem.word() + '-' + i,
+  description: faker.lorem.sentence(),
+  votes: R.times(
+    i => ({
+      voter: mongoose.Types.ObjectId(),
+      type: 'Session'
+    }),
+    faker.random.number(fakeVotesLimits)
+  )
 }), faker.random.number(fakeChoicesLimits))
 
 const createUsers = () => R.times(fakeUser, fakeAccounts)
@@ -71,7 +79,7 @@ function fakePoll (user) {
 
   return Poll.create({
     name: faker.lorem.word(),
-    description: R.replace(/^./, R.toUpper)(faker.lorem.words(faker.random.number(11))),
+    description: faker.lorem.sentence(),
     author: user._id,
     choices: fakeChoices(),
     stargazers: faker.random.number(maxGazers),
