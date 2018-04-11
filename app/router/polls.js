@@ -86,7 +86,7 @@ const actions = {
 
     return poll.save()
       .then(poll => {
-        res.render(`/polls/${poll._id}`)
+        res.redirect(`/polls/${poll._id}`)
       })
       .catch(err => {
         if (err.errors) {
