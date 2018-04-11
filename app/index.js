@@ -16,6 +16,7 @@ const config = require('../config')
 function createApp () {
   const app = express()
   const { pagination } = config.app
+  const csrfProtection = csrf()
 
   if (config.secret.key && config.secret.key.length < 128) {
     throw new Error('Broken secret keys')
@@ -67,7 +68,7 @@ function createApp () {
   app.use(csrf({ cookie: false }))
   app.use(overrideMethods())
 
-  app.use('/', router())
+  app.use('/', router(csrfProtection))
 
   app.use((err, req, res, next) => {
     if (err.code !== 'EBADCSRFTOKEN') {

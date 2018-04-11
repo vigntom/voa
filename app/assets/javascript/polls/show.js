@@ -24,8 +24,8 @@ function VoteBar ({ choices }) {
       div('.form-check.pb-1', { key: i }, [
         input(`#choce-${i}.form-check-input`, {
           type: 'radio',
-          name: `choice[index]`,
-          value: i
+          name: `choice`,
+          value: x._id
         }),
 
         label('.form-check-label.pl-2', {
@@ -37,7 +37,7 @@ function VoteBar ({ choices }) {
       ])
     )),
 
-    button('.btn.btn-success.mt-4.px-5', { type: 'button' }, 'Vote')
+    button('#voa-vote-btn.btn.btn-success.mt-4.px-5', { type: 'button' }, 'Vote')
   ])
 }
 
@@ -47,7 +47,7 @@ function Presentation ({ choices }) {
   ])
 }
 
-module.exports = function Edit ({ poll, flash }) {
+module.exports = function Edit ({ poll, flash, isVoted }) {
   return div('.bg-light.poll-show.main', [
     div('.container.p-0', [
       w.MessageDesk(flash),
@@ -60,8 +60,10 @@ module.exports = function Edit ({ poll, flash }) {
         div('#vote-container.row.border.rounded.mb-5', {
           'data-poll-id': poll._id
         }, [
-          div('.vote-col.col-4.pl-3.pr-2', [ VoteBar(poll) ]),
-          div('.chart-col.col-8.pl-2.pr-3', [ Presentation(poll) ])
+          div('.vote-col.col-4.pl-3.pr-2', {
+            className: isVoted ? 'hide' : ''
+          }, [ VoteBar(poll) ]),
+          div('.chart-col.col-8.pl-2.pr-3.m-auto', [ Presentation(poll) ])
         ])
       ])
     ])

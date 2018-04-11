@@ -157,7 +157,7 @@ function createActivationDigest (user, next) {
   })
 }
 
-userSchema.statics.authenticateBy = function (attribute) {
+userSchema.statics.authenticateBy = function authenticateBy (attribute) {
   const digest = `${attribute}Digest`
 
   function authenticate (user, token, cb) {
@@ -180,7 +180,7 @@ userSchema.statics.authenticateBy = function (attribute) {
   }
 }
 
-userSchema.statics.createResetDigest = function (user, cb) {
+userSchema.statics.createResetDigest = function createResetDigest (user, cb) {
   return newToken(16, (err, token) => {
     if (err) { return cb(err) }
 

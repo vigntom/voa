@@ -8,7 +8,7 @@ const polls = require('./polls')
 const api = require('./api')
 const log = require('../../lib/logger')
 
-function routes () {
+function routes (csrfProtection) {
   const router = express.Router()
 
   router.use((req, res, next) => {
@@ -21,6 +21,8 @@ function routes () {
 
     next()
   })
+
+  // router.use(csrfProtection)
 
   router.get('/', staticPages.to('home'))
   router.get('/about', staticPages.to('about'))
@@ -35,6 +37,7 @@ function routes () {
   router.use('/accountActivations', accountActivtions.router)
   router.use('/passwordResets', passwordResets.router)
   router.use('/polls', polls.router)
+
   router.use('/api', api.router)
 
   return router

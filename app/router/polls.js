@@ -102,13 +102,24 @@ const actions = {
 
   show (req, res, next) {
     const id = req.params.id
-
     if (!validator.isMongoId(id)) { return next() }
 
-    return Poll.findById(id).populate('author', 'username').lean()
-      .then(poll => {
+    const findPoll = Poll.findById(id).populate('author', 'username').lean()
+    const findVoter = Poll.find({
+      _id: id,
+      'choices.votes': {
+        $elemMatch: routing.voterQuery(req.session)
+      }
+    }).lean()
+
+    return Promise.all([findPoll, findVoter])
+      .then(([poll, voter]) => {
         res.locals.poll = poll
+        res.locals.isVoted = voter.length > 0
+
         res.render('application', view.show(res.locals))
+      })
+      .then(poll => {
       })
       .catch(next)
   },

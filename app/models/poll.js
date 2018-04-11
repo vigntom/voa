@@ -36,7 +36,7 @@ const pollSchema = new Schema({
 
     votes: [{
       voter: {
-        type: Schema.Types.ObjectId,
+        type: String,
         required: true
       },
 
@@ -99,6 +99,13 @@ function choicesValidator (next) {
   })
 
   next()
+}
+
+pollSchema.statics.pushVote = function pushVote (pollId, choiceId, voter) {
+  return this.findOneAndUpdate(
+    { _id: pollId, 'choices._id': choiceId },
+    { $push: { 'choices.$.votes': voter } }
+  )
 }
 
 module.exports = mongoose.model('Poll', pollSchema)
