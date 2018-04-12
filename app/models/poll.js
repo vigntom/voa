@@ -101,11 +101,29 @@ function choicesValidator (next) {
   next()
 }
 
+pollSchema.statics.findVoter = function findVoter (pollId, voter) {
+  return this.find({
+    _id: pollId,
+    'choices.votes': {
+      $elemMatch: voter
+    }
+  })
+}
+
 pollSchema.statics.pushVote = function pushVote (pollId, choiceId, voter) {
-  return this.findOneAndUpdate(
-    { _id: pollId, 'choices._id': choiceId },
-    { $push: { 'choices.$.votes': voter } }
-  )
+  return this.model('Poll').findVoter(pollId, voter).lean()
+    .then(res => {
+      console.log('isVoted: ', res)
+
+      if (res.length > 0) {
+        return Promise.reject(new Error('Voter already voted'))
+      }
+
+      return this.findOneAndUpdate(
+        { _id: pollId, 'choices._id': choiceId },
+        { $push: { 'choices.$.votes': voter } }
+      )
+    })
 }
 
 module.exports = mongoose.model('Poll', pollSchema)

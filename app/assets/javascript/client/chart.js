@@ -20,17 +20,20 @@ function createChart (poll) {
       datasets: [{
         label: `Votes in % (total: ${votes})`,
         data,
-        backgroundColor: data.map(toColor),
-        borderWidth: 1
+        backgroundColor: data.map(toColor)
       }]
     },
     options: {
       scales: {
         xAxes: [{
+          gridLines: { display: false },
           ticks: {
             suggestedMin: 0,
             suggestedMax: 100
           }
+        }],
+        yAxes: [{
+          gridLines: { display: false }
         }]
       },
       tooltips: {
