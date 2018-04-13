@@ -2,6 +2,7 @@ const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const pluralize = require('pluralize')
 const crypto = require('crypto')
+const querystring = require('querystring')
 const { form, div, ul, li, image, nav, a, span, h4, button, i } = hh(h)
 
 function md5 (string) {
@@ -164,7 +165,8 @@ function InfoBar ({ path, info, menuItem }, dropdown) {
 }
 
 function SortGroup (options) {
-  const { users, polls, pollsCount, usersCount } = options
+  const { users, polls, pollsCount, usersCount, query } = options
+  const queryStr = query ? `?${querystring.stringify(query)}` : ''
 
   function maybeSelected (cond) {
     const style = '.list-group-item'
@@ -173,11 +175,11 @@ function SortGroup (options) {
   }
 
   return div('.list-group', [
-    a(maybeSelected(polls), { href: '/polls' }, [
+    a(maybeSelected(polls), { href: '/polls' + queryStr }, [
       'Polls',
       span('.counter.badge.badge-pill.float-right', pollsCount)
     ]),
-    a(maybeSelected(users), { href: '/users' }, [
+    a(maybeSelected(users), { href: '/users' + queryStr }, [
       'Users',
       span('.counter.badge.badge-pill.float-right', usersCount)
     ])

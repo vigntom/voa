@@ -5,7 +5,7 @@ const w = require('../../../helpers/view-helper')
 const { div, h1, span, a, label, input, button } = hh(h)
 
 module.exports = function New ({ csrfToken, user, flash }) {
-  return div('.main.cointainer.mt-3', [
+  return div('.main.cointainer.mt-3.mb-5', [
     div('.w-30.m-auto', [
       h1('.page-header', 'Log in'),
       w.MessageDesk(flash),
@@ -22,6 +22,7 @@ module.exports = function New ({ csrfToken, user, flash }) {
             type: 'password',
             placeholder: 'Password'
           }),
+
           div('.form-check', [
             label('.form-check-label', [
               input('.form-check-input', {

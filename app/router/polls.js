@@ -21,6 +21,8 @@ const view = v.initViews(template, data)
 const actions = {
   index (req, res, next) {
     const sort = mkSortArg(req.query)
+    const query = routing.createSearchQuery('name', req.query.q)
+    const userQuery = routing.createSearchQuery('username', req.query.q)
 
     function mkSortArg ({ s, o }) {
       if (o !== 'asc' && o !== 'desc') {
@@ -41,9 +43,9 @@ const actions = {
     }
 
     return Promise.all([
-      Poll.find().sort(sort).limit(req.query.limit).skip(req.skip).populate('author').lean(),
-      Poll.count(),
-      User.count()
+      Poll.find(query).sort(sort).limit(req.query.limit).skip(req.skip).populate('author').lean(),
+      Poll.count(query),
+      User.count(userQuery)
     ]).then(([polls, pollsCount, usersCount]) => {
       const pageCount = Math.ceil(pollsCount / req.query.limit)
 
@@ -53,6 +55,7 @@ const actions = {
       res.locals.usersCount = usersCount
       res.locals.pages = paginate.getArrayPages(req)(7, pageCount, req.query.page)
       res.locals.menuItem = sortMenuItem(req.query)
+      res.locals.query = req.query
 
       return res.render('application', view.index(res.locals))
     })

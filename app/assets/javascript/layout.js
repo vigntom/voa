@@ -56,7 +56,7 @@ function Header (user) {
                 placeholder: 'Search Polls',
                 'aria-label': 'Search'
               }),
-              button('.btn btn-outline-success my-2 my-sm-0', { type: 'submit' }, 'Search')
+              input('.hidden', { type: 'submit' })
             ]),
             user ? AccountMenu(user._id) : SignNavbar()
           ])

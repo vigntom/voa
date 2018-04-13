@@ -42,6 +42,8 @@ const actions = {
     }
 
     const sort = mkSortArg(req.query)
+    const query = routing.createSearchQuery('username', req.query.q)
+    const pollQuery = routing.createSearchQuery('name', req.query.q)
 
     function mkSortArg ({ s, o }) {
       if (o !== 'asc' && o !== 'desc') {
@@ -67,7 +69,7 @@ const actions = {
       return 'Best match'
     }
 
-    return User.count()
+    return User.count(query)
       .then(usersCount => {
         if (req.skip >= usersCount) {
           req.skip = req.skip - req.query.limit
@@ -78,9 +80,9 @@ const actions = {
       })
       .then(usersCount => {
         return Promise.all([
-          User.find().sort(sort).limit(req.query.limit).skip(req.skip).lean(),
+          User.find(query).sort(sort).limit(req.query.limit).skip(req.skip).lean(),
           usersCount,
-          Poll.count()
+          Poll.count(pollQuery)
         ])
       })
       .then(([users, usersCount, pollsCount]) => {
@@ -92,6 +94,7 @@ const actions = {
         res.locals.pollsCount = pollsCount
         res.locals.pages = paginate.getArrayPages(req)(5, pageCount, req.query.page)
         res.locals.menuItem = sortMenuItem(req.query)
+        res.locals.query = req.query
 
         req.session.state = { users: req.originalUrl }
 
