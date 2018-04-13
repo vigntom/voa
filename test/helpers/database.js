@@ -10,7 +10,7 @@ test.before('Start MongoDB Server', t => {
   return mongod.getConnectionString()
     .then(uri => {
       mongoose.Promise = Promise
-      return mongoose.connect(uri, { useMongoClient: true })
+      return mongoose.connect(uri)
     })
     .then(() => {
       return Object.values(users).map(
