@@ -9,10 +9,21 @@ const User = require('../app/models/user')
 
 const createAdmin = () => User.create({
   username: 'admin',
-  email: 'admin@example.com',
-  password: 'qaz123',
-  passwordConfirmation: 'qaz123',
+  email: 'vigntom2708@gmail.com',
+  password: '*',
+  passwordConfirmation: '*',
   admin: true,
+  protected: true,
+  activated: true,
+  activatedAt: Date.now()
+})
+
+const createNeitherUser = () => User.create({
+  username: 'neither',
+  email: 'vigntom2708@gmail.com',
+  password: '*',
+  passwordConfirmation: '*',
+  protected: true,
   activated: true,
   activatedAt: Date.now()
 })
@@ -21,6 +32,11 @@ User.findOne({ username: 'admin' })
   .then(user => {
     if (user) return null
     return createAdmin()
+  })
+  .then(() => User.findOne({ username: 'neither' }))
+  .then(user => {
+    if (user) return null
+    return createNeitherUser()
   })
   .catch(err => {
     console.error(err.message)

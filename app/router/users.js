@@ -8,7 +8,7 @@ const { createView } = require('../helpers/application-helper')
 const usersView = require('../assets/javascript/users')
 const routing = require('../../lib/routing')
 const mailer = require('../../lib/mailer')
-const log = require('../../lib/logger')
+// const log = require('../../lib/logger')
 
 const renderer = res => page => res.render('application', page)
 
@@ -46,13 +46,12 @@ const actions = {
     const pollQuery = routing.createSearchQuery('name', req.query.q)
 
     function mkSortArg ({ s, o }) {
-      if (o !== 'asc' && o !== 'desc') {
-        log.warn('Unknown users query options: ', o)
-        return {}
-      }
+      const order = (o === 'asc') ? 'asc' : 'desc'
 
-      if (s === 'joined') { return { activatedAt: o } }
-      if (s === 'polls') { return { polls: o } }
+      if (s === 'joined') { return { activatedAt: order } }
+      if (s === 'polls') { return { polls: order } }
+
+      return {}
     }
 
     function sortMenuItem ({ s, o }) {
@@ -215,6 +214,12 @@ const actions = {
     return User.findByIdAndRemove(id)
       .then(user => {
         req.session.flash = { success: `User '${user.username}' is deleted` }
+        return User.findOne({ username: 'neither' }).lean()
+      })
+      .then(neither => {
+        return Poll.movePolls(id, neither._id)
+      })
+      .then(() => {
         return res.redirect(req.session.state.users)
       })
       .catch(next)

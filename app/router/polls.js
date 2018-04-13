@@ -25,13 +25,12 @@ const actions = {
     const userQuery = routing.createSearchQuery('username', req.query.q)
 
     function mkSortArg ({ s, o }) {
-      if (o !== 'asc' && o !== 'desc') {
-        log.warn('Unkown polls query option: ', o)
-        return {}
-      }
+      const order = (o === 'asc') ? 'asc' : 'desc'
 
-      if (s === 'stars') { return { stargazers: o } }
-      if (s === 'updated') { return { updatedAt: o } }
+      if (s === 'stars') { return { stargazers: order } }
+      if (s === 'updated') { return { updatedAt: order } }
+
+      return {}
     }
 
     function sortMenuItem ({ s, o }) {
@@ -59,7 +58,7 @@ const actions = {
 
       return res.render('application', view.index(res.locals))
     })
-    .catch(next)
+      .catch(next)
   },
 
   new (req, res) {

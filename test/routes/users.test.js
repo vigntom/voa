@@ -32,23 +32,23 @@ test('Should get users index', t => {
 
 test('Should get signup form', t => (
   request(app)
-  .get('/users/new')
-  .then(res => { t.is(res.statusCode, 200) })
-  .catch(t.ifError)
+    .get('/users/new')
+    .then(res => { t.is(res.statusCode, 200) })
+    .catch(t.ifError)
 ))
 
 test('Rejected signup without csrfToken', t => (
   request(app).post('/users')
-  .send({
-    username: 'foobar',
-    email: 'foobar@example.com',
-    password: 'password',
-    passwordConfirmation: 'password'
-  })
-  .then(res => {
-    t.is(res.statusCode, 422)
-  })
-  .catch(t.ifError)
+    .send({
+      username: 'foobar',
+      email: 'foobar@example.com',
+      password: 'password',
+      passwordConfirmation: 'password'
+    })
+    .then(res => {
+      t.is(res.statusCode, 422)
+    })
+    .catch(t.ifError)
 ))
 
 test('Should redirect edit when not logged in', t => {

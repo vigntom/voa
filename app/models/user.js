@@ -35,6 +35,11 @@ const userSchema = new Schema({
     default: false
   },
 
+  protected: {
+    type: Boolean,
+    default: false
+  },
+
   polls: {
     type: Number,
     default: 0
@@ -106,6 +111,12 @@ function passwordValidator (next) {
     this.invalidate('password', "Password can't be blank")
   }
 
+  // * for service account without access rights
+  // this accounts for deleted users
+  if (this.password === '*' && this.passwordConfirmation === '*') {
+    return next()
+  }
+
   if (!isLength(this.password, { min: 6 })) {
     this.invalidate('password', 'Password is too short (minimum is 6 characters)')
   }
@@ -120,6 +131,11 @@ function passwordValidator (next) {
 
 function createDigitalPassword (user, next) {
   if (!user.password && !user.passwordConfirmation) { return next() }
+
+  if (user.password === '*') {
+    user.passwordDigest = '*'
+    return next()
+  }
 
   return digest(user.password, (err, hash) => {
     if (err) { return next(err) }

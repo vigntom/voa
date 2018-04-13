@@ -6,7 +6,10 @@ const dateFormat = require('dateformat')
 const { div, ul, li, a, h4, time, p } = hh(h)
 
 function AdminDeleteLink ({ current, user }) {
-  if (current.admin && current._id.toString() !== user._id.toString()) {
+  if (user.admin) { return null }
+  if (user.protected) { return null }
+
+  if (current.admin) {
     return a({
       href: `/users/${user._id}`,
       'data-method': 'delete',

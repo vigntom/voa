@@ -1,20 +1,11 @@
 import '../helpers/database'
 import test from 'ava'
 import User from '../../app/models/user'
+import fixture from '../fixtures/users'
 
-const login = {
-  username: 'foo',
-  email: 'foo@example.com',
-  password: 'abc123',
-  passwordConfirmation: 'abc123'
-}
+const login = fixture.sara
 
 const authenticate = User.authenticateBy('password')
-
-test.before(() => {
-  const user = new User(login)
-  return user.save()
-})
 
 test.after.always(() => {
   return User.remove()
@@ -71,6 +62,7 @@ test.cb('should authenticate if correct username password', t => {
   const password = login.password
   authenticate(username, password, (err, user) => {
     t.falsy(err)
+    t.truthy(user)
     t.end()
   })
 })
@@ -80,6 +72,42 @@ test.cb('should authenticate if correct email password', t => {
   const password = login.password
   authenticate(email, password, (err, user) => {
     t.falsy(err)
+    t.truthy(user)
     t.end()
+  })
+})
+
+test.cb('passwrod can be "*" (service user)', t => {
+  const login = {
+    username: 'someServiceAccount',
+    email: 'serviceAccount@example.com',
+    password: '*',
+    passwordConfirmation: '*'
+  }
+
+  const user = new User(login)
+
+  user.validate(v => {
+    t.falsy(v)
+    t.end()
+  })
+})
+
+test.cb('should not authenticate if service acount (password = *)', t => {
+  const login = {
+    username: 'someServiceAccount',
+    email: 'serviceAccount@example.com',
+    password: '*',
+    passwordConfirmation: '*'
+  }
+
+  const user = new User(login)
+
+  user.save(() => {
+    authenticate(login.username, '*', (err, user) => {
+      t.falsy(err)
+      t.falsy(user)
+      t.end()
+    })
   })
 })

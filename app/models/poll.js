@@ -35,6 +35,8 @@ const pollSchema = new Schema({
     },
 
     votes: [{
+      _id: false,
+
       voter: {
         type: String,
         required: true
@@ -113,8 +115,6 @@ pollSchema.statics.findVoter = function findVoter (pollId, voter) {
 pollSchema.statics.pushVote = function pushVote (pollId, choiceId, voter) {
   return this.model('Poll').findVoter(pollId, voter).lean()
     .then(res => {
-      console.log('isVoted: ', res)
-
       if (res.length > 0) {
         return Promise.reject(new Error('Voter already voted'))
       }
@@ -123,6 +123,16 @@ pollSchema.statics.pushVote = function pushVote (pollId, choiceId, voter) {
         { _id: pollId, 'choices._id': choiceId },
         { $push: { 'choices.$.votes': voter } }
       )
+    })
+}
+
+pollSchema.statics.movePolls = function movePolls (fromId, toId) {
+  return this.model('Poll').updateMany({ author: fromId }, { $set: { author: toId } })
+    .then(() => {
+      return this.model('Poll').count({ author: toId })
+    })
+    .then(num => {
+      return User.findByIdAndUpdate(toId, { $set: { polls: num } })
     })
 }
 

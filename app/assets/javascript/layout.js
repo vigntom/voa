@@ -1,5 +1,6 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
+const w = require('../../helpers/view-helper')
 
 const { header, footer, div, a, nav, button, span, form, input } = hh(h)
 
@@ -41,25 +42,24 @@ function Header (user) {
         button('.navbar-toggler', {
           type: 'button',
           'data-toggle': 'collapse',
-          'data-target': '#navbarNavAltMarkup',
-          'aria-controls': 'navbarNavAltMarkup',
+          'data-target': '#navbar-voa',
+          'aria-controls': 'navbar-voa',
           'aria-expanded': false,
           'aria-label': 'Toggle navigator'
-        },
-          span('.navbar-toggler-icon')
-        ),
-        div('#navbarNavAltMarkup.collapse.navbar-collapse', [
-          div('.navbar-nav.ml-auto', [
-            form('.form-inline.pr-5', [
-              input('.form-control.bg-dark-lighter.mr-sm-2', {
-                type: 'search',
-                placeholder: 'Search Polls',
-                'aria-label': 'Search'
-              }),
-              input('.hidden', { type: 'submit' })
-            ]),
-            user ? AccountMenu(user._id) : SignNavbar()
-          ])
+        }, span('.navbar-toggler-icon')),
+
+        div('#navbar-voa.collapse.navbar-collapse', [
+          form('.form-inline.ml-lg-3.mr-auto.my-1.my-lg-0', { action: '/polls', method: 'get' }, [
+            input('.form-control.bg-dark-lighter.border-0', {
+              type: 'search',
+              placeholder: 'Search Polls',
+              'aria-label': 'Search',
+              name: 'q'
+            }),
+            input('.hidden', { type: 'submit' })
+          ]),
+
+          div('.navbar-nav', [ user ? AccountMenu(user._id) : SignNavbar() ])
         ])
       ])
     ])

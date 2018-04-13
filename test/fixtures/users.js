@@ -11,6 +11,15 @@ const namedUsers = {
     activated_at: Date.now()
   },
 
+  service: {
+    username: 'service',
+    email: 'service@example.com',
+    password: '*',
+    admin: false,
+    activated: true,
+    activated_at: Date.now()
+  },
+
   bob: {
     username: 'bob',
     email: 'bob@yahoo.com',

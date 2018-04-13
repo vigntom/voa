@@ -6,7 +6,9 @@ const { DllPlugin, DefinePlugin } = require('webpack')
 module.exports = function vendorConfig ({ root, env, dstPath }) {
   const config = {
     entry: {
-      'vendor': ['ramda', 'bootstrap', 'chart.js', 'd3-scale', 'd3-scale-chromatic']
+      'utils': [ 'ramda' ],
+      'chart': [ 'chart.js', 'd3-scale', 'd3-scale-chromatic' ],
+      'vendor': [ 'bootstrap' ]
     },
     output: {
       path: path.join(dstPath, 'vendor'),

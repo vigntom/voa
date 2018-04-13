@@ -10,9 +10,9 @@ const db = require('../../lib/db')
 
 const fakeAccounts = 100
 const pollsPerUser = 3
-const maxGazers = 1000
-const fakeChoicesLimits = { min: 2, max: 9 }
-const fakeVotesLimits = { min: 1, max: 100 }
+const maxGazers = 100
+const fakeChoicesLimits = { min: 2, max: 5 }
+const fakeVotesLimits = { min: 1, max: 11 }
 
 const createAdmin = () => User.create({
   username: 'admin',
@@ -20,11 +20,23 @@ const createAdmin = () => User.create({
   password: 'qwe321',
   passwordConfirmation: 'qwe321',
   admin: true,
+  protected: true,
   activated: true,
   activatedAt: Date.now()
 })
 
-const createUser = () => User.create({
+const createServiceUser = () => User.create({
+  username: 'neither',
+  email: 'service@example.com',
+  password: '*',
+  passwordConfirmation: '*',
+  admin: false,
+  protected: true,
+  activated: true,
+  activatedAt: Date.now()
+})
+
+const createTesterUser = () => User.create({
   username: 'foobar',
   email: 'foobar@example.com',
   password: 'qwe321',
@@ -94,7 +106,8 @@ function createPoolPerUser (users) {
 
 Promise.all([ User.remove(), Poll.remove() ])
   .then(() => createAdmin())
-  .then(() => createUser())
+  .then(() => createServiceUser())
+  .then(() => createTesterUser())
   .then(() => Promise.all(createUsers()))
   .then(() => User.find())
   .then(users => Promise.all(createPolls(users)))
