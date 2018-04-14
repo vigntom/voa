@@ -31,6 +31,14 @@ module.exports = function developmentConfig ({ root, dstPath }) {
       }),
       new DllReferencePlugin({
         context: dstPath,
+        manifest: require(path.join(dstPath, 'vendor/utils-manifest.json'))
+      }),
+      new DllReferencePlugin({
+        context: dstPath,
+        manifest: require(path.join(dstPath, 'vendor/chart-manifest.json'))
+      }),
+      new DllReferencePlugin({
+        context: dstPath,
         manifest: require(path.join(dstPath, 'vendor/vendor-manifest.json'))
       })
     ]

@@ -37,6 +37,7 @@ function basicConfig ({ env, srcPath, dstPath }) {
 module.exports = function buildConfig (env) {
   const srcPath = path.resolve(__dirname, 'app', 'assets')
   const dstPath = path.resolve(__dirname, 'public', 'assets')
+  const options = findOptions(env)
 
   function findOptions (env) {
     const options = { root: __dirname, srcPath, dstPath }
@@ -53,11 +54,17 @@ module.exports = function buildConfig (env) {
     return config(options)
   }
 
-  const options = findOptions(env)
+  function loadEnvConfig (options) {
+    const config = require(`./config/webpack/${options.env}`)
+    return config(options)
+  }
 
-  if (env && env.vendor) { return execVendorConfig(options) }
+  if (env && env.vendor) {
+    return execVendorConfig(options)
+  }
 
-  const config = require(`./config/webpack/${options.env}`)
-
-  return merge(basicConfig(options), config(options))
+  return merge(
+    basicConfig(options),
+    loadEnvConfig(options)
+  )
 }

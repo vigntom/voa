@@ -1,9 +1,11 @@
+const path = require('path')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const ChunkManifestPlugin = require('chunk-manifest-webpack-plugin')
 const WebpackMd5Hash = require('webpack-md5-hash')
+const { DefinePlugin, DllReferencePlugin } = require('webpack')
 
 module.exports = function productionConfig ({ root, dstPath }) {
   return {
@@ -23,9 +25,9 @@ module.exports = function productionConfig ({ root, dstPath }) {
             loader: 'css-loader',
             options: { modules: false, minimize: true }
           },
-            'postcss-loader?sourceMap',
-            'resolve-url-loader',
-            'sass-loader?sourceMap'
+          'postcss-loader?sourceMap',
+          'resolve-url-loader',
+          'sass-loader?sourceMap'
           ]
         })
       }, {
@@ -35,6 +37,9 @@ module.exports = function productionConfig ({ root, dstPath }) {
     },
     plugins: [
       new CleanWebpackPlugin(dstPath, { root }),
+      new DefinePlugin({
+        'process.env': { 'NODE_ENV': JSON.stringify('development') }
+      }),
       new UglifyJsPlugin({
         sourceMap: true,
         parallel: true
