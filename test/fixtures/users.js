@@ -46,7 +46,7 @@ const namedUsers = {
 }
 
 const createFakeUser = () => ({
-  username: faker.internet.userName(),
+  username: faker.internet.userName().replace(/(\.)|(_)/, '-'),
   email: faker.internet.email(),
   password: 'password',
   activated: true,

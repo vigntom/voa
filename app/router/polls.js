@@ -7,7 +7,7 @@ const template = require('../assets/javascript/polls')
 const Poll = require('../models/poll')
 const User = require('../models/user')
 const paginate = require('express-paginate')
-const log = require('../../lib/logger.js')
+// const log = require('../../lib/logger.js')
 
 const data = {
   index: { title: 'Polls' },
