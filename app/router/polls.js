@@ -107,7 +107,7 @@ const actions = {
     if (!validator.isMongoId(id)) { return next() }
 
     const findPoll = Poll.findById(id).populate('author', 'username').lean()
-    const findVoter = Poll.findVoter(id, routing.voterQuery(req.session)).lean()
+    const findVoter = Poll.findVoter({ id, voter: routing.voterQuery(req.session) }).lean()
 
     return Promise.all([findPoll, findVoter])
       .then(([poll, voter]) => {

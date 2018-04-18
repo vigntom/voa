@@ -29,7 +29,7 @@ const actions = {
         return res.json({ error: "Request poll id doesn't look like mongoId" })
       }
 
-      Poll.pushVote(id, choice, voter)
+      Poll.findByIdAndVote(id, { choice, voter })
         .then(poll => {
           res.json({ result: 'ok' })
         }).catch(err => {
