@@ -1,6 +1,40 @@
 const digest = require('../lib/digest')
 const { isLength } = require('validator')
 
+function passwordAuthentication (schema, options) {
+  schema.add({
+    passwordDigest: { type: String },
+    resetDigest: { type: String },
+    resetCreatedAt: { type: Date },
+    activationDigest: { type: String },
+    activated: { type: Boolean, default: false },
+    activatedAt: { type: Date }
+  })
+
+  schema.virtual('password')
+    .get(function () { return this._password })
+    .set(function (value) { this._password = value })
+
+  schema.virtual('passwordConfirmation')
+    .get(function () { return this._passwordConfirmation })
+    .set(function (value) { this._passwordConfirmation = value })
+
+  schema.virtual('resetToken')
+    .get(function () { return this._resetToken })
+    .set(function (value) { this._resetToken = value })
+
+  schema.virtual('activationToken')
+    .get(function () { return this._activationToken })
+    .set(function (value) { this._activationToken = value })
+
+  schema.pre('validate', passwordValidator)
+  schema.post('validate', createDigitalPassword)
+  schema.post('validate', createActivationDigest)
+
+  schema.statics.createResetDigest = createResetDigest
+  schema.statics.authenticateBy = authenticateBy
+}
+
 function passwordValidator (next) {
   const digestPresent = !this.isNew && this.passwordDigest
   const rawPasswordEmpty = !(this.password || this.passwordConfirmation)
@@ -100,40 +134,6 @@ function authenticateBy (attribute) {
         })
       })
   }
-}
-
-function passwordAuthentication (schema, options) {
-  schema.add({
-    passwordDigest: { type: String },
-    resetDigest: { type: String },
-    resetCreatedAt: { type: Date },
-    activationDigest: { type: String },
-    activated: { type: Boolean, default: false },
-    activatedAt: { type: Date }
-  })
-
-  schema.virtual('password')
-    .get(function () { return this._password })
-    .set(function (value) { this._password = value })
-
-  schema.virtual('passwordConfirmation')
-    .get(function () { return this._passwordConfirmation })
-    .set(function (value) { this._passwordConfirmation = value })
-
-  schema.virtual('resetToken')
-    .get(function () { return this._resetToken })
-    .set(function (value) { this._resetToken = value })
-
-  schema.virtual('activationToken')
-    .get(function () { return this._activationToken })
-    .set(function (value) { this._activationToken = value })
-
-  schema.pre('validate', passwordValidator)
-  schema.post('validate', createDigitalPassword)
-  schema.post('validate', createActivationDigest)
-
-  schema.statics.createResetDigest = createResetDigest
-  schema.statics.authenticateBy = authenticateBy
 }
 
 module.exports = passwordAuthentication

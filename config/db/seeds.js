@@ -39,6 +39,7 @@ const createServiceUser = () => User.create({
 const createTesterUser = () => User.create({
   username: 'foobar',
   email: 'foobar@example.com',
+  emailProtected: false,
   password: 'qwe321',
   passwordConfirmation: 'qwe321',
   admin: false,
@@ -65,6 +66,33 @@ const createPolls = (users) => R.times(
   users.length * pollsPerUser
 )
 
+const createFriendship = (users) => {
+  R.times(
+    () => randomFriendship(users),
+    users.length * 2
+  )
+
+  return users
+}
+
+const createPending = (users) => {
+  R.times(
+    () => randomPending(users),
+    users.length
+  )
+
+  return users
+}
+
+const createRequests = (users) => {
+  R.times(
+    () => randomRequest(users),
+    users.length
+  )
+
+  return users
+}
+
 function fakeUser () {
   const currentDate = faker.date.recent()
   const manyYearsAgo = faker.date.past(5, currentDate)
@@ -74,14 +102,14 @@ function fakeUser () {
   )
 
   return User.create({
-    username: faker.internet.userName(),
+    username: faker.internet.userName().replace(/(\.)|(_)/, '-'),
     email: faker.internet.email(),
     password: 'password',
     passwordConfirmation: 'password',
     activated: true,
     createdAt,
     activatedAt
-  })
+  }).catch(fakeUser)
 }
 
 function fakePoll (user) {
@@ -96,12 +124,50 @@ function fakePoll (user) {
     choices: fakeChoices(),
     stargazers: faker.random.number(maxGazers),
     createdAt
-  })
+  }).catch(fakePoll)
 }
 
 function createPoolPerUser (users) {
   const userIdx = faker.random.number(users.length - 1)
+  if (users[userIdx].protected) { return null }
   return fakePoll(users[userIdx])
+}
+
+function randomCommonUsers (users) {
+  const u1 = faker.random.number(users.length - 1)
+  const u2 = faker.random.number(users.length - 1)
+
+  if (u1 === u2) { return randomCommonUsers(users) }
+  if (users[u1].protected) { return randomCommonUsers(users) }
+  if (users[u2].protected) { return randomCommonUsers(users) }
+  return [ users[u1], users[u2] ]
+}
+
+function randomFriendship (users) {
+  const [u1, u2] = randomCommonUsers(users)
+
+  return User.findById(u1._id).addFriend({ _id: u2._id })
+    .catch(err => {
+      if (!err.errors) console.log(err.message)
+    })
+}
+
+function randomPending (users) {
+  const [u1, u2] = randomCommonUsers(users)
+
+  return User.findById(u1._id).acceptFriendship({ _id: u2._id })
+    .catch(err => {
+      if (!err.errors) console.log(err.message)
+    })
+}
+
+function randomRequest (users) {
+  const [u1, u2] = randomCommonUsers(users)
+
+  return User.findById(u1._id).requestFriendship({ _id: u2._id })
+    .catch(err => {
+      if (!err.errors) console.log(err.message)
+    })
 }
 
 Promise.all([ User.remove(), Poll.remove() ])
@@ -110,5 +176,9 @@ Promise.all([ User.remove(), Poll.remove() ])
   .then(() => createTesterUser())
   .then(() => Promise.all(createUsers()))
   .then(() => User.find())
+  .then(users => Promise.all(createRequests(users)))
+  .then(users => Promise.all(createPending(users)))
+  .then(users => Promise.all(createFriendship(users)))
   .then(users => Promise.all(createPolls(users)))
+  .catch(err => { console.error('** ERROR: ', err.message) })
   .then(() => db.connection.close())

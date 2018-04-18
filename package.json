@@ -32,7 +32,8 @@
     "d:b:w": "yarn dev:build:watch",
     "d:b:v": "yarn dev:build:vender",
     "d:b:f": "yarn dev:build:vendor && yarn dev:build:watch",
-    "t": "yarn test"
+    "t": "yarn test",
+    "t:w": "yarn test:watch"
   },
   "license": "MIT",
   "devDependencies": {

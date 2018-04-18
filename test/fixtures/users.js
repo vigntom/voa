@@ -6,18 +6,20 @@ const namedUsers = {
     username: 'admin',
     email: 'admin@example.com',
     password: 'password',
+    protected: true,
     admin: true,
     activated: true,
-    activated_at: Date.now()
+    activatedAt: Date.now()
   },
 
   service: {
     username: 'service',
     email: 'service@example.com',
     password: '*',
+    protected: true,
     admin: false,
     activated: true,
-    activated_at: Date.now()
+    activatedAt: Date.now()
   },
 
   bob: {
@@ -25,7 +27,7 @@ const namedUsers = {
     email: 'bob@yahoo.com',
     password: 'password',
     activated: true,
-    activated_at: Date.now()
+    activatedAt: Date.now()
   },
 
   sara: {
@@ -33,7 +35,7 @@ const namedUsers = {
     email: 'sara@example.org',
     password: 'password',
     activated: true,
-    activated_at: Date.now()
+    activatedAt: Date.now()
   },
 
   den: {
@@ -41,7 +43,15 @@ const namedUsers = {
     email: 'den@example.us',
     password: 'password',
     activated: true,
-    activated_at: Date.now()
+    activatedAt: Date.now()
+  },
+
+  samanta: {
+    username: 'samanta',
+    email: 'samanta@example.jp',
+    password: 'password',
+    activated: true,
+    activatedAt: Date.now()
   }
 }
 
