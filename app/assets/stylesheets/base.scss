@@ -154,3 +154,29 @@ $half-offset: 3px;
   display: none;
 }
 
+input {
+  &[type="search"] {
+    background: white(.2);
+    color: $white;
+
+    &:focus {
+      background: white(.21);
+      color: $white;
+    }
+
+    &::placeholder {
+      color: white(.4);
+      font-size: .9em;
+      line-height: 1;
+    }
+  }
+}
+
+.navbar-dark {
+  .navbar-nav {
+    .nav-link {
+      color: white(.8);
+    }
+  }
+}
+

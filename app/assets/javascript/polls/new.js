@@ -25,44 +25,64 @@ function Slash () {
 }
 
 function Name ({ name, errors }) {
+  const options = {
+    type: 'text',
+    name: 'name',
+    placeholder: 'Poll name',
+    defaultValue: name
+  }
+
   return div('.form-group.col-auto', [
     label({ htmlFor: 'poll-name' }, 'Poll name'),
-    input('#poll-name.form-control', {
-      type: 'text',
-      name: 'name',
-      placeholder: 'Poll name',
-      defaultValue: name,
-      className: w.maybeErrorField('name', errors)
-    })
+    input(
+      '#poll-name.form-control',
+      w.maybeError(options, errors, { placement: 'right' })
+    )
   ])
 }
 
-function Description (value) {
+function Description ({ description, errors }) {
+  const options = {
+    type: 'text',
+    name: 'description',
+    placeholder: 'question',
+    defaultValue: description
+  }
+
   return div('.form-group', [
-    label({ htmlFor: 'poll-description' }, 'Description (optional)'),
-    input('#poll-description.form-control', {
-      type: 'text',
-      name: 'description',
-      placeholder: 'description',
-      defaultValue: value
-    })
+    label({ htmlFor: 'poll-description' }, 'Question'),
+    input(
+      '#poll-description.form-control',
+      w.maybeError(options, errors, { placement: 'top' })
+    )
   ])
 }
 
 function PollName ({ author, name, errors }) {
-  return div('.form-row', [ Author(author), Slash(), Name({ name, errors }) ])
+  return div('.form-row', [
+    Author(author),
+    Slash(),
+    Name({ name, errors })
+  ])
 }
 
 function ChoiceItem ({ index, value, errors }) {
+  const nameOptions = {
+    type: 'text',
+    name: `choices[${index}][name]`,
+    placeholder: 'Choice name',
+    defaultValue: value.name
+  }
+
   return div(`.choice.choice-core.form-row.pb-1`, [
     div('.col-4', [
-      input('.choice-name.form-control', {
-        type: 'text',
-        name: `choices[${index}][name]`,
-        placeholder: 'Choice name',
-        defaultValue: value.name,
-        className: w.maybeErrorField(`choices.${index}.name`, errors)
-      })
+      input(
+        '.choice-name.form-control',
+        w.maybeError(nameOptions, errors, {
+          path: `choices.${index}.name`,
+          placement: 'left'
+        })
+      )
     ]),
 
     div('.col', [
@@ -88,7 +108,7 @@ function createOrUseChoices (choices) {
   return [{ name: '', description: '' }, { name: '', description: '' }]
 }
 
-module.exports = function New ({ poll, author, flash, errors, csrfToken }) {
+module.exports = function New ({ poll, author, description, flash, errors, csrfToken }) {
   const choices = createOrUseChoices(poll.choices)
   return div('.main.container.mt-3', [
     div('.voa-board.w-75.m-auto', [
@@ -100,7 +120,7 @@ module.exports = function New ({ poll, author, flash, errors, csrfToken }) {
 
         div('.voa-item', [
           PollName({ author, name: poll.name, errors }),
-          Description(poll.description)
+          Description({ description, errors })
         ]),
 
         div('.voa-item.clearfix', [

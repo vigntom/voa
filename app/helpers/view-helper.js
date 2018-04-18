@@ -46,6 +46,23 @@ function maybeErrorField (name, errors) {
   return 'is-valid'
 }
 
+function maybeError (options, errors, { path, placement }) {
+  const name = path || options.name
+
+  if (!errors) { return options }
+
+  if (errors[name]) {
+    return Object.assign({}, options, {
+      className: 'is-invalid',
+      'data-toggle': 'tooltip',
+      title: errors[name],
+      'data-placement': placement
+    })
+  }
+
+  return Object.assign({}, options, { className: 'is-valid' })
+}
+
 function gravatarUrl (email, size = 80) {
   return `https://secure.gravatar.com/avatar/${md5(email)}?s=${size}`
 }
@@ -204,6 +221,7 @@ module.exports = {
   ErrorMsg,
   MessageDesk,
   maybeErrorField,
+  maybeError,
   Gravatar,
   SortGroup,
   InfoBar,

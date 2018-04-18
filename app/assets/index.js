@@ -1,6 +1,3 @@
 import './stylesheets/main.scss'
 import 'bootstrap'
-import 'chart.js'
-import 'd3-scale'
-import 'd3-scale-chromatic'
 import './javascript/client'

@@ -9,9 +9,9 @@ $(function () {
     }
   })
 
+  $('[data-toggle="tooltip"]').tooltip()
+
   rest()
   dinput()
   chart()
 })
-
-/* global $ */

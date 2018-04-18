@@ -36,7 +36,7 @@ function AccountMenu (id) {
 
 function Header (user) {
   return header([
-    nav('.navbar.navbar-expand-lg.navbar-dark.bg-dark', [
+    nav('.navbar.navbar-expand-lg.navbar-dark.bg-dark.voa-navbar.voa-lighter', [
       div('.container', [
         a('.navbar-brand', { href: '/' }, 'VoA'),
         button('.navbar-toggler', {
@@ -50,7 +50,7 @@ function Header (user) {
 
         div('#navbar-voa.collapse.navbar-collapse', [
           form('.form-inline.ml-lg-3.mr-auto.my-1.my-lg-0', { action: '/polls', method: 'get' }, [
-            input('.form-control.bg-dark-lighter.border-0', {
+            input('.form-control.border-0', {
               type: 'search',
               placeholder: 'Search Polls',
               'aria-label': 'Search',
@@ -59,7 +59,7 @@ function Header (user) {
             input('.hidden', { type: 'submit' })
           ]),
 
-          div('.navbar-nav', [ user ? AccountMenu(user._id) : SignNavbar() ])
+          user ? AccountMenu(user._id) : SignNavbar()
         ])
       ])
     ])
