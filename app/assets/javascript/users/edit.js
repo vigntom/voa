@@ -5,10 +5,17 @@ const { FormFor, ErrorMsg, maybeErrorField, Gravatar } = require('../../../helpe
 const { div, h1, label, input, button, a } = hh(h)
 
 function EditPage ({ user, errors, csrfToken }) {
-  return div('.main', [
+  return div('.main.container.mt-3', [
     h1('.page-header', 'Update your profile'),
-    div('.d-flex.justify-content-center', [
-      div('.w-40', [
+    div('.row.mt-4', [
+      div('.gravatar-edit.col-3', [
+        div('.py-3', [ Gravatar({ user, size: '160px' }) ]),
+        button('.btn.btn-outline-secondary.btn-gravatar', [
+          a({ href: 'http://gravatar.com/emails', target: '_blank' }, 'change')
+        ])
+      ]),
+
+      div('.col-5.mb-3', [
         FormFor('#edit-user.edit-user', { action: `/users/${user.id}` }, [
           input({ name: '_method', value: 'patch', type: 'hidden' }),
           input({ name: '_csrf', value: csrfToken, type: 'hidden' }),
@@ -50,14 +57,20 @@ function EditPage ({ user, errors, csrfToken }) {
             })
           ]),
 
-          button('.btn.btn-block.btn-primary.my-2', {
+          div('.form-check.border-top.my-3.py-3', [
+            input('#edit-email-protection.form-check-input', {
+              type: 'checkbox',
+              defaultValue: user.emailProtected,
+              name: 'emailProtected'
+            }),
+            label('.form-check-label', {
+              htmlFor: 'edit-email-protection'
+            }, 'Keep my email address private')
+          ]),
+
+          button('.btn.btn-secondary.my-2', {
             type: 'submit'
           }, 'Save changes')
-        ]),
-
-        div('.gravatar-edit', [
-          Gravatar({ user }),
-          a({ href: 'http://gravatar.com/emails', target: '_blank' }, 'change')
         ])
       ])
     ])

@@ -180,3 +180,14 @@ input {
   }
 }
 
+.btn-gravatar {
+  width: 160px;
+
+  a {
+    color: $black;
+  }
+
+  &:hover {
+    background: black(.1);
+  }
+}

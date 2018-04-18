@@ -27,7 +27,7 @@ function basicConfig ({ env, srcPath, dstPath }) {
       new ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
-        'window.jquery': 'jquery',
+        'window.jQuery': 'jquery',
         Popper: ['popper.js', 'default']
       })
     ]
