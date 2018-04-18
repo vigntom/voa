@@ -3,14 +3,14 @@ const hh = require('hyperscript-helpers')
 const w = require('../../../helpers/view-helper')
 const dateFormat = require('dateformat')
 
-const { div, ul, li, a, h4, time, p } = hh(h)
+const { div, ul, li, a, time, p, span } = hh(h)
 
 function AdminDeleteLink ({ current, user }) {
   if (user.admin) { return null }
   if (user.protected) { return null }
 
-  if (current.admin) {
-    return a({
+  if (current && current.admin) {
+    return a('.btn.btn-outline-dark.btn-sm', {
       href: `/users/${user._id}`,
       'data-method': 'delete',
       'data-confirm': 'You shure?'
@@ -24,17 +24,22 @@ function UsersList (options) {
 
   return ul('.list-simple',
     users.map(user => {
-      return li('.col', [
-        div('.d-flex', [
-          div('.pr-1', [ w.Gravatar({ user, size: 64 }) ]),
-          div('.pl-1', [
-            h4([ a({ href: `/users/${user._id}` }, user.username) ]),
-            p('.m-0', [ 'Polls ', user.polls ])
+      return li('.d-flex', [
+        div([ w.Gravatar({ user, size: 48 }) ]),
+        div('.ml-2.mr-auto', [
+          div('.user-list', [
+            a({ href: `/users/${user._id}` }, user.username),
+            p([ 'Polls: ', user.polls ]),
+            p('.small', [
+              span('.oi.oi-envelope-closed.pr-2'),
+              a('.text-muted', { href: `mailto:${user.email}` }, user.email)
+            ]),
+            p('.small.text-muted', [ 'Joined on ', time(dateFormat(user.activatedAt, 'mediumDate')) ])
           ])
         ]),
-        div('.pt-1.mt-3', [
-          p('.m-0', [ 'Joined on ', time(dateFormat(user.activatedAt, 'mediumDate')) ]),
-          p('.m-0.mt-2', [ AdminDeleteLink({ current, user }) ])
+
+        div([
+          p([ AdminDeleteLink({ current, user }) ])
         ])
       ])
     })
@@ -50,6 +55,7 @@ function Dropdown ({ path }) {
     a('.dropdown-item', { href: `${path}?s=polls&o=asc` }, 'Fewest polls')
   ])
 }
+
 module.exports = function Index (options) {
   const info = `Result: ${options.usersCount} users`
   const path = '/users'
@@ -57,9 +63,9 @@ module.exports = function Index (options) {
 
   return div('.main.container.mt-3', [
     w.MessageDesk(options.flash),
-    div('.row', [
+    div('.row.justify-content-center', [
       div('.col-3', [ w.SortGroup(options) ]),
-      div('.col', [ w.InfoBar({ info, menuItem }, Dropdown({ path })), UsersList(options) ])
+      div('.col-7', [ w.InfoBar({ info, menuItem }, Dropdown({ path })), UsersList(options) ])
     ]),
     w.PaginationStdBar(options)
   ])

@@ -3,15 +3,15 @@ const hh = require('hyperscript-helpers')
 const w = require('../../../helpers/view-helper')
 const dateFormat = require('dateformat')
 
-const { div, ul, li, h3, a, p, time, span } = hh(h)
+const { div, ul, li, h4, a, p, time, span } = hh(h)
 
 function PollsList ({ polls }) {
   return ul('.list-simple',
     polls.map(x => li([
-      h3([a({ href: `/polls/${x._id}` }, `${x.author.username}/${x.name}`)]),
+      h4([a({ href: `/polls/${x._id}` }, `${x.author.username}/${x.name}`)]),
       p(x.description),
-      p([span('.oi.oi-star'), ` ${x.stargazers}`]),
-      p(['Updated on ', time(dateFormat(x.updatedAt, 'mediumDate'))])
+      p([span('.oi.oi-star'), ` ${x.stargazers.count}`]),
+      p('.small', ['Updated on ', time(dateFormat(x.updatedAt, 'mediumDate'))])
     ]))
   )
 }
@@ -32,9 +32,9 @@ module.exports = function Index (options) {
   const menuItem = options.menuItem
 
   return div('.main.container.mt-3', [
-    div('.row', [
+    div('.row.justify-content-center', [
       div('.col-3', [ w.SortGroup(options) ]),
-      div('.col', [ w.InfoBar({ info, menuItem }, Dropdown({ path })), PollsList(options) ])
+      div('.col-7', [ w.InfoBar({ info, menuItem }, Dropdown({ path })), PollsList(options) ])
     ]),
     w.PaginationStdBar(options)
   ])

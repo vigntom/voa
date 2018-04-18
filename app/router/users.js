@@ -36,11 +36,6 @@ const view = {
 
 const actions = {
   index (req, res, next) {
-    if (!req.session.user) {
-      req.session.flash = { danger: 'Please log in' }
-      return res.redirect('/login')
-    }
-
     const sort = mkSortArg(req.query)
     const query = routing.createSearchQuery('username', req.query.q)
     const pollQuery = routing.createSearchQuery('name', req.query.q)
@@ -72,6 +67,7 @@ const actions = {
       .then(usersCount => {
         if (req.skip >= usersCount) {
           req.skip = req.skip - req.query.limit
+          if (req.skip < 0) req.skip = 0
           res.locals.paginate.page = res.locals.paginate.page - 1
         }
 

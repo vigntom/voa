@@ -34,7 +34,10 @@ function AccountMenu (id) {
   ])
 }
 
-function Header (user) {
+function Header (options) {
+  const user = options.session.user
+  const query = options.query || {}
+
   return header([
     nav('.navbar.navbar-expand-lg.navbar-dark.bg-dark.voa-navbar.voa-lighter', [
       div('.container', [
@@ -54,7 +57,8 @@ function Header (user) {
               type: 'search',
               placeholder: 'Search Polls',
               'aria-label': 'Search',
-              name: 'q'
+              name: 'q',
+              defaultValue: query.q
             }),
             input('.hidden', { type: 'submit' })
           ]),
@@ -85,7 +89,7 @@ function Footer (props) {
 
 module.exports = function Layout ({ options, page }) {
   return div('#application', [
-    Header(options.session.user),
+    Header(options),
     page,
     Footer()
   ])

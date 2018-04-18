@@ -68,7 +68,7 @@ function gravatarUrl (email, size = 80) {
 }
 
 function Gravatar ({ user, size }) {
-  return image('.gravatar', { src: gravatarUrl(user.email, size), alt: user.username })
+  return image('.gravatar.rounded', { src: gravatarUrl(user.email, size), alt: user.username })
 }
 
 function PaginationPrevious ({ paginate, pageCount }) {
