@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 const { isEmail } = require('validator')
 const uniqueValidator = require('mongoose-unique-validator')
 const authenticationPlugin = require('./plugins/authentication')
+const pollsPlugin = require('./plugins/polls')
+const friendsPlugin = require('./plugins/friends')
 
 const Schema = mongoose.Schema
 
@@ -11,8 +13,8 @@ const userSchema = new Schema({
     unique: true,
     required: "Username can't be blank",
     trim: true,
-    minlength: [ 3, 'Username is too short. Use at least 3 characters.' ],
-    maxlength: [ 19, 'Username is too long. Limit it to 19 characters.' ]
+    minlength: [ 1, 'Username is too short. Use at least 1 characters.' ],
+    maxlength: [ 32, 'Username is too long. Limit it to 32 characters.' ]
   },
 
   email: {
@@ -24,6 +26,11 @@ const userSchema = new Schema({
     lowercase: true
   },
 
+  emailProtected: {
+    type: Boolean,
+    default: true
+  },
+
   admin: {
     type: Boolean,
     default: false
@@ -32,18 +39,16 @@ const userSchema = new Schema({
   protected: {
     type: Boolean,
     default: false
-  },
-
-  polls: {
-    type: Number,
-    default: 0
   }
+
 }, {
   timestamps: true
 })
 
 userSchema.plugin(uniqueValidator)
 userSchema.plugin(authenticationPlugin)
+userSchema.plugin(friendsPlugin, { ref: 'User' })
+userSchema.plugin(pollsPlugin)
 
 userSchema.path('email').validate(emailValidator)
 userSchema.path('username').validate(usernameValidator)
