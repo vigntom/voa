@@ -9,7 +9,7 @@ const User = require('../app/models/user')
 
 const createAdmin = () => User.create({
   username: 'admin',
-  email: 'vigntom2708@gmail.com',
+  email: 'vigntom.2708@gmail.com',
   password: '*',
   passwordConfirmation: '*',
   admin: true,
@@ -20,7 +20,7 @@ const createAdmin = () => User.create({
 
 const createNeitherUser = () => User.create({
   username: 'neither',
-  email: 'vigntom2708@gmail.com',
+  email: 'vigntom@mail.ru',
   password: '*',
   passwordConfirmation: '*',
   protected: true,

@@ -38,8 +38,8 @@ function createApp () {
   }
 
   if (config.env === 'production') {
-    // app.set('trust proxy', 1)
-    // sessionOptions.cookie.secure = true
+    app.set('trust proxy', 1)
+    sessionOptions.cookie.secure = true
   }
 
   if (config.env !== 'test') {
