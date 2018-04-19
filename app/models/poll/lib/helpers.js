@@ -3,7 +3,7 @@ function findByIdAndAddContributor (model, id, { contributor }) {
     .then(res => {
       if (res.length > 0) {
         return Promise.reject(new Error('Already contributor'))
-     }
+      }
 
       return model.findByIdAndUpdate(
         id,
@@ -15,7 +15,7 @@ function findByIdAndAddContributor (model, id, { contributor }) {
 function movePolls (Poll, User, fromId, toId) {
   return Poll.updateMany({ author: fromId }, { $set: { author: toId } })
     .then(() => {
-      return this.model('Poll').count({ author: toId })
+      return Poll.count({ author: toId })
     })
     .then(num => {
       return User.findByIdAndUpdate(toId, { $set: { polls: num } })

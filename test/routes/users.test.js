@@ -133,17 +133,6 @@ test('Should redirect update non own profile', t => {
     .catch(t.ifError)
 })
 
-test('Should redirect index when not logged in', t => {
-  const agent = request.agent(app)
-
-  return agent.get('/users')
-    .then(res => {
-      t.is(res.statusCode, 302)
-      t.is(res.headers.location, '/login')
-    })
-    .catch(t.ifError)
-})
-
 test('should redirect delete when not logged in', t => {
   const agent = request.agent(app)
 

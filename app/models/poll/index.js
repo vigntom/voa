@@ -26,6 +26,11 @@ const pollSchema = new Schema({
     requred: true
   },
 
+  restricted: {
+    type: Boolean,
+    default: false
+  },
+
   contributors: [{
     _id: false,
     type: Schema.Types.ObjectId,
@@ -76,9 +81,7 @@ const pollSchema = new Schema({
 })
 
 pollSchema.path('name').validate(nameValidator)
-
 pollSchema.pre('validate', choicesValidator)
-
 pollSchema.post('save', incUserPolls(1))
 pollSchema.post('remove', incUserPolls(-1))
 

@@ -36,9 +36,11 @@ const view = {
 
 const actions = {
   index (req, res, next) {
+    const q = routing.query
     const sort = mkSortArg(req.query)
-    const query = routing.createSearchQuery('username', req.query.q)
-    const pollQuery = routing.createSearchQuery('name', req.query.q)
+    const cond = !(req.session.user && req.session.user.admin)
+    const query = q.unprotected(cond, q.search('username', req.query.q))
+    const pollQuery = q.unrestricted(cond, q.search('name', req.query.q))
 
     function mkSortArg ({ s, o }) {
       const order = (o === 'asc') ? 'asc' : 'desc'
@@ -100,12 +102,18 @@ const actions = {
 
   show (req, res, next) {
     const id = req.params.id
+    const q = routing.query
+    const query = q.search('name', req.query.q)
 
     if (!validator.isMongoId(id)) { return next('route') }
 
-    return User.findById(id)
+    return User.findById(id).populate({
+      path: 'pollList',
+      match: query
+    }).lean()
       .then(user => {
         res.locals.user = user
+        res.locals.userQuery = req.query
         renderer(res)(view.show(res.locals))
       })
       .catch(next)
@@ -207,7 +215,8 @@ const actions = {
       return res.redirect('/')
     }
 
-    return User.findByIdAndRemove(id)
+    return Poll.updateMany({ author: id }, { $set: { restricted: true } })
+      .then(() => User.findByIdAndRemove(id))
       .then(user => {
         req.session.flash = { success: `User '${user.username}' is deleted` }
         return User.findOne({ username: 'neither' }).lean()

@@ -4,6 +4,7 @@ const uniqueValidator = require('mongoose-unique-validator')
 const authenticationPlugin = require('./plugins/authentication')
 const pollsPlugin = require('./plugins/polls')
 const friendsPlugin = require('./plugins/friends')
+const helpers = require('./plugins/helpers')
 
 const Schema = mongoose.Schema
 
@@ -49,6 +50,7 @@ userSchema.plugin(uniqueValidator)
 userSchema.plugin(authenticationPlugin)
 userSchema.plugin(friendsPlugin, { ref: 'User' })
 userSchema.plugin(pollsPlugin)
+userSchema.plugin(helpers)
 
 userSchema.path('email').validate(emailValidator)
 userSchema.path('username').validate(usernameValidator)

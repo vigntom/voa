@@ -3,7 +3,7 @@ const hh = require('hyperscript-helpers')
 const w = require('../../../helpers/view-helper')
 const dateFormat = require('dateformat')
 
-const { div, ul, li, a, time, p, span } = hh(h)
+const { div, h3, a, time, p } = hh(h)
 
 function AdminDeleteLink ({ current, user }) {
   if (user.admin) { return null }
@@ -18,32 +18,46 @@ function AdminDeleteLink ({ current, user }) {
   }
 }
 
+function UserCard ({ user, current }) {
+  return div('.d-flex.flex-row', [
+    div('.pr-3', [ w.Gravatar({ user, size: 48 }) ]),
+
+    div('.card.w-100.border-0', [
+      h3('.h5.font-weight-normal.card-title', [
+        a({ href: `/users/${user._id}` }, user.username)
+      ]),
+
+      p('.card-text', [ 'Polls: ', user.polls ]),
+
+      w.Email({ className: 'small', user, linkClass: 'card-text text-muted mr-3' }),
+
+      p('.card-text.text-muted.small', [
+        'Joined on ',
+        time(dateFormat(user.activatedAt, 'mediumDate'))
+      ])
+    ]),
+
+    div([ p([ AdminDeleteLink({ current, user }) ]) ])
+  ])
+}
+
 function UsersList (options) {
   const { users, session } = options
   const current = session.user
+  const info = `Result: ${options.usersCount} users`
+  const path = '/users'
+  const menuItem = options.menuItem
 
-  return ul('.list-simple',
-    users.map(user => {
-      return li('.d-flex', [
-        div([ w.Gravatar({ user, size: 48 }) ]),
-        div('.ml-2.mr-auto', [
-          div('.user-list', [
-            a({ href: `/users/${user._id}` }, user.username),
-            p([ 'Polls: ', user.polls ]),
-            p('.small', [
-              span('.oi.oi-envelope-closed.pr-2'),
-              a('.text-muted', { href: `mailto:${user.email}` }, user.email)
-            ]),
-            p('.small.text-muted', [ 'Joined on ', time(dateFormat(user.activatedAt, 'mediumDate')) ])
-          ])
-        ]),
+  return div('.voa-board', [
+    div('.voa-item.p-0', [
+      w.InfoBar({ info, menuItem }),
+      Dropdown({ path })
+    ]),
 
-        div([
-          p([ AdminDeleteLink({ current, user }) ])
-        ])
-      ])
-    })
-  )
+    users.map(user => (
+      div('.voa-item', { key: user._id }, [ UserCard({ user, current }) ])
+    ))
+  ])
 }
 
 function Dropdown ({ path }) {
@@ -57,15 +71,11 @@ function Dropdown ({ path }) {
 }
 
 module.exports = function Index (options) {
-  const info = `Result: ${options.usersCount} users`
-  const path = '/users'
-  const menuItem = options.menuItem
-
-  return div('.main.container.mt-3', [
+  return div('.main.container.my-5', [
     w.MessageDesk(options.flash),
     div('.row.justify-content-center', [
       div('.col-3', [ w.SortGroup(options) ]),
-      div('.col-7', [ w.InfoBar({ info, menuItem }, Dropdown({ path })), UsersList(options) ])
+      div('.col-7', [ UsersList(options) ])
     ]),
     w.PaginationStdBar(options)
   ])

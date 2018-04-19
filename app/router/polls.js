@@ -20,9 +20,11 @@ const view = v.initViews(template, data)
 
 const actions = {
   index (req, res, next) {
+    const q = routing.query
     const sort = mkSortArg(req.query)
-    const query = routing.createSearchQuery('name', req.query.q)
-    const userQuery = routing.createSearchQuery('username', req.query.q)
+    const cond = !(req.session.user && req.session.user.admin)
+    const query = q.unrestricted(cond, q.search('name', req.query.q))
+    const userQuery = q.unprotected(cond, q.search('username', req.query.q))
 
     function mkSortArg ({ s, o }) {
       const order = (o === 'asc') ? 'asc' : 'desc'

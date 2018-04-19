@@ -3,7 +3,7 @@ const hh = require('hyperscript-helpers')
 const pluralize = require('pluralize')
 const crypto = require('crypto')
 const querystring = require('querystring')
-const { form, div, ul, li, image, nav, a, span, h4, button, i } = hh(h)
+const { form, div, ul, li, image, nav, a, span, h4, button, i, p } = hh(h)
 
 function md5 (string) {
   return crypto.createHash('md5')
@@ -67,8 +67,21 @@ function gravatarUrl (email, size = 80) {
   return `https://secure.gravatar.com/avatar/${md5(email)}?s=${size}`
 }
 
-function Gravatar ({ user, size }) {
-  return image('.gravatar.rounded', { src: gravatarUrl(user.email, size), alt: user.username })
+function Gravatar ({ user, size, className }) {
+  return image('.gravatar.rounded', {
+    src: gravatarUrl(user.email, size),
+    alt: user.username,
+    className
+  })
+}
+
+function Email ({ user, className, linkClass }) {
+  if (user.emailProtected) { return null }
+
+  return p({ className }, [
+    span('.oi.oi-envelope-closed.pr-2.text-muted'),
+    a({ href: `mailto: ${user.email}`, className: linkClass }, user.email)
+  ])
 }
 
 function PaginationPrevious ({ paginate, pageCount }) {
@@ -223,6 +236,7 @@ module.exports = {
   maybeErrorField,
   maybeError,
   Gravatar,
+  Email,
   SortGroup,
   InfoBar,
   PaginationStdBar

@@ -5,12 +5,11 @@ const { FormFor, ErrorMsg, maybeErrorField, Gravatar } = require('../../../helpe
 const { div, h1, label, input, button, a } = hh(h)
 
 function EditPage ({ user, errors, csrfToken }) {
-  return div('.main.container.mt-3', [
-    h1('.page-header', 'Update your profile'),
-    div('.row.mt-4', [
+  return div('.main.container.my-5.p-5', [
+    div('.row.justify-content-center', [
       div('.gravatar-edit.col-3', [
-        div('.py-3', [ Gravatar({ user, size: '160px' }) ]),
-        button('.btn.btn-outline-secondary.btn-gravatar', [
+        Gravatar({ user, size: '160px' }),
+        button('.btn.btn-outline-secondary.btn-gravatar.mt-1', [
           a({ href: 'http://gravatar.com/emails', target: '_blank' }, 'change')
         ])
       ]),

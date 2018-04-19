@@ -52,8 +52,11 @@ function Header (options) {
         }, span('.navbar-toggler-icon')),
 
         div('#navbar-voa.collapse.navbar-collapse', [
-          form('.form-inline.ml-lg-3.mr-auto.my-1.my-lg-0', { action: '/polls', method: 'get' }, [
-            input('.form-control.border-0', {
+          form('.form-inline.ml-lg-3.mr-auto.my-1.my-lg-0', {
+            action: '/polls',
+            method: 'get'
+          }, [
+            input('.form-control.border-0.navbar-search', {
               type: 'search',
               placeholder: 'Search Polls',
               'aria-label': 'Search',

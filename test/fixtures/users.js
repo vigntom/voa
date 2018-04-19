@@ -52,6 +52,24 @@ const namedUsers = {
     password: 'password',
     activated: true,
     activatedAt: Date.now()
+  },
+
+  bobProtectedEmail: {
+    username: 'bobprotectedemail',
+    email: 'bobprotectedemail@email.bomb',
+    emailProtected: true,
+    password: 'password',
+    activated: true,
+    activatedAt: Date.now()
+  },
+
+  saraEnabledEmail: {
+    username: 'saraenabledemail',
+    email: 'saraenabledemail@email.cool',
+    emailProtected: false,
+    password: 'password',
+    activated: true,
+    activatedAt: Date.now()
   }
 }
 

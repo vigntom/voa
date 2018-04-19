@@ -29,43 +29,6 @@ $half-offset: 3px;
   font-size: 12px;
 }
 
-.list-simple {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-
-  li {
-    padding: $std-offset 0;
-    border-bottom: 1px solid $gray-300;
-    overflow: auto;
-
-    &:first-child {
-      border-top: 1px solid $gray-300;
-    }
-
-    &:last-child {
-      border-bottom: 0;
-    }
-  }
-
-  .user-list {
-    font-size: 16px;
-    font-weight: normal;
-
-    p {
-      margin: 0;
-      padding: 3px 0;
-      color: black(.75);
-      font-size: 14px;
-    }
-
-    .small {
-      color: black(.7);
-      font-size: 12px;
-    }
-  }
-}
-
 .small {
   color: black(.7);
   font-size: 12px;
@@ -89,12 +52,6 @@ $half-offset: 3px;
 }
 
 .list-group-item {
-  color: $primary;
-
-  &:hover {
-    color: $primary;
-  }
-
   &.selected {
     color: $gray-900;
 
@@ -176,7 +133,7 @@ $half-offset: 3px;
   display: none;
 }
 
-input {
+.navbar-search {
   &[type="search"] {
     background: white(.2);
     color: $white;

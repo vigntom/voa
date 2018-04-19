@@ -3,17 +3,36 @@ const hh = require('hyperscript-helpers')
 const w = require('../../../helpers/view-helper')
 const dateFormat = require('dateformat')
 
-const { div, ul, li, h4, a, p, time, span } = hh(h)
+const { div, h3, a, p, time, span } = hh(h)
 
-function PollsList ({ polls }) {
-  return ul('.list-simple',
-    polls.map(x => li([
-      h4([a({ href: `/polls/${x._id}` }, `${x.author.username}/${x.name}`)]),
-      p(x.description),
-      p([span('.oi.oi-star'), ` ${x.stargazers.count}`]),
-      p('.small', ['Updated on ', time(dateFormat(x.updatedAt, 'mediumDate'))])
-    ]))
-  )
+function PollCard ({ poll }) {
+  return div('.card.w-100.border-0', [
+    div('.card-body.p-0', [
+      h3('.h5.font-weight-normal.card-title', [
+        a('.card-link', { href: `/users/${poll.author._id}` }, `${poll.author.username}`),
+        span('.slash', ' / '),
+        a('.card-link', { href: `/polls/${poll._id}` }, `${poll.name}`)
+      ]),
+
+      p('.card-text', poll.description),
+      p('.card-text', [span('.oi.oi-star'), ` ${poll.stargazers.count}`]),
+      p('.card-text.small', ['Updated on ', time(dateFormat(poll.updatedAt, 'mediumDate'))])
+    ])
+  ])
+}
+
+function PollsList ({ polls, pollsCount, menuItem }) {
+  const info = `Result: ${pollsCount} polls`
+  const path = '/polls'
+
+  return div('.voa-board', [
+    div('.voa-item.p-0', [
+      w.InfoBar({ info, menuItem }),
+      Dropdown({ path })
+    ]),
+
+    polls.map(x => div('.voa-item', { key: x._id }, [ PollCard({ poll: x }) ]))
+  ])
 }
 
 function Dropdown ({ path }) {
@@ -27,14 +46,10 @@ function Dropdown ({ path }) {
 }
 
 module.exports = function Index (options) {
-  const info = `Result: ${options.pollsCount} polls`
-  const path = '/polls'
-  const menuItem = options.menuItem
-
-  return div('.main.container.mt-3', [
+  return div('.main.container.my-5', [
     div('.row.justify-content-center', [
       div('.col-3', [ w.SortGroup(options) ]),
-      div('.col-7', [ w.InfoBar({ info, menuItem }, Dropdown({ path })), PollsList(options) ])
+      div('.col-7', [ PollsList(options) ])
     ]),
     w.PaginationStdBar(options)
   ])
