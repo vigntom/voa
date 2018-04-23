@@ -8,9 +8,20 @@ const { createView } = require('../helpers/application-helper')
 const usersView = require('../assets/javascript/users')
 const routing = require('../../lib/routing')
 const mailer = require('../../lib/mailer')
-// const log = require('../../lib/logger')
 
 const renderer = res => page => res.render('application', page)
+const defaultParams = {
+  username: '',
+  email: '',
+  password: '',
+  passwordConfirmation: '',
+  emailProtected: false
+}
+
+const userParams = R.compose(
+  R.merge(defaultParams),
+  R.compose(R.pick, R.keys)(defaultParams)
+)
 
 const view = {
   index (options) {
@@ -195,7 +206,7 @@ const actions = {
         if (err) { return next(err) }
 
         req.session.flash = { success: 'Profile updated' }
-        return res.redirect(`/users/${user.id}`)
+        return res.redirect(`/users/${user.id}/edit`)
       })
     }
 
@@ -246,18 +257,6 @@ function createUserRouter () {
   router.delete('/:id', to('delete'))
 
   return { to, router }
-}
-
-function userParams (params) {
-  const fields = ['username', 'email', 'password', 'passwordConfirmation']
-  const pickOrBlank = R.compose(
-    R.pick(fields),
-    R.merge(R.__, params),
-    R.mergeAll,
-    R.map(x => ({ [x]: '' }))
-  )
-
-  return pickOrBlank(fields)
 }
 
 module.exports = createUserRouter()

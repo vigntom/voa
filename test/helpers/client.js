@@ -1,3 +1,4 @@
+import User from '../../app/models/user'
 import { JSDOM } from 'jsdom'
 
 function createDoc (text) {
@@ -26,10 +27,10 @@ function signUpAsUser (agent, user = {}) {
   return res => agent
     .post('/users').send({
       _csrf: csrf(res.text),
-      username: user.username,
-      email: user.email,
-      password: user.password,
-      passwordConfirmation: user.passwordConfirmation
+      username: user.username || '',
+      email: user.email || '',
+      password: user.password || '',
+      passwordConfirmation: user.passwordConfirmation || ''
     })
 }
 

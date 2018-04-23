@@ -59,8 +59,9 @@ function EditPage ({ user, errors, csrfToken }) {
           div('.form-check.border-top.my-3.py-3', [
             input('#edit-email-protection.form-check-input', {
               type: 'checkbox',
-              defaultValue: user.emailProtected,
-              name: 'emailProtected'
+              name: 'emailProtected',
+              value: true,
+              defaultChecked: user.emailProtected
             }),
             label('.form-check-label', {
               htmlFor: 'edit-email-protection'

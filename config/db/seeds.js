@@ -36,10 +36,21 @@ const createServiceUser = () => User.create({
   activatedAt: Date.now()
 })
 
-const createTesterUser = () => User.create({
+const createTesterUser1 = () => User.create({
   username: 'foobar',
   email: 'foobar@example.com',
   emailProtected: false,
+  password: 'qwe321',
+  passwordConfirmation: 'qwe321',
+  admin: false,
+  activated: true,
+  activatedAt: Date.now()
+})
+
+const createTesterUser2 = () => User.create({
+  username: 'barfoo',
+  email: 'barfoo@example.com',
+  emailProtected: true,
   password: 'qwe321',
   passwordConfirmation: 'qwe321',
   admin: false,
@@ -171,9 +182,12 @@ function randomRequest (users) {
 }
 
 Promise.all([ User.remove(), Poll.remove() ])
-  .then(() => createAdmin())
-  .then(() => createServiceUser())
-  .then(() => createTesterUser())
+  .then(() => Promise.all([
+    createAdmin(),
+    createServiceUser(),
+    createTesterUser1(),
+    createTesterUser2()
+  ]))
   .then(() => Promise.all(createUsers()))
   .then(() => User.find())
   .then(users => Promise.all(createRequests(users)))

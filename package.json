@@ -8,7 +8,7 @@
   },
   "author": "Aleksandr Ignatyev <vigntom.2708@gmail.com>",
   "engines": {
-    "node": "9.10.1"
+    "node": "9.11.1"
   },
   "scripts": {
     "start": "heroku local",

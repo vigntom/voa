@@ -24,7 +24,7 @@ test('Unsuccessful edit', t => {
     .then(ua.followRedirect(agent))
     .then(res => {
       return agent
-          .patch(`/users/${activeUser._id}`)
+        .patch(`/users/${activeUser._id}`)
         .send({
           _csrf: csrf(res.text),
           username: '',
@@ -55,7 +55,7 @@ test('Successfull edit', t => {
     .then(res => agent.get(res.header.location))
     .then(res => {
       const doc = createDoc(res.text)
-      t.is(doc.title, 'Show Users | Vote Application')
+      t.is(doc.title, 'Edit User | Vote Application')
 
       return User.findById(activeUser.id)
     })
