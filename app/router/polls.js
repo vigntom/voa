@@ -7,6 +7,7 @@ const template = require('../assets/javascript/polls')
 const Poll = require('../models/poll')
 const User = require('../models/user')
 const paginate = require('express-paginate')
+const mongoose = require('mongoose')
 // const log = require('../../lib/logger.js')
 
 const data = {
@@ -135,7 +136,7 @@ const actions = {
 
     return Poll.findById(id).lean()
       .then(poll => {
-        if (poll.author !== req.session.user._id) {
+        if (!poll.author.equals(req.session.user._id)) {
           req.session.flash = { danger: "You can't modify this poll" }
           return res.redirect(`/polls/${poll._id}`)
         }
