@@ -13,11 +13,23 @@ function passwordAuthentication (schema, options) {
 
   schema.virtual('password')
     .get(function () { return this._password })
-    .set(function (value) { this._password = value })
+    .set(function (value) {
+      const self = this
+      const opts = { path: 'password', title: 'Password' }
+
+      validatePasswordComponent(value, opts, self)
+      self._password = value
+    })
 
   schema.virtual('passwordConfirmation')
     .get(function () { return this._passwordConfirmation })
-    .set(function (value) { this._passwordConfirmation = value })
+    .set(function (value) {
+      const self = this
+      const opts = { path: 'passwordConfirmation', title: 'Confirmation' }
+
+      validatePasswordComponent(value, opts, self)
+      self._passwordConfirmation = value
+    })
 
   schema.virtual('resetToken')
     .get(function () { return this._resetToken })
@@ -35,16 +47,30 @@ function passwordAuthentication (schema, options) {
   schema.statics.authenticateBy = authenticateBy
 }
 
+function validatePasswordComponent (value, opts, doc) {
+  const { path } = opts
+  const title = opts.title || path
+  const digestPresent = !doc.isNew && doc.passwordDigest
+
+  if (digestPresent && !value) return null
+
+  if (!value) {
+    return doc.invalidate(path, `${title} can't be blank`)
+  }
+
+  if (value === '*') return null
+
+  if (!isLength(value, { min: 6 })) {
+    return doc.invalidate(path, `${title} is too short (minimum is 6 characters)`)
+  }
+}
+
 function passwordValidator (next) {
   const digestPresent = !this.isNew && this.passwordDigest
   const rawPasswordEmpty = !(this.password || this.passwordConfirmation)
 
   if (digestPresent && rawPasswordEmpty) {
     return next()
-  }
-
-  if (this.isNew && !this.password) {
-    this.invalidate('password', "Password can't be blank")
   }
 
   // * for service account without access rights
@@ -66,9 +92,10 @@ function passwordValidator (next) {
 }
 
 function createDigitalPassword (user, next) {
+  const isService = user.password === '*' && user.passwordConfirmation === '*'
   if (!user.password && !user.passwordConfirmation) { return next() }
 
-  if (user.password === '*') {
+  if (isService) {
     user.passwordDigest = '*'
     return next()
   }

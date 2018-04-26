@@ -112,18 +112,6 @@ $half-offset: 3px;
   }
 }
 
-.poll-show {
-  h1 {
-    font-size: 1.5em;
-    font-weight: 400;
-  }
-
-  h2 {
-    font-size: 1.3em;
-    font-weight: 400;
-  }
-}
-
 .chart-container {
   position: relative;
 }
@@ -168,5 +156,11 @@ $half-offset: 3px;
 
   &:hover {
     background: black(.1);
+  }
+}
+
+.nav-link {
+  &:hover:not(.active) {
+    border: 0;
   }
 }

@@ -3,7 +3,7 @@ const hh = require('hyperscript-helpers')
 const pluralize = require('pluralize')
 const crypto = require('crypto')
 const querystring = require('querystring')
-const { form, div, ul, li, image, nav, a, span, h4, button, i, p } = hh(h)
+const { form, div, ul, li, image, nav, a, span, h2, button, i, p } = hh(h)
 
 function md5 (string) {
   return crypto.createHash('md5')
@@ -178,7 +178,7 @@ function PaginationNavBar (options, nest) {
 
 function InfoBar ({ path, info, menuItem }, dropdown) {
   return div('.info-bar.d-flex.pb-3', [
-    h4('.mr-auto', info),
+    h2('.h3.mr-auto', info),
     div('.dropdown', [
       button('#pollSortButton.btn.btn-sm.btn-outline-secondary.dropdown-toggle', {
         type: 'button',

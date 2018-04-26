@@ -84,29 +84,30 @@ pollSchema.path('name').validate(nameValidator)
 pollSchema.pre('validate', choicesValidator)
 pollSchema.post('save', incUserPolls(1))
 pollSchema.post('remove', incUserPolls(-1))
+pollSchema.pre('update', nameValidatorByQuery)
 
 pollSchema.methods.addContributor = function (data) {
-  return h.findbyIdAndAddContibutor(this.model('Poll'), this.id, data)
+  return h.findbyIdAndAddContibutor(this, this.id, data)
 }
 
 pollSchema.methods.movePolls = function (to) {
-  return h.movePolls(this.model('Poll'), this.id, to)
+  return h.movePolls(this, this.id, to)
 }
 
 pollSchema.statics.findbyIdAndAddContibutor = function (id, data) {
-  return h.findByIdAndAddContributor(this.model('Poll'), id, data)
+  return h.findByIdAndAddContributor(this, id, data)
 }
 
 pollSchema.statics.movePolls = function (from, to) {
-  return h.movePolls(this.model('Poll'), User, from, to)
+  return h.movePolls(this, User, from, to)
 }
 
 pollSchema.statics.findVoter = function (cond) {
-  return h.findVoter(this.model('Poll'), cond)
+  return h.findVoter(this, cond)
 }
 
 pollSchema.statics.findByIdAndVote = function (id, cond) {
-  return h.findByIdAndVote(this.model('Poll'), id, cond)
+  return h.findByIdAndVote(this, id, cond)
 }
 
 function incUserPolls (num) {
@@ -116,21 +117,50 @@ function incUserPolls (num) {
 }
 
 function nameValidator (value) {
-  const enabledChars = /^[a-zA-Z0-9_-]+/
+  const enabledChars = /^[a-zA-Z0-9_-]+$/
 
   if (!enabledChars.test(value)) {
-    return this.invalidate('name', 'Poll Name may only contain alpahumeric' +
+    this.invalidate('name', 'Poll Name may only contain alpahumeric' +
       ' hyphen and uderscore charactes')
   }
 
-  return this.model('Poll').count({ author: this.author, name: this.name })
+  return this.model.count({ author: this.author, name: this.name })
     .then(count => {
       if (count > 0) {
-        return this.invalidate('name', 'Author/name must be unique')
+        this.invalidate('name', 'Author/name must be unique')
       }
     })
     .catch(err => {
-      return this.invalidate('name', err.message)
+      this.invalidate('name', err.message)
+    })
+}
+
+function nameValidatorByQuery () {
+  const query = this
+  const doc = query.model()
+  const enabledChars = /^[a-zA-Z0-9_-]+$/
+  const value = query.getUpdate().name
+
+  if (!enabledChars.test(value)) {
+    const msg = 'Poll Name may only contain alpahumeric hyphen and uderscore charactes'
+    const error = doc.invalidate('name', msg, value)
+    query.error(error)
+  }
+
+  return query.model.findOne(query.getQuery())
+    .then(poll => {
+      return query.model.count({ author: poll.author, name: value })
+    })
+    .then(count => {
+      if (count > 0) {
+        const msg = 'Author/name must be unique'
+        const error = doc.invalidate('name', msg, value)
+        query.error(error)
+      }
+    })
+    .catch(err => {
+      const error = doc.invalidate('name', err.message)
+      query.error(error)
     })
 }
 

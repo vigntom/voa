@@ -2,7 +2,6 @@ import '../helpers/database'
 import request from 'supertest'
 import app from '../../index'
 import test from 'ava'
-import { createDoc, csrf, ua } from '../helpers/client'
 
 test('Guest request polls', t => {
   const agent = request.agent(app)

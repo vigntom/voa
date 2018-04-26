@@ -41,6 +41,7 @@
     "cookie": "^0.3.1",
     "dotenv": "^5.0.1",
     "faker": "^4.1.0",
+    "jsctags": "^5.2.0",
     "jsdom": "^11.5.1",
     "mongodb-memory-server": "^1.6.5",
     "nodemon": "^1.14.8",

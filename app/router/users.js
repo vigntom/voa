@@ -10,18 +10,19 @@ const routing = require('../../lib/routing')
 const mailer = require('../../lib/mailer')
 
 const renderer = res => page => res.render('application', page)
-const defaultParams = {
-  username: '',
-  email: '',
-  password: '',
-  passwordConfirmation: '',
-  emailProtected: false
-}
+const defaultParams = [
+  'username',
+  'email',
+  'password',
+  'passwordConfirmation',
+  'emailProtected'
+]
 
-const userParams = R.compose(
-  R.merge(defaultParams),
-  R.compose(R.pick, R.keys)(defaultParams)
-)
+// const userParams = R.compose(
+//   R.merge(defaultParams),
+//   R.compose(R.pick, R.keys)(defaultParams)
+// )
+const userParams = R.pick(defaultParams)
 
 const view = {
   index (options) {

@@ -7,8 +7,6 @@ const template = require('../assets/javascript/polls')
 const Poll = require('../models/poll')
 const User = require('../models/user')
 const paginate = require('express-paginate')
-const mongoose = require('mongoose')
-// const log = require('../../lib/logger.js')
 
 const data = {
   index: { title: 'Polls' },
@@ -44,8 +42,16 @@ const actions = {
       return 'Best match'
     }
 
+    const findAll = Poll
+      .find(query)
+      .sort(sort)
+      .limit(req.query.limit)
+      .skip(req.skip)
+      .populate('author')
+      .lean()
+
     return Promise.all([
-      Poll.find(query).sort(sort).limit(req.query.limit).skip(req.skip).populate('author').lean(),
+      findAll,
       Poll.count(query),
       User.count(userQuery)
     ]).then(([polls, pollsCount, usersCount]) => {
@@ -86,7 +92,8 @@ const actions = {
       return res.redirect('/')
     }
 
-    const params = R.merge({ author: user._id }, pollParams(req.body))
+    const permit = R.pick(['name', 'description', 'choices'])
+    const params = R.merge({ author: user._id }, permit(req.body))
     const poll = new Poll(params)
 
     return poll.save()
@@ -110,7 +117,10 @@ const actions = {
     if (!validator.isMongoId(id)) { return next() }
 
     const findPoll = Poll.findById(id).populate('author', 'username').lean()
-    const findVoter = Poll.findVoter({ id, voter: routing.voterQuery(req.session) }).lean()
+    const findVoter = Poll.findVoter({
+      id,
+      voter: routing.voterQuery(req.session)
+    }).lean()
 
     return Promise.all([findPoll, findVoter])
       .then(([poll, voter]) => {
@@ -134,9 +144,9 @@ const actions = {
       return res.redirect('/login')
     }
 
-    return Poll.findById(id).lean()
+    return Poll.findById(id).populate('author', 'username').lean()
       .then(poll => {
-        if (!poll.author.equals(req.session.user._id)) {
+        if (!poll.author._id.equals(req.session.user._id)) {
           req.session.flash = { danger: "You can't modify this poll" }
           return res.redirect(`/polls/${poll._id}`)
         }
@@ -157,29 +167,35 @@ const actions = {
       return res.redirect('/login')
     }
 
-    return Poll.findById(id, (err, poll) => {
-      if (err) { next(err) }
-      if (poll.author !== req.session.user._id) {
-        req.session.flash = { danger: "You can't modify this poll" }
-        return res.redirect(`/polls/${poll._id}`)
-      }
-
-      poll.set(pollParams(req.body))
-
-      return poll.save((err) => {
-        if (err && err.errors) {
-          res.locals.poll = poll
-          res.locals.errors = err.errors
-          return res.render('application', view.edit(res.locals))
+    return Poll
+      .findById(id)
+      .populate('author', 'username')
+      .exec((err, poll) => {
+        if (err) { next(err) }
+        if (!poll.author.equals(req.session.user._id)) {
+          req.session.flash = { danger: "You can't modify this poll" }
+          return res.redirect(`/polls/${poll._id}`)
         }
 
-        if (err) { return next(err) }
+        const permit = R.pick(['name', 'description', 'choices'])
 
-        req.session.flash = { success: 'Poll updated' }
+        return poll
+          .update(permit(req.body))
+          .lean()
+          .exec(err => {
+            if (err && err.errors) {
+              res.locals.poll = poll
+              res.locals.errors = err.errors
+              return res.render('application', view.edit(res.locals))
+            }
 
-        return res.redirect(`/polls/${poll._id}`)
+            if (err) { return next(err) }
+
+            req.session.flash = { success: 'Poll updated' }
+
+            return res.redirect(`/polls/${poll._id}`)
+          })
       })
-    })
   },
 
   delete (req, res, next) {
@@ -222,18 +238,6 @@ function createRouter () {
   router.delete('/:id', to('delete'))
 
   return { to, router }
-}
-
-function pollParams (params) {
-  const fields = ['name', 'description', 'choices']
-  const pickOrBlank = R.compose(
-    R.pick(fields),
-    R.merge(R.__, params),
-    R.mergeAll,
-    R.map(x => ({ [x]: '' }))
-  )
-
-  return pickOrBlank(fields)
 }
 
 module.exports = createRouter()
