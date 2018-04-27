@@ -126,6 +126,7 @@ const actions = {
       .then(([poll, voter]) => {
         res.locals.poll = poll
         res.locals.isVoted = voter.length > 0
+        res.locals.canUpdate = isOwner(req.session.user, poll.author._id)
 
         res.render('application', view.show(res.locals))
       })
@@ -146,7 +147,8 @@ const actions = {
 
     return Poll.findById(id).populate('author', 'username').lean()
       .then(poll => {
-        if (!poll.author._id.equals(req.session.user._id)) {
+        // if (!poll.author._id.equals(req.session.user._id)) {
+        if (!isOwner(req.session.user, poll.author)) {
           req.session.flash = { danger: "You can't modify this poll" }
           return res.redirect(`/polls/${poll._id}`)
         }
@@ -238,6 +240,14 @@ function createRouter () {
   router.delete('/:id', to('delete'))
 
   return { to, router }
+}
+
+function isOwner (user, author) {
+  if (!user) return false
+  if (!author) return false
+  if (author.equals) return author.equals(user._id)
+  if (author._id && author._id.equals) return author._id.equals(user._id)
+  return false
 }
 
 module.exports = createRouter()

@@ -58,9 +58,7 @@ function Edit ({ poll, csrfToken, errors }) {
       input({ name: '_method', value: 'patch', type: 'hidden' }),
       input({ name: '_csrf', value: csrfToken, type: 'hidden' }),
 
-      PollNameOption({ poll, errors }),
-
-
+      PollNameOption({ poll, errors })
     ]),
 
     div('.border-bottom.mt-5', [ h2('Collaborators') ])

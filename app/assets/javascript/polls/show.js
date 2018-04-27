@@ -63,31 +63,45 @@ function Show ({ poll, isVoted }) {
   ])
 }
 
-function PollTabNavBar ({ poll }) {
+function Settings ({ canUpdate, poll, active }) {
+  if (!canUpdate) return null
+
+  return li('.nav-item', [
+    a('.nav-link', {
+      href: `/polls/${poll._id}/edit`,
+      className: (active === 'Settings') ? 'active' : 'text-muted'
+    }, [
+      span('.oi.oi-cog.pr-1'),
+      'Settings'
+    ])
+  ])
+}
+
+function PollTabNavBar (options) {
+  const { poll, active } = options
+
   return ul('.nav.nav-tabs.container.border-0', [
     li('.nav-item', [
-      a('.nav-link.active', { href: `/polls/${poll._id}` }, [
+      a('.nav-link', {
+        href: `/polls/${poll._id}`,
+        className: (active !== 'Settings') ? 'active' : 'text-muted'
+      }, [
         span('.oi.oi-bar-chart.pr-1'),
         'Poll'
       ])
     ]),
 
-    li('.nav-item', [
-      a('.nav-link.text-muted', { href: `/polls/${poll._id}/edit` }, [
-        span('.oi.oi-cog.pr-1'),
-        'Settings'
-      ])
-    ])
+    Settings(options)
   ])
 }
 
-module.exports = function Page ({ poll, flash, isVoted }) {
+module.exports = function Page ({ poll, flash, isVoted, canUpdate }) {
   return div('.bg-light.main', [
     div('.border-bottom', [
       div('.container.p-0', [
         w.MessageDesk(flash),
         Header(poll),
-        PollTabNavBar({ poll })
+        PollTabNavBar({ poll, active: 'Poll', canUpdate })
       ])
     ]),
 
