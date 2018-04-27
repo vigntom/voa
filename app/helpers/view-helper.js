@@ -18,32 +18,38 @@ function FormFor (selector, params, children) {
   return form(selector, formParams, children)
 }
 
-function ErrorMsg (err) {
-  if (!err) { return null }
-
-  const errors = Object.values(err)
-
-  return div('.error-msg', [
-    div('.alert.alert-danger',
-      `The form contains ${pluralize('error', errors.length, true)}`
-    ),
-    ul(errors.map(msg => li(msg.message)))
-  ])
-}
-
 function MessageDesk (messages) {
   const msgTypes = Object.keys(messages)
-  const alert = msgType => div(`.alert.alert-${msgType}.mt-1.mb-3`, messages[msgType])
+  const alert = msgType => {
+    const message = messages[msgType]
 
-  if (msgTypes.length > 0) { return div(msgTypes.map(alert)) }
+    if (message.type) return AlertBox(message)
+
+    return AlertBox({
+      type: msgType,
+      msg: messages[msgType]
+    })
+  }
+
+  function AlertBox ({ type, msg }) {
+    return div(`.alert.alert-${type}.alert-dismissible.fade.show.stack-level-3`, {
+      role: 'alert'
+    }, [
+      msg,
+
+      button('.close', {
+        type: 'button',
+        'data-dismiss': 'alert',
+        'aria-label': 'close'
+      }, [ span({ 'aria-hidden': true }, '×') ])
+    ])
+  }
+
+  if (msgTypes.length > 0) {
+    return div('.alert.alert-fadable.fade.show.m-0', msgTypes.map(alert))
+  }
 
   return null
-}
-
-function maybeErrorField (name, errors) {
-  if (!errors) { return '' }
-  if (errors[name]) { return 'is-invalid' }
-  return 'is-valid'
 }
 
 function maybeError (options, errors, { path, placement }) {
@@ -52,10 +58,11 @@ function maybeError (options, errors, { path, placement }) {
   if (!errors) { return options }
 
   if (errors[name]) {
+    const title = errors[name]
     return Object.assign({}, options, {
       className: 'is-invalid',
       'data-toggle': 'tooltip',
-      title: errors[name],
+      title: typeof title === 'string' ? title : title.msg,
       'data-placement': placement
     })
   }
@@ -231,9 +238,7 @@ function PaginationStdBar ({ pageCount, pages, paginate }) {
 
 module.exports = {
   FormFor,
-  ErrorMsg,
   MessageDesk,
-  maybeErrorField,
   maybeError,
   Gravatar,
   Email,

@@ -41,7 +41,8 @@ function Name ({ name, errors }) {
   ])
 }
 
-function Description ({ description, errors }) {
+function Description ({ poll, errors }) {
+  const { description } = poll
   const options = {
     type: 'text',
     name: 'description',
@@ -58,7 +59,9 @@ function Description ({ description, errors }) {
   ])
 }
 
-function PollName ({ author, name, errors }) {
+function PollName ({ author, poll, errors }) {
+  const { name } = poll
+
   return div('.form-row', [
     Author(author),
     Slash(),
@@ -108,19 +111,19 @@ function createOrUseChoices (choices) {
   return [{ name: '', description: '' }, { name: '', description: '' }]
 }
 
-module.exports = function New ({ poll, author, description, flash, errors, csrfToken }) {
+module.exports = function New (options) {
+  const { poll, author, flash, errors, csrfToken } = options
   const choices = createOrUseChoices(poll.choices)
   return div('.main.container.mt-3', [
     div('.voa-board.w-75.m-auto', [
       w.MessageDesk(flash),
-      w.ErrorMsg(errors),
       div('.voa-item', [ h2('Create a new poll') ]),
       w.FormFor('#new-poll', { action: '/polls' }, [
         input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
 
         div('.voa-item', [
-          PollName({ author, name: poll.name, errors }),
-          Description({ description, errors })
+          PollName({ author, poll, errors }),
+          Description({ poll, errors })
         ]),
 
         div('.voa-item.clearfix', [

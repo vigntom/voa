@@ -124,7 +124,7 @@ function nameValidator (value) {
       ' hyphen and uderscore charactes')
   }
 
-  return this.model.count({ author: this.author, name: this.name })
+  return this.model('Poll').count({ author: this.author, name: this.name })
     .then(count => {
       if (count > 0) {
         this.invalidate('name', 'Author/name must be unique')

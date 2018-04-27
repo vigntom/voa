@@ -18,10 +18,6 @@ const defaultParams = [
   'emailProtected'
 ]
 
-// const userParams = R.compose(
-//   R.merge(defaultParams),
-//   R.compose(R.pick, R.keys)(defaultParams)
-// )
 const userParams = R.pick(defaultParams)
 
 const view = {
@@ -195,8 +191,13 @@ const actions = {
 
     function updateUser (err, user) {
       if (err) { return next(err) }
+      const isPassword = x => x === 'password' || x === 'passwordConfirmation'
+      const params = R.compose(
+        R.pickBy((val, key) => !(!val && isPassword(key))),
+        userParams
+      )
 
-      user.set(userParams(req.body))
+      user.set(params(req.body))
       user.save((err) => {
         if (err && err.errors) {
           res.locals.user = user

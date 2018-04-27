@@ -34,7 +34,6 @@ test('Unsuccessful edit', t => {
     .then(res => {
       const doc = createDoc(res.text)
       t.is(doc.title, 'Edit User | Vote Application')
-      t.truthy(doc.querySelector('.alert.alert-danger'))
     })
 })
 

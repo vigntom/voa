@@ -11,7 +11,13 @@ $(function () {
 
   $('[data-toggle="tooltip"]').tooltip()
 
+  $('.alert-fadable').delay(3000).fadeTo(1000, 0.5, () => {
+    $('.alert-fadable').alert('close')
+  })
+
   rest()
   dinput()
   chart()
 })
+
+/* global $ */

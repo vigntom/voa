@@ -126,7 +126,7 @@ const actions = {
       .then(([poll, voter]) => {
         res.locals.poll = poll
         res.locals.isVoted = voter.length > 0
-        res.locals.canUpdate = isOwner(req.session.user, poll.author._id)
+        res.locals.canUpdate = isOwner(req.session.user, poll.author)
 
         res.render('application', view.show(res.locals))
       })

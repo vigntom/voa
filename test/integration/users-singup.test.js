@@ -25,7 +25,6 @@ test('Invalid singup', t => {
 
           t.is(res.statusCode, 200)
           t.is(doc.title, 'Signup | Vote Application')
-          t.truthy(doc.querySelector('div.error-msg'))
           t.truthy(doc.querySelector('input.is-invalid'))
 
           return assertNoDiff(count)

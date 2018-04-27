@@ -50,9 +50,6 @@ function passwordAuthentication (schema, options) {
 function validatePasswordComponent (value, opts, doc) {
   const { path } = opts
   const title = opts.title || path
-  const digestPresent = !doc.isNew && doc.passwordDigest
-
-  if (digestPresent && !value) return null
 
   if (!value) {
     return doc.invalidate(path, `${title} can't be blank`)

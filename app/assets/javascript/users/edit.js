@@ -1,8 +1,45 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { FormFor, ErrorMsg, maybeErrorField, Gravatar } = require('../../../helpers/view-helper')
+const { FormFor, maybeError, Gravatar } = require('../../../helpers/view-helper')
 
-const { div, h1, label, input, button, a } = hh(h)
+const { div, label, input, button, a } = hh(h)
+
+function Username ({ user, errors }) {
+  const options = maybeError({
+    name: 'username',
+    defaultValue: user.username
+  }, errors, { placement: 'top' })
+
+  return div('.form-group', [
+    label({ htmlFor: 'edit-username' }, 'Username'),
+    input('#edit-username.form-control', options)
+  ])
+}
+
+function Email ({ user, errors }) {
+  const options = maybeError({
+    name: 'email',
+    type: 'email',
+    defaultValue: user.email
+  }, errors, { placement: 'top' })
+
+  return div('.form-group', [
+    label({ htmlFor: 'edit-email' }, 'Email'),
+    input('#edit-email.form-control', options)
+  ])
+}
+
+function Password ({ user, errors, name }) {
+  const options = maybeError({
+    name,
+    type: 'password'
+  }, errors, { placement: 'top' })
+
+  return div('.form-group', [
+    label({ htmlFor: 'edit-password' }, 'Password'),
+    input(`#edit-${name}.form-control`, options)
+  ])
+}
 
 function EditPage ({ user, errors, csrfToken }) {
   return div('.main.container.my-5.p-5', [
@@ -18,43 +55,11 @@ function EditPage ({ user, errors, csrfToken }) {
         FormFor('#edit-user.edit-user', { action: `/users/${user.id}` }, [
           input({ name: '_method', value: 'patch', type: 'hidden' }),
           input({ name: '_csrf', value: csrfToken, type: 'hidden' }),
-          ErrorMsg(errors),
-          div('.form-group', [
-            label({ htmlFor: 'edit-username' }, 'Username'),
-            input('#edit-username.form-control', {
-              name: 'username',
-              defaultValue: user.username,
-              className: maybeErrorField('username', errors)
-            })
-          ]),
 
-          div('.form-group', [
-            label({ htmlFor: 'edit-email' }, 'Email'),
-            input('#edit-email.form-control', {
-              name: 'email',
-              type: 'email',
-              defaultValue: user.email,
-              className: maybeErrorField('email', errors)
-            })
-          ]),
-
-          div('.form-group', [
-            label({ htmlFor: 'edit-password' }, 'Password'),
-            input('#edit-password.form-control', {
-              name: 'password',
-              type: 'password',
-              className: maybeErrorField('password', errors)
-            })
-          ]),
-
-          div('.form-group', [
-            label({ htmlFor: 'edit-confirmation' }, 'Confirmation'),
-            input('#edit-confirmation.form-control', {
-              name: 'passwordConfirmation',
-              type: 'password',
-              className: maybeErrorField('passwordConfirmation', errors)
-            })
-          ]),
+          Username({ user, errors }),
+          Email({ user, errors }),
+          Password({ user, errors, name: 'password' }),
+          Password({ user, errors, name: 'passwordConfirmation' }),
 
           div('.form-check.border-top.my-3.py-3', [
             input('#edit-email-protection.form-check-input', {

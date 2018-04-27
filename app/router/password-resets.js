@@ -69,7 +69,11 @@ const actions = {
 
     function emailNotFound (msg) {
       if (msg) { log.warn(msg) }
-      res.locals.errors = { email: { message: 'Wrong email' } }
+      res.locals.email = email
+      res.locals.errors = {
+        email: { msg: 'Wrong email', type: 'danger' }
+      }
+
       return res.render('application', view.new(res.locals))
     }
 
@@ -131,11 +135,14 @@ const actions = {
       if (err) { return next(err) }
       if (!user) { return invalidReset('User not found.') }
       if (!user.activated) { return invalidReset('User not activated.') }
-      if (!password) { return warnAndEdit('password', user) }
-      if (!confirmation) { return warnAndEdit('passwordConfirmation', user) }
       if (isExpired(user)) { return redirectWhenExpired({ req, res }) }
 
       user.set({ password, passwordConfirmation: confirmation, resetDigest: '' })
+
+      // user.password = password
+      // user.passwordConfirmation = confirmation
+      // user.resetDigest = ''
+
       res.locals.user = user
 
       return user.save((err, who) => {
