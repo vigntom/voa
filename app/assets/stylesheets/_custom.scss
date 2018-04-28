@@ -1,6 +1,14 @@
 $primary: #0366d6;
 $pagination-disabled-color: #d1d5da;
 $pagination-disabled-bg: #fafbfc;
+$gray: #bdbdbd;
+
+// tooltip
+$tooltip-opacity: 1;
+$tooltip-padding-y: 12px;
+$tooltip-padding-x: 24px;
+$tooltip-bg: black(.75);
+$tooltip-color: #fff;
 
 .w-30 {
   width: 30%;
@@ -9,32 +17,3 @@ $pagination-disabled-bg: #fafbfc;
 .w-40 {
   width: 40%;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
