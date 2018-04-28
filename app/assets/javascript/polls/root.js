@@ -27,8 +27,7 @@ function PollsList ({ polls, pollsCount, menuItem }) {
 
   return div('.voa-board', [
     div('.voa-item.p-0', [
-      w.InfoBar({ info, menuItem }),
-      Dropdown({ path })
+      w.InfoBar({ info, menuItem }, Dropdown({ path }))
     ]),
 
     polls.map(x => div('.voa-item', { key: x._id }, [ PollCard({ poll: x }) ]))
@@ -36,7 +35,9 @@ function PollsList ({ polls, pollsCount, menuItem }) {
 }
 
 function Dropdown ({ path }) {
-  return div('.dropdown-menu.dropdown-menu-right', { 'aria-labelledby': 'dropdownMenuButton' }, [
+  return div('.dropdown-menu', {
+    'aria-labelledby': 'dropdownMenuButton'
+  }, [
     a('.dropdown-item', { href: `${path}?s=&o=desc` }, 'Best match'),
     a('.dropdown-item', { href: `${path}?s=stars&o=desc` }, 'Most stars'),
     a('.dropdown-item', { href: `${path}?s=stars&o=asc` }, 'Fewest stars'),

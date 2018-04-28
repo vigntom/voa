@@ -50,8 +50,7 @@ function UsersList (options) {
 
   return div('.voa-board', [
     div('.voa-item.p-0', [
-      w.InfoBar({ info, menuItem }),
-      Dropdown({ path })
+      w.InfoBar({ info, menuItem }, Dropdown({ path }))
     ]),
 
     users.map(user => (
