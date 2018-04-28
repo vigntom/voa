@@ -80,6 +80,10 @@ const actions = {
 
     res.locals.poll = new Poll({ author: user._id })
     res.locals.author = user.username
+    res.locals.action = {
+      link: '/polls',
+      name: 'Create'
+    }
 
     return res.render('application', view.new(res.locals))
   },
@@ -105,6 +109,11 @@ const actions = {
           res.locals.poll = poll
           res.locals.errors = err.errors
           res.locals.author = req.session.user.username
+          res.locals.action = {
+            link: '/polls',
+            name: 'Create'
+          }
+
           return res.render('application', view.new(res.locals))
         }
 
@@ -154,6 +163,13 @@ const actions = {
         }
 
         res.locals.poll = poll
+        res.locals.author = poll.author.username
+        res.locals.action = {
+          name: 'Update',
+          method: 'patch',
+          link: `/polls/${poll._id}`
+        }
+
         return res.render('application', view.edit(res.locals))
       })
       .catch(next)
@@ -187,7 +203,14 @@ const actions = {
           .exec(err => {
             if (err && err.errors) {
               res.locals.poll = poll
+              res.locals.author = poll.author.username
+              res.locals.action = {
+                name: 'Update',
+                method: 'patch',
+                link: `/polls/${poll._id}`
+              }
               res.locals.errors = err.errors
+
               return res.render('application', view.edit(res.locals))
             }
 

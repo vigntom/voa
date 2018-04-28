@@ -71,7 +71,7 @@ const actions = {
       if (msg) { log.warn(msg) }
       res.locals.email = email
       res.locals.errors = {
-        email: { msg: 'Wrong email', type: 'danger' }
+        email: { message: 'Wrong email', type: 'danger' }
       }
 
       return res.render('application', view.new(res.locals))
@@ -124,13 +124,6 @@ const actions = {
       return res.redirect('/')
     }
 
-    function warnAndEdit (field, user) {
-      res.locals.errors = { [field]: { message: "Can't be blank" } }
-      res.locals.user = user
-      res.locals.token = token
-      return res.render('application', view.edit(res.locals))
-    }
-
     return authenticate(email, token, (err, user) => {
       if (err) { return next(err) }
       if (!user) { return invalidReset('User not found.') }
@@ -138,10 +131,6 @@ const actions = {
       if (isExpired(user)) { return redirectWhenExpired({ req, res }) }
 
       user.set({ password, passwordConfirmation: confirmation, resetDigest: '' })
-
-      // user.password = password
-      // user.passwordConfirmation = confirmation
-      // user.resetDigest = ''
 
       res.locals.user = user
 

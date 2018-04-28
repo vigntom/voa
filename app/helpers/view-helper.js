@@ -19,23 +19,30 @@ function FormFor (selector, params, children) {
 }
 
 function MessageDesk (messages) {
-  const msgTypes = Object.keys(messages)
+  if (!messages) return null
+
   const alert = msgType => {
     const message = messages[msgType]
 
     if (message.type) return AlertBox(message)
+    if (Array.isArray(message)) {
+      return message.map(m => AlertBox({
+        type: msgTypes,
+        message: m
+      }))
+    }
 
     return AlertBox({
       type: msgType,
-      msg: messages[msgType]
+      message
     })
   }
 
-  function AlertBox ({ type, msg }) {
+  function AlertBox ({ type, message }) {
     return div(`.alert.alert-${type}.alert-dismissible.fade.show.stack-level-3`, {
       role: 'alert'
     }, [
-      msg,
+      message,
 
       button('.close', {
         type: 'button',
@@ -45,6 +52,8 @@ function MessageDesk (messages) {
     ])
   }
 
+  const msgTypes = Object.keys(messages)
+
   if (msgTypes.length > 0) {
     return div('.alert.alert-fadable.fade.show.m-0', msgTypes.map(alert))
   }
@@ -52,17 +61,18 @@ function MessageDesk (messages) {
   return null
 }
 
-function maybeError (options, errors, { path, placement }) {
-  const name = path || options.name
+function maybeError (options, errors, tooltip = {}) {
+  const name = tooltip.path || options.name
+  const placement = tooltip.placement || 'top'
 
   if (!errors) { return options }
 
   if (errors[name]) {
-    const title = errors[name]
+    const error = errors[name]
     return Object.assign({}, options, {
       className: 'is-invalid',
       'data-toggle': 'tooltip',
-      title: typeof title === 'string' ? title : title.msg,
+      title: typeof error === 'string' ? error : error.message,
       'data-placement': placement
     })
   }

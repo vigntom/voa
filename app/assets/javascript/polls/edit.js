@@ -1,6 +1,7 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const w = require('../../../helpers/view-helper')
+const Settings = require('./settings')
 
 const { div, h1, h2, a, span, ul, li, input, label, button } = hh(h)
 
@@ -32,36 +33,21 @@ function PollTabNavBar ({ poll }) {
   ])
 }
 
-function PollNameOption ({ poll, errors }) {
+function Name ({ poll, errors }) {
   const options = w.maybeError({
     name: 'name',
     defaultValue: poll.name
-  }, errors, { placement: 'top' })
+  }, errors)
 
-  return div('.form-row', [
+  return div('.form-row.mb-4', [
     div('.col-auto', [
-      label({ htmlFor: 'edit-pollname' }, 'Poll name'),
-      input('#edit-pollname.form-control', options)
+      label({ htmlFor: 'name' }, 'Name'),
+      input('#name.form-control', options)
     ]),
 
     div('.col-auto.align-self-end', [
       button('.btn.btn-outline-primary', 'Rename')
     ])
-  ])
-}
-
-function Edit ({ poll, csrfToken, errors }) {
-  return div('.container', [
-    div('.border-bottom.mt-4', [ h2('Settings') ]),
-
-    w.FormFor('#settings.pt-3', { action: `/polls/${poll._id}` }, [
-      input({ name: '_method', value: 'patch', type: 'hidden' }),
-      input({ name: '_csrf', value: csrfToken, type: 'hidden' }),
-
-      PollNameOption({ poll, errors })
-    ]),
-
-    div('.border-bottom.mt-5', [ h2('Collaborators') ])
   ])
 }
 
@@ -77,7 +63,9 @@ module.exports = function Page (options) {
     ]),
 
     div('.row.justify-content-center.bg-white', [
-      div('.col-7', [ Edit(options) ])
+      div('.col-7.p-5.voa-board', [
+        Settings(options)
+      ])
     ])
   ])
 }
