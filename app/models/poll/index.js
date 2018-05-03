@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const User = require('../user')
 const Schema = mongoose.Schema
 const h = require('./lib/helpers')
+const beautifyUnique = require('mongoose-beautiful-unique-validation')
 
 const pollSchema = new Schema({
   name: {
@@ -9,7 +10,11 @@ const pollSchema = new Schema({
     required: "Poll name can't be blank",
     trim: true,
     minlength: [ 1, 'Use at least 3 characters for pool name' ],
-    maxlength: [ 32, 'Keep pool name within 32 characters' ]
+    maxlength: [ 32, 'Keep pool name within 32 characters' ],
+    validate: {
+      validator: x => /^[a-zA-Z0-9_-]+$/.test(x),
+      message: 'Poll Name may only contain alphumeric hyphen and uderscore charactes'
+    }
   },
 
   description: {
@@ -80,11 +85,16 @@ const pollSchema = new Schema({
   timestamps: true
 })
 
-pollSchema.path('name').validate(nameValidator)
-pollSchema.pre('validate', choicesValidator)
+pollSchema.index({ name: 1, author: 1 }, {
+  unique: 'You already use the name "{VALUE}" for another poll'
+})
+
+pollSchema.plugin(beautifyUnique)
+
+pollSchema.post('validate', choicesValidator)
 pollSchema.post('save', incUserPolls(1))
 pollSchema.post('remove', incUserPolls(-1))
-pollSchema.pre('update', nameValidatorByQuery)
+pollSchema.pre('update', choiceValidatorByQuery)
 
 pollSchema.methods.addContributor = function (data) {
   return h.findbyIdAndAddContibutor(this, this.id, data)
@@ -116,61 +126,40 @@ function incUserPolls (num) {
   )
 }
 
-function nameValidator (value) {
-  const enabledChars = /^[a-zA-Z0-9_-]+$/
-
-  if (!enabledChars.test(value)) {
-    this.invalidate('name', 'Poll Name may only contain alpahumeric' +
-      ' hyphen and uderscore charactes')
-  }
-
-  return this.model('Poll').count({ author: this.author, name: this.name })
-    .then(count => {
-      if (count > 0) {
-        this.invalidate('name', 'Author/name must be unique')
-      }
-    })
-    .catch(err => {
-      this.invalidate('name', err.message)
-    })
-}
-
-function nameValidatorByQuery () {
+function choiceValidatorByQuery () {
   const query = this
-  const doc = query.model()
-  const enabledChars = /^[a-zA-Z0-9_-]+$/
-  const value = query.getUpdate().name
+  const model = query.model
+  const update = query.getUpdate()
 
-  if (!enabledChars.test(value)) {
-    const msg = 'Poll Name may only contain alpahumeric hyphen and uderscore charactes'
-    const error = doc.invalidate('name', msg, value)
-    query.error(error)
-  }
+  if (update.$push && update.$push.choices) {
+    const choice = update.$push.choices
+    const name = choice.name
+    const cond = query.getQuery()
 
-  return query.model.findOne(query.getQuery())
-    .then(poll => {
-      return query.model.count({ author: poll.author, name: value })
-    })
-    .then(count => {
-      if (count > 0) {
-        const msg = 'Author/name must be unique'
-        const error = doc.invalidate('name', msg, value)
-        query.error(error)
-      }
-    })
-    .catch(err => {
-      const error = doc.invalidate('name', err.message)
+    if (!name) {
+      const msg = "Choice name can't be blank"
+      const error = model().invalidate('choices', msg)
       query.error(error)
-    })
+      return null
+    }
+
+    return model.findOne(cond).where('choices').elemMatch({ name })
+      .then(poll => {
+        if (poll) {
+          const msg = 'Choice name must be unique'
+          const error = model().invalidate('choices', msg)
+          query.error(error)
+        }
+      })
+  }
 }
 
-function choicesValidator (next) {
+function choicesValidator (doc) {
   let dupIndexes = []
-  const choices = this.choices.map(x => x.name)
+  const choices = doc.choices.map(x => x.name)
 
   if (choices.length < 2) {
-    this.invalidate('choices', 'Must be at least 2 choices')
-    return next()
+    doc.invalidate('choices', 'Must be at least 2 choices')
   }
 
   choices.forEach((x, i) => {
@@ -180,10 +169,17 @@ function choicesValidator (next) {
   })
 
   dupIndexes.forEach(i => {
-    this.invalidate(`choices.${i}.name`, 'Choice name must be unique for current poll')
+    doc.invalidate(`choices.${i}.name`, 'Choice name must be unique for current poll')
   })
+}
 
-  next()
+pollSchema.query.addChoiceOption = function (choice) {
+  const query = this
+
+  return query
+    .then(poll => {
+      return poll.update({ $push: { choices: choice } })
+    })
 }
 
 module.exports = mongoose.model('Poll', pollSchema)

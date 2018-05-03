@@ -91,6 +91,7 @@
     "kefir": "^3.8.1",
     "method-override": "^2.3.10",
     "mongoose": "^5.0.14",
+    "mongoose-beautiful-unique-validation": "^7.1.1",
     "mongoose-unique-validator": "^2.0.0",
     "node-sass": "^4.7.2",
     "nodemailer": "^4.4.2",

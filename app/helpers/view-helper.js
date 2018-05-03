@@ -211,22 +211,28 @@ function InfoBar ({ path, info, menuItem }, dropdown) {
   ])
 }
 
-function SortGroup (options) {
-  const { users, polls, pollsCount, usersCount, query } = options
-  const queryStr = query ? `?${querystring.stringify(query)}` : ''
-
+function GroupLink ({ cond, href }, nest) {
   function maybeSelected (cond) {
     const style = '.list-group-item'
     if (cond) { return style + '.selected' }
     return style
   }
 
+  const selector = maybeSelected(cond)
+  return a(selector, { href }, nest)
+}
+
+function SortGroup (options) {
+  const { users, polls, pollsCount, usersCount, query } = options
+  const queryStr = query ? `?${querystring.stringify(query)}` : ''
+
   return div('.list-group', [
-    a(maybeSelected(polls), { href: '/polls' + queryStr }, [
+    GroupLink({ cond: polls, href: '/polls' + queryStr }, [
       'Polls',
       span('.counter.badge.badge-pill.float-right', pollsCount)
     ]),
-    a(maybeSelected(users), { href: '/users' + queryStr }, [
+
+    GroupLink({ cond: users, href: '/users' + queryStr }, [
       'Users',
       span('.counter.badge.badge-pill.float-right', usersCount)
     ])
@@ -254,5 +260,6 @@ module.exports = {
   Email,
   SortGroup,
   InfoBar,
-  PaginationStdBar
+  PaginationStdBar,
+  GroupLink
 }

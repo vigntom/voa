@@ -48,6 +48,7 @@ function Dropdown ({ path }) {
 
 module.exports = function Index (options) {
   return div('.main.container.my-5', [
+    w.MessageDesk(options.flash),
     div('.row.justify-content-center', [
       div('.col-3', [ w.SortGroup(options) ]),
       div('.col-7', [ PollsList(options) ])

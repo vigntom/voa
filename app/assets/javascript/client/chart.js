@@ -1,19 +1,12 @@
-import { scaleSequential } from 'd3-scale'
-import { interpolateRainbow } from 'd3-scale-chromatic'
 import Chart from 'chart.js'
+import pollChart from '../../../../lib/poll-chart'
 
 export default function () {
   let chart
   const $chart = $('#poll-chart')
-  const d3 = { scaleSequential, interpolateRainbow }
 
   function createChart (poll) {
-    const votes = poll.choices.reduce((acc, x) => acc + x.votes, 0)
-    const data = poll.choices.map(x => Math.round(x.votes * 100 / votes))
-    const maxVote = Math.max(...data)
-    const toColor = d3.scaleSequential(
-      d3.interpolateRainbow
-    ).domain([0, maxVote])
+    const { data, votes, scale } = pollChart(poll.choices)
 
     const chart = new Chart($chart, {
       type: 'horizontalBar',
@@ -21,8 +14,8 @@ export default function () {
         labels: poll.choices.map(x => x.name),
         datasets: [{
           label: `Votes in % (total: ${votes})`,
-          data,
-          backgroundColor: data.map(toColor)
+          data: data.map(scale.vote),
+          backgroundColor: data.map(scale.color)
         }]
       },
       options: {
@@ -53,7 +46,7 @@ export default function () {
 
   function fetchChart () {
     const pollId = $('#vote-container').data('pollId')
-    $.ajax({
+    return $.ajax({
       dataType: 'json',
       url: `/api/poll/${pollId}`
     }).done(poll => {
@@ -61,30 +54,68 @@ export default function () {
     })
   }
 
-  function bindButton () {
-    $('#voa-vote-btn').on('click', (e) => {
-      const id = $('#vote-container').data('pollId')
-      const choice = $('input[name=choice]:checked').val()
+  function bindVoteButton () {
+    $('.choices-voted').on('click', e => {
+      const $btn = $(e.target).closest('button')
 
-      if (!choice) { return choice }
+      $btn.on('hidden.bs.tooltip', () => {
+        const choice = $btn.val()
+        const id = $('#vote-container').data('pollId')
+
+        return $.ajax({
+          url: `/api/poll/${id}/choice/${choice}`,
+          dataType: 'json',
+          method: 'patch'
+        }).done(res => {
+          if (res.success) {
+            chart.destroy()
+            fetchChart()
+            $('.vote-col').remove()
+          }
+        })
+      })
+
+      $btn.tooltip('hide')
+    })
+  }
+
+  function bindFreeVoteButton () {
+    $('.choice-free-submit').on('click', e => {
+      const pollId = $('#vote-container').data('pollId')
+      const name = $('.choice-name').val()
+      const description = $('.choice-description').val()
 
       $.ajax({
-        url: `/api/poll/${id}/${choice}`,
         dataType: 'json',
-        method: 'patch'
+        url: `/api/poll/${pollId}/choice`,
+        data: { name, description },
+        method: 'post'
       }).done(res => {
-        if (res.result === 'ok') {
+        if (res.success) {
           chart.destroy()
-          fetchChart()
-          $('.vote-col').toggleClass('hide')
+          $('#new-choice').modal('toggle')
         }
+
+        if (res.error && res.error.errors && res.error.errors.choices) {
+          const $el = $('[name="choices[][name]"]')
+
+          $el.data('toggle', 'tooltip')
+          $el.addClass('is-invalid')
+          $el.tooltip({ title: res.error.errors.choices.message })
+
+          return null
+        }
+
+        window.location.reload()
       })
     })
   }
 
   if ($chart.length) {
     fetchChart()
-    bindButton()
+    bindVoteButton()
+    bindFreeVoteButton()
   }
 }
+
 /* global $ */

@@ -59,7 +59,7 @@ const createTesterUser2 = () => User.create({
 })
 
 const fakeChoices = () => R.times(i => ({
-  name: faker.lorem.word() + '-' + i,
+  name: faker.lorem.word(),
   description: faker.lorem.sentence(),
   votes: R.times(
     i => ({

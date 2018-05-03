@@ -1,19 +1,19 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { Gravatar, Email, FormFor } = require('../../../helpers/view-helper')
+const w = require('../../../helpers/view-helper')
 const dateFormat = require('dateformat')
 
 const { div, h2, h3, p, a, input, form, time, button } = hh(h)
 
 function UserInfo ({ user }) {
   return div('.card.border-0', [
-    Gravatar({ user, size: '160px', className: 'card-img-top' }),
+    w.Gravatar({ user, size: '160px', className: 'card-img-top' }),
     div('.card-body.px-0', [
       h2('.h3.card-title', user.username)
 
     ]),
 
-    div('.card-footer.bg-white.py-4.px-0', [ Email({
+    div('.card-footer.bg-white.py-4.px-0', [ w.Email({
       user,
       className: 'card-text'
     }) ])
@@ -84,6 +84,7 @@ function PollList (options) {
 
 module.exports = function Index (options) {
   return div('.main.container.my-5', [
+    w.MessageDesk(options.flash),
     div('.row.justify-content-center', [
       div('.col-3', [ UserInfo(options) ]),
       div('.col-5', [ PollList(options) ])

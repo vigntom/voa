@@ -8,6 +8,7 @@ const { createView } = require('../helpers/application-helper')
 const usersView = require('../assets/javascript/users')
 const routing = require('../../lib/routing')
 const mailer = require('../../lib/mailer')
+const log = require('../../lib/logger')
 
 const renderer = res => page => res.render('application', page)
 const defaultParams = [

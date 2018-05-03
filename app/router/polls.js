@@ -12,7 +12,8 @@ const data = {
   index: { title: 'Polls' },
   show: { title: 'Show polls' },
   new: { title: 'New poll' },
-  edit: { title: 'Edit poll' }
+  settings: { title: 'Settings' },
+  choices: { title: 'Choices' }
 }
 
 const view = v.initViews(template, data)
@@ -136,6 +137,7 @@ const actions = {
         res.locals.poll = poll
         res.locals.isVoted = voter.length > 0
         res.locals.canUpdate = isOwner(req.session.user, poll.author)
+        res.locals.isAuthenticated = !!req.session.user
 
         res.render('application', view.show(res.locals))
       })
@@ -144,7 +146,7 @@ const actions = {
       .catch(next)
   },
 
-  edit (req, res, next) {
+  settings (req, res, next) {
     const id = req.params.id
 
     if (!validator.isMongoId(id)) { return next() }
@@ -156,7 +158,6 @@ const actions = {
 
     return Poll.findById(id).populate('author', 'username').lean()
       .then(poll => {
-        // if (!poll.author._id.equals(req.session.user._id)) {
         if (!isOwner(req.session.user, poll.author)) {
           req.session.flash = { danger: "You can't modify this poll" }
           return res.redirect(`/polls/${poll._id}`)
@@ -164,63 +165,11 @@ const actions = {
 
         res.locals.poll = poll
         res.locals.author = poll.author.username
-        res.locals.action = {
-          name: 'Update',
-          method: 'patch',
-          link: `/polls/${poll._id}`
-        }
+        res.locals.settings = true
 
-        return res.render('application', view.edit(res.locals))
+        return res.render('application', view.settings(res.locals))
       })
       .catch(next)
-  },
-
-  update (req, res, next) {
-    const id = req.params.id
-
-    if (!validator.isMongoId(id)) { return next() }
-
-    if (!req.session.user) {
-      req.session.flash = { danger: 'Please log in' }
-      return res.redirect('/login')
-    }
-
-    return Poll
-      .findById(id)
-      .populate('author', 'username')
-      .exec((err, poll) => {
-        if (err) { next(err) }
-        if (!poll.author.equals(req.session.user._id)) {
-          req.session.flash = { danger: "You can't modify this poll" }
-          return res.redirect(`/polls/${poll._id}`)
-        }
-
-        const permit = R.pick(['name', 'description', 'choices'])
-
-        return poll
-          .update(permit(req.body))
-          .lean()
-          .exec(err => {
-            if (err && err.errors) {
-              res.locals.poll = poll
-              res.locals.author = poll.author.username
-              res.locals.action = {
-                name: 'Update',
-                method: 'patch',
-                link: `/polls/${poll._id}`
-              }
-              res.locals.errors = err.errors
-
-              return res.render('application', view.edit(res.locals))
-            }
-
-            if (err) { return next(err) }
-
-            req.session.flash = { success: 'Poll updated' }
-
-            return res.redirect(`/polls/${poll._id}`)
-          })
-      })
   },
 
   delete (req, res, next) {
@@ -233,19 +182,78 @@ const actions = {
       return res.redirect('/login')
     }
 
-    return Poll.findById(id, (err, poll) => {
-      if (err) { return next(err) }
-      if (poll.author !== req.session.user._id) {
-        req.session.flash = { danger: "You can't modify this poll" }
-        return res.redirect(`/polls/${poll._id}`)
+    return Poll.findById(id)
+      .populate('author', 'username')
+      .then(poll => {
+        if (!poll.author._id.equals(req.session.user._id)) {
+          req.session.flash = { danger: "You can't modify this poll" }
+          return res.redirect(`/polls/${poll._id}`)
+        }
+
+        return poll.remove()
+      })
+      .then(poll => {
+        req.session.flash = { success: 'Poll is deleted' }
+        return res.redirect(`/users/${poll.author._id}`)
+      })
+      .catch(next)
+  },
+
+  update: {
+    settings (req, res, next) {
+      const id = req.params.id
+
+      if (!validator.isMongoId(id)) { return next() }
+
+      if (!req.session.user) {
+        req.session.flash = { danger: 'Please log in' }
+        return res.redirect('/login')
       }
 
-      return poll.remove(err => {
-        if (err) { return next(err) }
-        req.session.flash = { success: `Poll is deleted` }
-        return res.redirect('/polls/')
-      })
-    })
+      return Poll.findById(id)
+        .populate('author', 'username')
+        .then(poll => {
+          if (!poll._id) {
+            req.session.flash = { warning: 'Unknoun poll' }
+            return res.redirect('/')
+          }
+
+          if (!poll.author._id.equals(req.session.user._id)) {
+            req.session.flash = { danger: "You can't modify this poll" }
+            return res.redirect(`/polls/${poll._id}`)
+          }
+
+          const params = R.pick(['name', 'description'], req.body)
+
+          if (poll.name === params.name && poll.description === params.description) {
+            return res.redirect(`/polls/${poll._id}/settings`)
+          }
+
+          res.locals.poll = poll
+          res.locals.author = poll.author
+
+          return poll.update(
+            { $set: { name: params.name, description: params.description } }
+          ).then(() => poll)
+        })
+        .then(poll => {
+          req.session.flash = { success: 'Poll settings updated' }
+          return res.redirect(`/polls/${poll._id}/settings`)
+        })
+        .catch((err, poll) => {
+          if (err.errors) {
+            res.locals.errors = err.errors
+            return res.render('application', view.settings(res.locals))
+          }
+        })
+    },
+
+    choices (req, res, next) {
+    },
+
+    transfer (req, res, next) {
+
+    }
   }
 }
 
@@ -256,11 +264,18 @@ function createRouter () {
   router.get('/', to('index'))
   router.get('/new', to('new'))
   router.get('/:id', to('show'))
-  router.get('/:id/edit', to('edit'))
+
+  // router.get('/:id/edit', to('edit'))
+  router.get('/:id/settings', to('settings'))
+  router.get('/:id/choices', to('choices'))
 
   router.post('/', to('create'))
-  router.patch('/:id', to('update'))
   router.delete('/:id', to('delete'))
+
+  // router.patch('/:id', to('update'))
+  router.post('/:id/settings', actions.update.settings)
+  router.post('/:id/choices', actions.update.choices)
+  router.post('/:id/transfer', actions.update.transfer)
 
   return { to, router }
 }

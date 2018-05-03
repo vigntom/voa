@@ -112,6 +112,40 @@ $half-offset: 3px;
   }
 }
 
+.btn-choice {
+  @include stack-effect(2);
+
+  padding: 0;
+  border: 0;
+  border-radius: $half-offset;
+
+  div {
+    padding: $std-offset;
+    border-radius: $half-offset;
+    background: black(.2);
+    color: white(.9);
+
+    &:hover {
+      background: black(.3);
+      box-shadow: 0 0 0 $half-offset white(.5);
+    }
+  }
+}
+
+.btn-choice-free {
+  @include stack-effect(2);
+
+  border: 1px solid $gray-600;
+  background: $white;
+  color: $gray-600;
+
+  &:hover {
+    background: black(.75);
+    color: $white;
+    box-shadow: 0 0 0 $half-offset black(.3);
+  }
+}
+
 .chart-container {
   position: relative;
 }
@@ -170,8 +204,9 @@ $half-offset: 3px;
   top: 4em;
   right: 3em;
   left: 3em;
+  z-index: 1050;
 }
 
 .alert-dismissible {
-  opacity: .9;
+  opacity: 1;
 }

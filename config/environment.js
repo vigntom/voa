@@ -1,6 +1,6 @@
 module.exports = {
   production: {
-    log: { console: 'warn' }
+    log: { console: 'info' }
   },
 
   development: {
@@ -8,6 +8,6 @@ module.exports = {
   },
 
   test: {
-    log: { console: 'error', file: 'warn' }
+    log: { console: 'debug', file: 'info' }
   }
 }

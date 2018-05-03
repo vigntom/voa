@@ -1,11 +1,13 @@
-const pageRoot = require('./root')
-const pageNew = require('./new')
-const pageShow = require('./show')
-const pageEdit = require('./edit')
+const rootPage = require('./root')
+const newPoll = require('./new')
+const show = require('./show')
+const settings = require('./settings')
+const choices = require('./choices')
 
 module.exports = {
-  index: pageRoot,
-  new: pageNew,
-  show: pageShow,
-  edit: pageEdit
+  index: rootPage,
+  new: newPoll,
+  show,
+  settings,
+  choices
 }

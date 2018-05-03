@@ -21,20 +21,40 @@ const actions = {
         })
     },
 
-    update (req, res, next) {
-      const { id, choice } = req.params
-      const voter = routing.voterQuery(req.session)
+    choice: {
+      update (req, res, next) {
+        const { id, choice } = req.params
+        const voter = routing.voterQuery(req.session)
 
-      if (!validator.isMongoId(id)) {
-        return res.json({ error: "Request poll id doesn't look like mongoId" })
+        if (!validator.isMongoId(id)) {
+          return res.json({ error: "Request poll id doesn't look like mongoId" })
+        }
+
+        Poll.findByIdAndVote(id, { choice, voter })
+          .then(poll => {
+            res.json({ success: true })
+          }).catch(err => {
+            res.json({ error: err.message, result: 'error' })
+          })
+      },
+
+      create (req, res, next) {
+        const { id } = req.params
+        const { name, description } = req.body
+
+        if (!validator.isMongoId(id)) {
+          return res.json({ error: "Request poll id doesn't look like mongoId" })
+        }
+
+        Poll.findById(id)
+          .addChoiceOption({ name, description })
+          .then(result => {
+            res.json({ success: true })
+          })
+          .catch(error => {
+            res.json({ success: false, error })
+          })
       }
-
-      Poll.findByIdAndVote(id, { choice, voter })
-        .then(poll => {
-          res.json({ result: 'ok' })
-        }).catch(err => {
-          res.json({ error: err.message, result: 'error' })
-        })
     }
   }
 }
@@ -43,7 +63,8 @@ function createRouter () {
   const router = express.Router()
 
   router.get('/poll/:id', actions.poll.show)
-  router.patch('/poll/:id/:choice', actions.poll.update)
+  router.patch('/poll/:id/choice/:choice', actions.poll.choice.update)
+  router.post('/poll/:id/choice', actions.poll.choice.create)
 
   return { router }
 }
