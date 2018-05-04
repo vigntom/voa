@@ -22,8 +22,6 @@ function routes (csrfProtection) {
     next()
   })
 
-  // router.use(csrfProtection)
-
   router.get('/', staticPages.to('home'))
   router.get('/about', staticPages.to('about'))
   router.get('/contact', staticPages.to('contact'))

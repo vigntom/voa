@@ -5,6 +5,7 @@ const routing = require('../../lib/routing')
 const v = require('../helpers/application-helper')
 const template = require('../assets/javascript/polls')
 const Poll = require('../models/poll')
+// const Option = require('../models/option')
 const User = require('../models/user')
 const paginate = require('express-paginate')
 
@@ -126,7 +127,11 @@ const actions = {
     const id = req.params.id
     if (!validator.isMongoId(id)) { return next() }
 
-    const findPoll = Poll.findById(id).populate('author', 'username').lean()
+    const findPoll = Poll.findById(id)
+      .populate('author', 'username')
+      .populate({ path: 'options', populate: { path: 'votes' } })
+      .lean()
+
     const findVoter = Poll.findVoter({
       id,
       voter: routing.voterQuery(req.session)
@@ -265,14 +270,12 @@ function createRouter () {
   router.get('/new', to('new'))
   router.get('/:id', to('show'))
 
-  // router.get('/:id/edit', to('edit'))
   router.get('/:id/settings', to('settings'))
   router.get('/:id/choices', to('choices'))
 
   router.post('/', to('create'))
   router.delete('/:id', to('delete'))
 
-  // router.patch('/:id', to('update'))
   router.post('/:id/settings', actions.update.settings)
   router.post('/:id/choices', actions.update.choices)
   router.post('/:id/transfer', actions.update.transfer)

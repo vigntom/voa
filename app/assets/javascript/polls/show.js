@@ -7,13 +7,13 @@ const R = require('ramda')
 
 const { div, h1, h5, p, a, span, canvas, button, ul, li } = hh(h)
 
-function ChoicesButton (choices) {
+function ChoicesButton (options) {
   const { scale } = pollChart(
-    R.map(x => ({ votes: x.votes.length }), choices)
+    R.map(x => ({ votes: x.votes.length }), options)
   )
 
   return index => {
-    const item = choices[index]
+    const item = options[index]
 
     return button('.btn.btn-choice.my-1', {
       type: 'button',
@@ -75,24 +75,24 @@ function NewChoice () {
   ])
 }
 
-function ChoicesGroup ({ choices }) {
-  const length = choices.length
+function ChoicesGroup ({ options }) {
+  const length = options.length
   const idx = R.range(0, length)
 
   return div('.choices-voted.d-flex.flex-column', [
-    R.map(ChoicesButton(choices), idx)
+    R.map(ChoicesButton(options), idx)
   ])
 }
 
 function VoteBar ({ poll, isAuthenticated }) {
-  const { choices } = poll
+  const { options } = poll
   return div('.d-flex.flex-column.px-2.py-4', [
-    ChoicesGroup({ choices }),
+    ChoicesGroup({ options }),
     FreeChoice({ isAuthenticated })
   ])
 }
 
-function Presentation ({ choices }) {
+function Presentation ({ options }) {
   return div('.chart-container', [
     canvas('#poll-chart')
   ])

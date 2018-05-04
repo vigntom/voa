@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const User = require('../user')
 const Schema = mongoose.Schema
+const Option = require('../option')
 const h = require('./lib/helpers')
 const beautifyUnique = require('mongoose-beautiful-unique-validation')
 
@@ -42,35 +43,6 @@ const pollSchema = new Schema({
     ref: 'User'
   }],
 
-  choices: [{
-    name: {
-      type: String,
-      required: "Choice name can't be blank",
-      trim: true,
-      minlenth: [1, 'Use at leas 1 character for choice name'],
-      maxlength: [64, 'Keep choice name within 64 characters']
-    },
-
-    description: {
-      type: String,
-      default: '',
-      trim: true,
-      maxlength: 254
-    },
-
-    votes: [{
-      _id: false,
-
-      voter: { type: String, required: true },
-
-      type: {
-        type: String,
-        required: true,
-        enum: ['User', 'Session']
-      }
-    }]
-  }],
-
   stargazers: {
     count: { type: Number, default: 0 },
 
@@ -85,40 +57,20 @@ const pollSchema = new Schema({
   timestamps: true
 })
 
+pollSchema.plugin(beautifyUnique)
+
 pollSchema.index({ name: 1, author: 1 }, {
   unique: 'You already use the name "{VALUE}" for another poll'
 })
 
-pollSchema.plugin(beautifyUnique)
-
-pollSchema.post('validate', choicesValidator)
 pollSchema.post('save', incUserPolls(1))
 pollSchema.post('remove', incUserPolls(-1))
-pollSchema.pre('update', choiceValidatorByQuery)
 
-pollSchema.methods.addContributor = function (data) {
-  return h.findbyIdAndAddContibutor(this, this.id, data)
-}
-
-pollSchema.methods.movePolls = function (to) {
-  return h.movePolls(this, this.id, to)
-}
-
-pollSchema.statics.findbyIdAndAddContibutor = function (id, data) {
-  return h.findByIdAndAddContributor(this, id, data)
-}
-
-pollSchema.statics.movePolls = function (from, to) {
-  return h.movePolls(this, User, from, to)
-}
-
-pollSchema.statics.findVoter = function (cond) {
-  return h.findVoter(this, cond)
-}
-
-pollSchema.statics.findByIdAndVote = function (id, cond) {
-  return h.findByIdAndVote(this, id, cond)
-}
+pollSchema.virtual('options', {
+  ref: 'Option',
+  localField: '_id',
+  foreignField: 'poll'
+})
 
 function incUserPolls (num) {
   return (doc) => (
@@ -126,60 +78,37 @@ function incUserPolls (num) {
   )
 }
 
-function choiceValidatorByQuery () {
-  const query = this
-  const model = query.model
-  const update = query.getUpdate()
+// pollSchema.methods.addContributor = function (data) {
+//   return h.findbyIdAndAddContibutor(this, this.id, data)
+// }
 
-  if (update.$push && update.$push.choices) {
-    const choice = update.$push.choices
-    const name = choice.name
-    const cond = query.getQuery()
+// pollSchema.methods.movePolls = function (to) {
+//   return h.movePolls(this, this.id, to)
+// }
 
-    if (!name) {
-      const msg = "Choice name can't be blank"
-      const error = model().invalidate('choices', msg)
-      query.error(error)
-      return null
-    }
+// pollSchema.statics.findbyIdAndAddContibutor = function (id, data) {
+//   return h.findByIdAndAddContributor(this, id, data)
+// }
 
-    return model.findOne(cond).where('choices').elemMatch({ name })
-      .then(poll => {
-        if (poll) {
-          const msg = 'Choice name must be unique'
-          const error = model().invalidate('choices', msg)
-          query.error(error)
-        }
-      })
-  }
+// pollSchema.statics.movePolls = function (from, to) {
+//   return h.movePolls(this, User, from, to)
+// }
+
+pollSchema.statics.findVoter = function (cond) {
+  return h.findVoter(this, cond)
 }
 
-function choicesValidator (doc) {
-  let dupIndexes = []
-  const choices = doc.choices.map(x => x.name)
+// pollSchema.statics.findByIdAndVote = function (id, cond) {
+//   return h.findByIdAndVote(this, id, cond)
+// }
 
-  if (choices.length < 2) {
-    doc.invalidate('choices', 'Must be at least 2 choices')
-  }
+// pollSchema.query.addChoiceOption = function (choice) {
+//   const query = this
 
-  choices.forEach((x, i) => {
-    if (choices.filter(y => x === y).length > 1) {
-      dupIndexes.push(i)
-    }
-  })
-
-  dupIndexes.forEach(i => {
-    doc.invalidate(`choices.${i}.name`, 'Choice name must be unique for current poll')
-  })
-}
-
-pollSchema.query.addChoiceOption = function (choice) {
-  const query = this
-
-  return query
-    .then(poll => {
-      return poll.update({ $push: { choices: choice } })
-    })
-}
+//   return query
+//     .then(poll => {
+//       return poll.update({ $push: { choices: choice } })
+//     })
+// }
 
 module.exports = mongoose.model('Poll', pollSchema)

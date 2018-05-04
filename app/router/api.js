@@ -12,7 +12,10 @@ const actions = {
         return res.json({ error: "Request param doesn't look like mongoId" })
       }
 
-      return Poll.findById(id).populate('author', 'username').lean()
+      return Poll.findById(id)
+        .populate('author', 'username')
+        .populate({ path: 'options', populate: { path: 'votes' } })
+        .lean()
         .then(poll => {
           res.json(summVotes(poll))
         })
@@ -72,7 +75,7 @@ function createRouter () {
 function summVotes (poll) {
   const result = Object.assign({}, poll)
 
-  result.choices = poll.choices.map(x => {
+  result.options = poll.options.map(x => {
     const y = Object.assign({}, x)
     y.votes = x.votes.length
 

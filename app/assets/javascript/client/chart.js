@@ -6,12 +6,12 @@ export default function () {
   const $chart = $('#poll-chart')
 
   function createChart (poll) {
-    const { data, votes, scale } = pollChart(poll.choices)
+    const { data, votes, scale } = pollChart(poll.options)
 
     const chart = new Chart($chart, {
       type: 'horizontalBar',
       data: {
-        labels: poll.choices.map(x => x.name),
+        labels: poll.options.map(x => x.name),
         datasets: [{
           label: `Votes in % (total: ${votes})`,
           data: data.map(scale.vote),
@@ -34,7 +34,7 @@ export default function () {
         tooltips: {
           callbacks: {
             label (item, data) {
-              return `${item.xLabel}% (votes: ${poll.choices[item.index].votes})`
+              return `${item.xLabel}% (votes: ${poll.options[item.index].votes})`
             }
           }
         }
@@ -96,12 +96,12 @@ export default function () {
           $('#new-choice').modal('toggle')
         }
 
-        if (res.error && res.error.errors && res.error.errors.choices) {
+        if (res.error && res.error.errors && res.error.errors.options) {
           const $el = $('[name="choices[][name]"]')
 
           $el.data('toggle', 'tooltip')
           $el.addClass('is-invalid')
-          $el.tooltip({ title: res.error.errors.choices.message })
+          $el.tooltip({ title: res.error.errors.options.message })
 
           return null
         }

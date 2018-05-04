@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const { isEmail } = require('validator')
-// const uniqueValidator = require('mongoose-unique-validator')
 const beautifyUnique = require('mongoose-beautiful-unique-validation')
 const authenticationPlugin = require('./plugins/authentication')
 const pollsPlugin = require('./plugins/polls')
@@ -47,7 +46,6 @@ const userSchema = new Schema({
   timestamps: true
 })
 
-// userSchema.plugin(uniqueValidator)
 userSchema.plugin(beautifyUnique)
 userSchema.plugin(authenticationPlugin)
 userSchema.plugin(friendsPlugin, { ref: 'User' })

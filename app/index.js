@@ -37,11 +37,6 @@ function createApp () {
     cookie: {}
   }
 
-  if (config.env === 'production') {
-    app.set('trust proxy', 1)
-    sessionOptions.cookie.secure = true
-  }
-
   if (config.env !== 'test') {
     const MongoStore = createMongoStore(session)
 
@@ -56,7 +51,11 @@ function createApp () {
   app.set('view engine', 'ejs')
   app.set('views', path.resolve('app', 'view', 'layouts'))
 
-  if (config.env === 'production') { app.use(compression()) }
+  if (config.env === 'production') {
+    app.set('trust proxy', 1)
+    sessionOptions.cookie.secure = true
+    app.use(compression())
+  }
 
   app.use('/public', express.static('public'))
   app.use(helmet())
