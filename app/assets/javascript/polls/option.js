@@ -4,15 +4,14 @@ const w = require('../../../helpers/view-helper')
 
 const { div, input, button, span } = hh(h)
 
-function ChoiceItem (options) {
-  const index = options.index || ''
+function Option (options) {
   const value = options.value || {}
   const { errors, isDeletable } = options
 
   const nameOptions = {
     type: 'text',
-    name: `choices[${index}][name]`,
-    placeholder: 'Choice name',
+    name: `name`,
+    placeholder: 'Name',
     defaultValue: value.name
   }
 
@@ -23,7 +22,7 @@ function ChoiceItem (options) {
       input(
         '.choice-name.form-control',
         w.maybeError(nameOptions, errors, {
-          path: `choices.${index}.name`,
+          path: 'name',
           placement: 'left'
         })
       )
@@ -32,7 +31,7 @@ function ChoiceItem (options) {
     div('.col', [
       input('.choice-description.form-control', {
         type: 'text',
-        name: `choices[${index}][description]`,
+        name: 'description',
         placeholder: 'description (optional)',
         defaultValue: value.description
       })
@@ -44,4 +43,4 @@ function ChoiceItem (options) {
   ])
 }
 
-module.exports = ChoiceItem
+module.exports = Option

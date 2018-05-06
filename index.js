@@ -3,9 +3,10 @@ const throng = require('throng')
 const log = require('./lib/logger')
 const config = require('./config')
 const createApp = require('./app')
-const db = require('./lib/db')
+const createConntection = require('./lib/db')
 
 const app = createApp()
+const db = createConntection()
 
 switch (config.env) {
   case 'test':

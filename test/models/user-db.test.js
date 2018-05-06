@@ -1,28 +1,36 @@
-import '../helpers/database'
+import db from '../helpers/database'
 import test from 'ava'
 import User from '../../app/models/user'
 import fixture from '../fixtures/users'
+import R from 'ramda'
 
 const login = fixture.sara
-
 const authenticate = User.authenticateBy('password')
 
 test.after.always(() => {
   return User.remove()
 })
 
-test.cb('username should be unique', t => {
-  const user = new User(login)
-  user.validate(v => {
-    t.truthy(v.errors.username)
+test.only.cb('username should be unique', t => {
+  const signup = db.fixture.user(login)
+  const user = new User(signup)
+
+  user.validate(err => {
+    t.truthy(err)
+    t.truthy(err.errors)
+    t.truthy(err.errors.username)
     t.end()
   })
 })
 
 test.cb('email should be unique', t => {
-  const user = new User(login)
-  user.validate(v => {
-    t.truthy(v.errors.email)
+  const signup = db.fixture.user(login)
+  const user = new User(R.assoc('username', 'foobar', signup))
+
+  user.validate(err => {
+    t.truthy(err)
+    t.truthy(err.errors)
+    t.truthy(err.errors.email)
     t.end()
   })
 })

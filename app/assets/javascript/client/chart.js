@@ -91,17 +91,23 @@ export default function () {
         data: { name, description },
         method: 'post'
       }).done(res => {
+        console.log('res: ', res)
+        const error = res.err
         if (res.success) {
           chart.destroy()
           $('#new-choice').modal('toggle')
         }
 
-        if (res.error && res.error.errors && res.error.errors.options) {
-          const $el = $('[name="choices[][name]"]')
+        if (error && error.errors) {
+          console.log('err: ', res.err)
+          const $el = $('[name=name]')
 
-          $el.data('toggle', 'tooltip')
-          $el.addClass('is-invalid')
-          $el.tooltip({ title: res.error.errors.options.message })
+          if (error.errors.name) {
+            $el.data('toggle', 'tooltip')
+            $el.addClass('is-invalid')
+            $el.tooltip('dispose')
+            $el.tooltip({ title: error.errors.name.message })
+          }
 
           return null
         }

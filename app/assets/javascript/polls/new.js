@@ -2,7 +2,6 @@ const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const w = require('../../../helpers/view-helper')
 const R = require('ramda')
-const ChoiceItem = require('./_choice-item')
 
 const { div, h2, label, input, button, span, h5 } = hh(h)
 
@@ -21,7 +20,7 @@ function Author (value) {
     input('#poll-authorname.form-control.d-inline', {
       type: 'text',
       readOnly: true,
-      name: 'author-name',
+      name: 'author',
       value
     })
   ])
@@ -37,12 +36,12 @@ function Name ({ name, errors }) {
   const options = w.maybeError({
     type: 'text',
     name: 'name',
-    placeholder: 'Poll name',
-    defaultValue: name
+    defaultValue: name,
+    autoFocus: true
   }, errors, { placement: 'right' })
 
   return div('.form-group.col-auto', [
-    label({ htmlFor: 'poll-name' }, 'Poll name'),
+    label({ htmlFor: 'poll-name' }, 'Name'),
     input(
       '#poll-name.form-control',
       w.maybeError(options, errors, { placement: 'right' })
@@ -55,7 +54,6 @@ function Description ({ poll, errors }) {
   const options = {
     type: 'text',
     name: 'description',
-    placeholder: 'question',
     defaultValue: description
   }
 
@@ -80,9 +78,6 @@ function PollName ({ author, poll, errors }) {
 
 function Settings (options) {
   const { author, poll, errors, csrfToken, action } = options
-  const choices = createOrUseChoices(poll.choices)
-  const isDeletable = choices.length > 2
-
   function requestMethod ({ method }) {
     if (!method) return null
 
@@ -96,20 +91,6 @@ function Settings (options) {
     div('.voa-item', [
       PollName({ author, poll, errors }),
       Description({ poll, errors })
-    ]),
-
-    div('.voa-item.clearfix', [
-      h5('Poll choises'),
-
-      div('.choice-group.form-group',
-        R.map(
-          x => ChoiceItem({ index: x, value: choices[x], errors, isDeletable })
-        )(R.range(0, choices.length))
-      ),
-
-      button('.btn-add-choice.btn.btn-outline-primary.btn-sm.float-right', {
-        type: 'button'
-      }, [ span('.oi.voa-oi-sm.oi-plus'), ' Add' ])
     ]),
 
     div('.voa-item', [

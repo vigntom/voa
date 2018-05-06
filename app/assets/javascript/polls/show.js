@@ -2,7 +2,7 @@ const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const w = require('../../../helpers/view-helper')
 const pollChart = require('../../../../lib/poll-chart')
-const ChoiceItem = require('./_choice-item')
+const Option = require('./option')
 const R = require('ramda')
 
 const { div, h1, h5, p, a, span, canvas, button, ul, li } = hh(h)
@@ -61,7 +61,7 @@ function NewChoice () {
         ]),
 
         div('.modal-body', [
-          ChoiceItem({ isDeletable: false })
+          Option({ isDeletable: false })
         ]),
 
         div('.modal-footer', [

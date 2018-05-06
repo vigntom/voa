@@ -5,7 +5,7 @@ const routing = require('../../lib/routing')
 const v = require('../helpers/application-helper')
 const template = require('../assets/javascript/polls')
 const Poll = require('../models/poll')
-// const Option = require('../models/option')
+const Option = require('../models/option')
 const User = require('../models/user')
 const paginate = require('express-paginate')
 
@@ -98,17 +98,16 @@ const actions = {
       return res.redirect('/')
     }
 
-    const permit = R.pick(['name', 'description', 'choices'])
+    const permit = R.pick(['name', 'description'])
     const params = R.merge({ author: user._id }, permit(req.body))
-    const poll = new Poll(params)
 
-    return poll.save()
+    Poll.create(params)
       .then(poll => {
-        res.redirect(`/polls/${poll._id}`)
+        return res.redirect(`/polls/${poll._id}`)
       })
       .catch(err => {
         if (err.errors) {
-          res.locals.poll = poll
+          res.locals.poll = params
           res.locals.errors = err.errors
           res.locals.author = req.session.user.username
           res.locals.action = {
@@ -118,29 +117,24 @@ const actions = {
 
           return res.render('application', view.new(res.locals))
         }
-
-        return next(err)
       })
   },
 
   show (req, res, next) {
     const id = req.params.id
+    const userId = req.session.user ? req.session.user._id : req.session.id
+    const isVoted = R.compose(R.contains(userId), R.map(R.prop('voter')))
+
     if (!validator.isMongoId(id)) { return next() }
 
-    const findPoll = Poll.findById(id)
+    return Poll.findById(id)
       .populate('author', 'username')
+      .populate('votes', 'voter')
       .populate({ path: 'options', populate: { path: 'votes' } })
       .lean()
-
-    const findVoter = Poll.findVoter({
-      id,
-      voter: routing.voterQuery(req.session)
-    }).lean()
-
-    return Promise.all([findPoll, findVoter])
-      .then(([poll, voter]) => {
+      .then((poll) => {
         res.locals.poll = poll
-        res.locals.isVoted = voter.length > 0
+        res.locals.isVoted = isVoted(poll.votes)
         res.locals.canUpdate = isOwner(req.session.user, poll.author)
         res.locals.isAuthenticated = !!req.session.user
 

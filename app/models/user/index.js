@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const { isEmail } = require('validator')
+const uniqueValidator = require('mongoose-unique-validator')
 const beautifyUnique = require('mongoose-beautiful-unique-validation')
 const authenticationPlugin = require('./plugins/authentication')
 const pollsPlugin = require('./plugins/polls')
@@ -8,7 +9,7 @@ const helpers = require('./plugins/helpers')
 
 const Schema = mongoose.Schema
 
-const userSchema = new Schema({
+const schema = new Schema({
   username: {
     type: String,
     unique: 'Username {VALUE} already taken',
@@ -46,14 +47,15 @@ const userSchema = new Schema({
   timestamps: true
 })
 
-userSchema.plugin(beautifyUnique)
-userSchema.plugin(authenticationPlugin)
-userSchema.plugin(friendsPlugin, { ref: 'User' })
-userSchema.plugin(pollsPlugin)
-userSchema.plugin(helpers)
+schema.path('email').validate(emailValidator)
+schema.path('username').validate(usernameValidator)
 
-userSchema.path('email').validate(emailValidator)
-userSchema.path('username').validate(usernameValidator)
+schema.plugin(authenticationPlugin)
+schema.plugin(friendsPlugin, { ref: 'User' })
+schema.plugin(pollsPlugin)
+schema.plugin(helpers)
+schema.plugin(uniqueValidator)
+schema.plugin(beautifyUnique)
 
 function emailValidator (value) {
   if (!isEmail(value)) {
@@ -71,4 +73,4 @@ function usernameValidator (value) {
   }
 }
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('User', schema)

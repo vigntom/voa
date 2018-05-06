@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
-const Vote = require('../vote')
 const beautifyUnique = require('mongoose-beautiful-unique-validation')
+const uniqueValidator = require('mongoose-unique-validator')
 const Schema = mongoose.Schema
+require('../vote')
 
 const schema = new Schema({
   poll: {
@@ -26,6 +27,7 @@ const schema = new Schema({
   }
 })
 
+schema.plugin(uniqueValidator)
 schema.plugin(beautifyUnique)
 
 schema.index({ poll: 1, name: 1 }, {

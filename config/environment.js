@@ -8,6 +8,6 @@ module.exports = {
   },
 
   test: {
-    log: { console: 'debug', file: 'info' }
+    log: { console: 'error', file: 'warn' }
   }
 }

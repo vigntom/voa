@@ -8,57 +8,84 @@ const User = require('../../app/models/user')
 const Poll = require('../../app/models/poll')
 const Option = require('../../app/models/option')
 const Vote = require('../../app/models/vote')
-const db = require('../../lib/db')
+const createDbConnection = require('../../lib/db')
 
+const db = createDbConnection()
 const fakeAccounts = 100
 const pollsPerUser = 3
 const maxGazers = 100
 const fakeChoicesLimits = { min: 2, max: 5 }
 const fakeVotesLimits = { min: 0, max: fakeAccounts / 3 }
 
-const createAdmin = () => User.create({
-  username: 'admin',
-  email: 'admin@example.com',
-  password: 'qwe321',
-  passwordConfirmation: 'qwe321',
-  admin: true,
-  protected: true,
-  activated: true,
-  activatedAt: Date.now()
-})
+function cleanDB () {
+  console.time('Clean DB')
 
-const createServiceUser = () => User.create({
-  username: 'neither',
-  email: 'service@example.com',
-  password: '*',
-  passwordConfirmation: '*',
-  admin: false,
-  protected: true,
-  activated: true,
-  activatedAt: Date.now()
-})
+  return Promise.all([
+    User.remove(),
+    Poll.remove(),
+    Option.remove(),
+    Vote.remove()
+  ]).catch(() => {
+    console.log('Failed to clean db')
+  }).then(() => {
+    console.timeEnd('Clean DB')
+  })
+}
 
-const createTesterUser1 = () => User.create({
-  username: 'foobar',
-  email: 'foobar@example.com',
-  emailProtected: false,
-  password: 'qwe321',
-  passwordConfirmation: 'qwe321',
-  admin: false,
-  activated: true,
-  activatedAt: Date.now()
-})
+const accounts = (function () {
+  const createAdmin = () => User.create({
+    username: 'admin',
+    email: 'admin@example.com',
+    password: 'qwe321',
+    passwordConfirmation: 'qwe321',
+    admin: true,
+    protected: true,
+    activated: true,
+    activatedAt: Date.now()
+  })
 
-const createTesterUser2 = () => User.create({
-  username: 'barfoo',
-  email: 'barfoo@example.com',
-  emailProtected: true,
-  password: 'qwe321',
-  passwordConfirmation: 'qwe321',
-  admin: false,
-  activated: true,
-  activatedAt: Date.now()
-})
+  const createServiceUser = () => User.create({
+    username: 'neither',
+    email: 'service@example.com',
+    password: '*',
+    passwordConfirmation: '*',
+    admin: false,
+    protected: true,
+    activated: true,
+    activatedAt: Date.now()
+  })
+
+  const createTesterUser1 = () => User.create({
+    username: 'foobar',
+    email: 'foobar@example.com',
+    emailProtected: false,
+    password: 'qwe321',
+    passwordConfirmation: 'qwe321',
+    admin: false,
+    activated: true,
+    activatedAt: Date.now()
+  })
+
+  const createTesterUser2 = () => User.create({
+    username: 'barfoo',
+    email: 'barfoo@example.com',
+    emailProtected: true,
+    password: 'qwe321',
+    passwordConfirmation: 'qwe321',
+    admin: false,
+    activated: true,
+    activatedAt: Date.now()
+  })
+
+  return {
+    generate: () => Promise.all([
+      createAdmin(),
+      createServiceUser(),
+      createTesterUser1(),
+      createTesterUser2()
+    ])
+  }
+})()
 
 const users = (function () {
   const genUsers = () => R.times(fakeUser, fakeAccounts)
@@ -221,6 +248,7 @@ const votes = (function () {
 
   function fakeVote (option) {
     return Vote.create({
+      poll: option.poll,
       option: option._id,
       voter: mongoose.Types.ObjectId(),
       type: 'User'
@@ -234,16 +262,20 @@ const votes = (function () {
   }
 })()
 
-Promise.all([ User.remove(), Poll.remove(), Option.remove(), Vote.remove() ])
-  .then(() => Promise.all([
-    createAdmin(),
-    createServiceUser(),
-    createTesterUser1(),
-    createTesterUser2()
-  ]))
+function start () {
+  console.log('Starting ...')
+  console.time('Total: ')
+}
+
+Promise.resolve(start())
+  .then(cleanDB)
+  .then(accounts.generate)
   .then(users.generate)
   .then(polls.generate)
   .then(options.generate)
   .then(votes.generate)
   .catch(err => { console.error('** ERROR: ', err) })
   .then(() => db.connection.close())
+  .then(() => {
+    console.timeEnd('Total: ')
+  })

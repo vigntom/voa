@@ -1,11 +1,13 @@
+require('../option')
+require('../vote')
 const mongoose = require('mongoose')
 const User = require('../user')
 const Schema = mongoose.Schema
-const Option = require('../option')
 const h = require('./lib/helpers')
+const uniqueValidator = require('mongoose-unique-validator')
 const beautifyUnique = require('mongoose-beautiful-unique-validation')
 
-const pollSchema = new Schema({
+const schema = new Schema({
   name: {
     type: String,
     required: "Poll name can't be blank",
@@ -57,17 +59,24 @@ const pollSchema = new Schema({
   timestamps: true
 })
 
-pollSchema.plugin(beautifyUnique)
-
-pollSchema.index({ name: 1, author: 1 }, {
+schema.index({ name: 1, author: 1 }, {
   unique: 'You already use the name "{VALUE}" for another poll'
 })
 
-pollSchema.post('save', incUserPolls(1))
-pollSchema.post('remove', incUserPolls(-1))
+schema.plugin(uniqueValidator)
+schema.plugin(beautifyUnique)
 
-pollSchema.virtual('options', {
+schema.post('save', incUserPolls(1))
+schema.post('remove', incUserPolls(-1))
+
+schema.virtual('options', {
   ref: 'Option',
+  localField: '_id',
+  foreignField: 'poll'
+})
+
+schema.virtual('votes', {
+  ref: 'Vote',
   localField: '_id',
   foreignField: 'poll'
 })
@@ -78,37 +87,8 @@ function incUserPolls (num) {
   )
 }
 
-// pollSchema.methods.addContributor = function (data) {
-//   return h.findbyIdAndAddContibutor(this, this.id, data)
-// }
-
-// pollSchema.methods.movePolls = function (to) {
-//   return h.movePolls(this, this.id, to)
-// }
-
-// pollSchema.statics.findbyIdAndAddContibutor = function (id, data) {
-//   return h.findByIdAndAddContributor(this, id, data)
-// }
-
-// pollSchema.statics.movePolls = function (from, to) {
-//   return h.movePolls(this, User, from, to)
-// }
-
-pollSchema.statics.findVoter = function (cond) {
+schema.statics.findVoter = function (cond) {
   return h.findVoter(this, cond)
 }
 
-// pollSchema.statics.findByIdAndVote = function (id, cond) {
-//   return h.findByIdAndVote(this, id, cond)
-// }
-
-// pollSchema.query.addChoiceOption = function (choice) {
-//   const query = this
-
-//   return query
-//     .then(poll => {
-//       return poll.update({ $push: { choices: choice } })
-//     })
-// }
-
-module.exports = mongoose.model('Poll', pollSchema)
+module.exports = mongoose.model('Poll', schema)

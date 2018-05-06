@@ -1,8 +1,15 @@
 const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
 const beautifyUnique = require('mongoose-beautiful-unique-validation')
 const { Schema } = mongoose
 
 const schema = new Schema({
+  poll: {
+    type: Schema.Types.ObjectId,
+    ref: 'Options',
+    required: true
+  },
+
   option: {
     type: Schema.Types.ObjectId,
     ref: 'Option',
@@ -21,10 +28,11 @@ const schema = new Schema({
   }
 })
 
+schema.plugin(uniqueValidator)
 schema.plugin(beautifyUnique)
 
-schema.index({ option: 1, voter: 1 }, {
-  unique: 'You already voted'
+schema.index({ poll: 1, voter: 1 }, {
+  unique: 'Already voted'
 })
 
 module.exports = mongoose.model('Vote', schema)

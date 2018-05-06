@@ -1,6 +1,8 @@
 const express = require('express')
 const validator = require('validator')
 const Poll = require('../models/poll')
+const Option = require('../models/option')
+const Vote = require('../models/vote')
 const routing = require('../../lib/routing')
 
 const actions = {
@@ -27,18 +29,15 @@ const actions = {
     choice: {
       update (req, res, next) {
         const { id, choice } = req.params
-        const voter = routing.voterQuery(req.session)
+        const voter = routing.createVoter(id, choice, req.session)
 
         if (!validator.isMongoId(id)) {
           return res.json({ error: "Request poll id doesn't look like mongoId" })
         }
 
-        Poll.findByIdAndVote(id, { choice, voter })
-          .then(poll => {
-            res.json({ success: true })
-          }).catch(err => {
-            res.json({ error: err.message, result: 'error' })
-          })
+        return Vote.create(voter)
+          .then(() => res.json({ success: true }))
+          .catch(error => res.json({ success: false, error }))
       },
 
       create (req, res, next) {
@@ -50,12 +49,14 @@ const actions = {
         }
 
         Poll.findById(id)
-          .addChoiceOption({ name, description })
-          .then(result => {
-            res.json({ success: true })
+          .then(poll => {
+            return Option.create({ poll: poll._id, name, description })
           })
-          .catch(error => {
-            res.json({ success: false, error })
+          .then(result => {
+            return res.json({ success: true })
+          })
+          .catch(err => {
+            return res.json({ success: false, err })
           })
       }
     }
