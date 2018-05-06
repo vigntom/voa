@@ -1,0 +1,48 @@
+#!/usr/bin/env sh
+
+cmd=${1}
+env=${2:-development}
+containerName="voa-mongodb-development"
+db="voa-${env}"
+
+createContainer () {
+  port=$1
+  engine=$2
+  
+  docker run --name ${containerName} \
+    -v /srv/docker/mongo:/data/db \
+    --expose ${port} -p ${port}:${port} \
+    -d mongo --storageEngine ${engine} \
+    --auth
+}
+
+createContainerByEnv () {
+  if [ "$env" = "development" ]; then
+    createContainer 27017 wiredTiger
+  # elif [ "$env" = "test" ]; then
+  #   createContainer 27018 wiredTiger
+  else
+    die "Unknown environment ${env}"
+  fi
+}
+
+runShell () {
+  docker exec -it ${containerName} mongo ${db}
+}
+
+die () {
+  echo -e "$@"
+  exit 1
+}
+
+case $cmd in
+  shell)
+    runShell
+    ;;
+  create)
+    createContainerByEnv
+    ;;
+  *)
+    die "Unknown command ${cmd}"
+    ;;
+esac

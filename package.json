@@ -21,6 +21,7 @@
     "db:addAdmin": "node ./scripts/add-admin",
     "db:drop": "node ./scripts/drop-db",
     "db:seed": "node ./config/db/seeds.js",
+    "db:shell": "node ./scripts/voadb shell",
     "test": "ava",
     "test:watch": "ava --watch",
     "secret": "node ./scripts/secret",
