@@ -11,9 +11,9 @@ function SignNavbar () {
   ])
 }
 
-function AccountMenu (id) {
+function AccountMenu ({ username }) {
   return div('.navbar-nav', [
-    a('.nav-link', { href: '/polls/new' }, 'Create Poll'),
+    a('.nav-link', { href: `/ui/${username}/new` }, 'Create Poll'),
     div('.dropdown', [
       a('#profileDropdown.nav-link.dropdown-toggle', {
         href: '#',
@@ -22,8 +22,8 @@ function AccountMenu (id) {
         'aria-expanded': 'false'
       }, 'Account'),
       div('.dropdown-menu', { 'aria-labelledby': 'profileDropdown' }, [
-        a('.dropdown-item', { href: `/users/${id}` }, 'Profile'),
-        a('.dropdown-item', { href: `/users/${id}/edit` }, 'Settings'),
+        a('.dropdown-item', { href: `/ui/${username}` }, 'Profile'),
+        a('.dropdown-item', { href: `/settings` }, 'Settings'),
         div('.dropdown-divider'),
         a('.dropdown-item', {
           href: '/logout',
@@ -53,12 +53,13 @@ function Header (options) {
 
         div('#navbar-voa.collapse.navbar-collapse', [
           form('.form-inline.ml-lg-3.mr-auto.my-1.my-lg-0', {
-            action: '/polls',
+            action: '/search',
             method: 'get'
           }, [
+            input({ type: 'hidden', name: 'type', value: query.type || 'poll' }),
             input('.form-control.border-0.navbar-search', {
               type: 'search',
-              placeholder: 'Search Polls',
+              placeholder: 'Search ...',
               'aria-label': 'Search',
               name: 'q',
               defaultValue: query.q
@@ -66,7 +67,7 @@ function Header (options) {
             input('.hidden', { type: 'submit' })
           ]),
 
-          user ? AccountMenu(user._id) : SignNavbar()
+          user ? AccountMenu(user) : SignNavbar()
         ])
       ])
     ])

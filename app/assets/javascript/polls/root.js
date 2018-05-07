@@ -6,12 +6,15 @@ const dateFormat = require('dateformat')
 const { div, h3, a, p, time, span } = hh(h)
 
 function PollCard ({ poll }) {
+  const author = poll.author.username
+  const pollname = poll.name
+
   return div('.card.w-100.border-0', [
     div('.card-body.p-0', [
       h3('.h5.font-weight-normal.card-title', [
-        a('.card-link', { href: `/users/${poll.author._id}` }, `${poll.author.username}`),
+        a('.card-link', { href: `/ui/${author}` }, `${author}`),
         span('.slash', ' / '),
-        a('.card-link', { href: `/polls/${poll._id}` }, `${poll.name}`)
+        a('.card-link', { href: `/ui/${author}/${pollname}` }, `${pollname}`)
       ]),
 
       p('.card-text', poll.description),
@@ -23,7 +26,7 @@ function PollCard ({ poll }) {
 
 function PollsList ({ polls, pollsCount, menuItem }) {
   const info = `Result: ${pollsCount} polls`
-  const path = '/polls'
+  const path = '/search'
 
   return div('.voa-board', [
     div('.voa-item.p-0', [
@@ -38,11 +41,11 @@ function Dropdown ({ path }) {
   return div('.dropdown-menu', {
     'aria-labelledby': 'dropdownMenuButton'
   }, [
-    a('.dropdown-item', { href: `${path}?s=&o=desc` }, 'Best match'),
-    a('.dropdown-item', { href: `${path}?s=stars&o=desc` }, 'Most stars'),
-    a('.dropdown-item', { href: `${path}?s=stars&o=asc` }, 'Fewest stars'),
-    a('.dropdown-item', { href: `${path}?s=updated&o=desc` }, 'Recently updated'),
-    a('.dropdown-item', { href: `${path}?s=updated&o=asc` }, 'Least recently updated')
+    a('.dropdown-item', { href: `${path}?type=poll&s=&o=desc` }, 'Best match'),
+    a('.dropdown-item', { href: `${path}?stype=poll&=stars&o=desc` }, 'Most stars'),
+    a('.dropdown-item', { href: `${path}?stype=poll&=stars&o=asc` }, 'Fewest stars'),
+    a('.dropdown-item', { href: `${path}?stype=poll&=updated&o=desc` }, 'Recently updated'),
+    a('.dropdown-item', { href: `${path}?stype=poll&=updated&o=asc` }, 'Least recently updated')
   ])
 }
 

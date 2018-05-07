@@ -1,6 +1,5 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const pluralize = require('pluralize')
 const crypto = require('crypto')
 const querystring = require('querystring')
 const { form, div, ul, li, image, nav, a, span, h2, button, i, p } = hh(h)
@@ -223,16 +222,18 @@ function GroupLink ({ cond, href }, nest) {
 }
 
 function SortGroup (options) {
-  const { users, polls, pollsCount, usersCount, query } = options
-  const queryStr = query ? `?${querystring.stringify(query)}` : ''
+  const { users, polls, pollsCount, usersCount } = options
+  const query = type => Object.assign({}, options.query, { type })
+  const qtoString = type => querystring.stringify(query(type))
+  // const queryStr = query ? `?${querystring.stringify(query)}` : ''
 
   return div('.list-group', [
-    GroupLink({ cond: polls, href: '/polls' + queryStr }, [
+    GroupLink({ cond: polls, href: '/search' + '?' + qtoString('poll') }, [
       'Polls',
       span('.counter.badge.badge-pill.float-right', pollsCount)
     ]),
 
-    GroupLink({ cond: users, href: '/users' + queryStr }, [
+    GroupLink({ cond: users, href: '/search' + '?' + qtoString('user') }, [
       'Users',
       span('.counter.badge.badge-pill.float-right', usersCount)
     ])

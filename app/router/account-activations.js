@@ -29,7 +29,7 @@ const actions = {
 
         req.session.flash = { success: 'Acctount activated!' }
 
-        return res.redirect(`/users/${user._id}`)
+        return res.redirect(`/ui/${user.username}`)
       })
     }
 

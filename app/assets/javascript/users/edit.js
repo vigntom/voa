@@ -1,11 +1,11 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
-const { FormFor, maybeError, Gravatar } = require('../../../helpers/view-helper')
+const w = require('../../../helpers/view-helper')
 
 const { div, label, input, button, a } = hh(h)
 
 function Username ({ user, errors }) {
-  const options = maybeError({
+  const options = w.maybeError({
     name: 'username',
     defaultValue: user.username
   }, errors, { placement: 'top' })
@@ -17,7 +17,7 @@ function Username ({ user, errors }) {
 }
 
 function Email ({ user, errors }) {
-  const options = maybeError({
+  const options = w.maybeError({
     name: 'email',
     type: 'email',
     defaultValue: user.email
@@ -30,7 +30,7 @@ function Email ({ user, errors }) {
 }
 
 function Password ({ user, errors, name }) {
-  const options = maybeError({
+  const options = w.maybeError({
     name,
     type: 'password'
   }, errors, { placement: 'top' })
@@ -41,18 +41,19 @@ function Password ({ user, errors, name }) {
   ])
 }
 
-function EditPage ({ user, errors, csrfToken }) {
+function EditPage ({ user, errors, csrfToken, flash }) {
   return div('.main.container.my-5.p-5', [
     div('.row.justify-content-center', [
+      w.MessageDesk(flash),
       div('.gravatar-edit.col-3', [
-        Gravatar({ user, size: '160px' }),
+        w.Gravatar({ user, size: '160px' }),
         button('.btn.btn-outline-secondary.btn-gravatar.mt-1', [
           a({ href: 'http://gravatar.com/emails', target: '_blank' }, 'change')
         ])
       ]),
 
       div('.col-5.mb-3', [
-        FormFor('#edit-user.edit-user', { action: `/users/${user.id}` }, [
+        w.FormFor('#edit-user.edit-user', { action: `/ui/${user.username}` }, [
           input({ name: '_method', value: 'patch', type: 'hidden' }),
           input({ name: '_csrf', value: csrfToken, type: 'hidden' }),
 

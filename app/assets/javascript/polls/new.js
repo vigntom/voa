@@ -1,17 +1,8 @@
 const h = require('react-hyperscript')
 const hh = require('hyperscript-helpers')
 const w = require('../../../helpers/view-helper')
-const R = require('ramda')
 
-const { div, h2, label, input, button, span, h5 } = hh(h)
-
-function createOrUseChoices (choices) {
-  if (choices && choices.length > 0) {
-    return choices
-  }
-
-  return [{ name: '', description: '' }, { name: '', description: '' }]
-}
+const { div, h2, label, input, button, span } = hh(h)
 
 function Author (value) {
   return div('.form-group.col-auto', [
@@ -77,16 +68,10 @@ function PollName ({ author, poll, errors }) {
 }
 
 function Settings (options) {
-  const { author, poll, errors, csrfToken, action } = options
-  function requestMethod ({ method }) {
-    if (!method) return null
+  const { author, poll, errors, csrfToken } = options
 
-    return input({ name: '_method', value: method, type: 'hidden' })
-  }
-
-  return w.FormFor('#new-poll', { action: action.link }, [
+  return w.FormFor('#new-poll', { action: `/ui/${author}` }, [
     input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
-    requestMethod(action),
 
     div('.voa-item', [
       PollName({ author, poll, errors }),
@@ -94,7 +79,7 @@ function Settings (options) {
     ]),
 
     div('.voa-item', [
-      button('.btn.btn-success', { type: 'submit' }, action.name)
+      button('.btn.btn-success', { type: 'submit' }, 'Create')
     ])
   ])
 }

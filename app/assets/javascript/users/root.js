@@ -11,7 +11,7 @@ function AdminDeleteLink ({ current, user }) {
 
   if (current && current.admin) {
     return a('.btn.btn-outline-dark.btn-sm', {
-      href: `/users/${user._id}`,
+      href: `/ui/${user.username}`,
       'data-method': 'delete',
       'data-confirm': 'You shure?'
     }, 'Delete')
@@ -24,7 +24,7 @@ function UserCard ({ user, current }) {
 
     div('.card.w-100.border-0', [
       h3('.h5.font-weight-normal.card-title', [
-        a({ href: `/users/${user._id}` }, user.username)
+        a({ href: `/ui/${user.username}` }, user.username)
       ]),
 
       p('.card-text', [ 'Polls: ', user.polls ]),
@@ -45,7 +45,7 @@ function UsersList (options) {
   const { users, session } = options
   const current = session.user
   const info = `Result: ${options.usersCount} users`
-  const path = '/users'
+  const path = '/search'
   const menuItem = options.menuItem
 
   return div('.voa-board', [
@@ -61,11 +61,11 @@ function UsersList (options) {
 
 function Dropdown ({ path }) {
   return div('.dropdown-menu.dropdown-menu-right', { 'aria-labelledby': 'dropdownMenuButton' }, [
-    a('.dropdown-item', { href: `${path}?s=&o=desc` }, 'Best match'),
-    a('.dropdown-item', { href: `${path}?s=joined&o=desc` }, 'Most recently joined'),
-    a('.dropdown-item', { href: `${path}?s=joined&o=asc` }, 'Least recently joined'),
-    a('.dropdown-item', { href: `${path}?s=polls&o=desc` }, 'Most polls'),
-    a('.dropdown-item', { href: `${path}?s=polls&o=asc` }, 'Fewest polls')
+    a('.dropdown-item', { href: `${path}?type=user&s=&o=desc` }, 'Best match'),
+    a('.dropdown-item', { href: `${path}?type=user&s=joined&o=desc` }, 'Most recently joined'),
+    a('.dropdown-item', { href: `${path}?type=user&s=joined&o=asc` }, 'Least recently joined'),
+    a('.dropdown-item', { href: `${path}?type=user&s=polls&o=desc` }, 'Most polls'),
+    a('.dropdown-item', { href: `${path}?type=user&s=polls&o=asc` }, 'Fewest polls')
   ])
 }
 

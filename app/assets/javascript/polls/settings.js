@@ -6,18 +6,17 @@ const EditGroup = require('./_edit-group')
 const { div, h1, h2, h5, h6, a, p, span, ul, li, input, label, button } = hh(h)
 
 function Page (options) {
-  const { flash, poll } = options
   return div('.bg-light.main', [
     div('.border-bottom', [
       div('.container.p-0', [
-        Header(poll),
+        Header(options),
         PollTabNavBar(options)
       ])
     ]),
 
     div('.bg-white', [
       div('.container.py-5', [
-        w.MessageDesk(flash),
+        w.MessageDesk(options.flash),
         div('.row.justify-content-center.bg-white', [
           div('.col-3', [ EditGroup(options) ]),
           div('.col-7', [ Settings(options) ])
@@ -27,27 +26,30 @@ function Page (options) {
   ])
 }
 
-function Header ({ _id, name, author }) {
+function Header ({ poll }) {
+  const { author, name } = poll
   return div('.py-3', [
     h1('.h3', [
-      a({ href: `/users/${author._id}` }, author.username),
+      a({ href: `/ui/${author.username}` }, author.username),
       span('.slash', ' / '),
-      a({ href: `/polls/${_id}` }, name)
+      a({ href: `/ui/${author.username}/${name}` }, name)
     ])
   ])
 }
 
 function PollTabNavBar ({ poll }) {
+  const { author, name } = poll
+
   return ul('.nav.nav-tabs.container.border-0', [
     li('.nav-item', [
-      a('.nav-link.text-muted', { href: `/polls/${poll._id}` }, [
+      a('.nav-link.text-muted', { href: `/ui/${author.username}/${name}` }, [
         span('.oi.oi-bar-chart.pr-1'),
         'Poll'
       ])
     ]),
 
     li('.nav-item', [
-      a('.nav-link.active', { href: `/polls/${poll._id}/edit` }, [
+      a('.nav-link.active', { href: `/ui/${author.username}/${name}/settings` }, [
         span('.oi.oi-cog.pr-1'),
         'Settings'
       ])
@@ -69,7 +71,10 @@ function Settings (options) {
 }
 
 function MainOptions ({ poll, csrfToken, errors }) {
-  return w.FormFor('#settings.pt-3', { action: `/polls/${poll._id}/settings` }, [
+  const author = poll.author.username
+  const pollname = poll.name
+
+  return w.FormFor('#settings.pt-3', { action: `/ui/${author}/${pollname}/settings` }, [
     input({ name: '_csrf', value: csrfToken, type: 'hidden' }),
 
     Name({ poll, errors }),
@@ -171,8 +176,13 @@ function createPattern (str) {
 }
 
 function TransferModal ({ poll, csrfToken }) {
+  const author = poll.author.username
+  const pollname = poll.name
+
   return Modal({ id: 'transfer-modal', title: 'Transfer Poll' }, [
-    w.FormFor('#transfer-poll.confirmable', { action: `/polls/${poll._id}/transfer` }, [
+    w.FormFor('#transfer-poll.confirmable', {
+      action: `/ui/${author}/${pollname}/transfer`
+    }, [
       input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
 
       div('.form-group', [
@@ -212,8 +222,11 @@ function TransferModal ({ poll, csrfToken }) {
 }
 
 function DeleteModal ({ poll, csrfToken }) {
+  const author = poll.author.username
+  const pollname = poll.name
+
   return Modal({ id: 'delete-modal', title: 'Delete Poll' }, [
-    w.FormFor('#delete-poll.confirmable', { action: `/polls/${poll._id}` }, [
+    w.FormFor('#delete-poll.confirmable', { action: `/ui/${author}/${pollname}` }, [
       input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
       input({ type: 'hidden', name: '_method', value: 'delete' }),
 

@@ -4,6 +4,7 @@ const validator = require('validator')
 const paginate = require('express-paginate')
 const User = require('../models/user')
 const Poll = require('../models/poll')
+const polls = require('./polls')
 const { createView } = require('../helpers/application-helper')
 const usersView = require('../assets/javascript/users')
 const routing = require('../../lib/routing')
@@ -110,13 +111,11 @@ const actions = {
   },
 
   show (req, res, next) {
-    const id = req.params.id
+    const username = req.params.username
     const q = routing.query
     const query = q.search('name', req.query.q)
 
-    if (!validator.isMongoId(id)) { return next('route') }
-
-    return User.findById(id).populate({
+    return User.findOne({ username }).populate({
       path: 'pollList',
       match: query
     }).lean()
@@ -155,21 +154,20 @@ const actions = {
   },
 
   edit (req, res, next) {
-    const id = req.params.id
+    const current = req.session.user
 
-    if (!validator.isMongoId(id)) { return next() }
-
-    if (!req.session.user) {
+    if (!current) {
       req.session.flash = { danger: 'Please log in' }
       return res.redirect('/login')
     }
 
-    if (req.session.user._id !== req.params.id) {
-      return res.redirect('/')
-    }
-
-    return User.findById(id)
+    return User.findOne({ username: current.username })
       .then(user => {
+        if (!user._id.equals(current._id)) {
+          log.warning('User %s does not have privileges to edit other users', current.username)
+          return res.redirect('/')
+        }
+
         res.locals.user = user
         renderer(res)(view.edit(res.locals))
       })
@@ -177,21 +175,20 @@ const actions = {
   },
 
   update (req, res, next) {
-    const id = req.params.id
+    const { username } = req.params
+    const current = req.session.user
 
-    if (!validator.isMongoId(id)) { return next() }
-
-    if (!req.session.user) {
+    if (!current) {
       req.session.flash = { danger: 'Please log in' }
       return res.redirect('/login')
     }
 
-    if (req.session.user._id !== req.params.id) {
+    if (current.username !== username) {
+      log.warning(`User ${current.username} attampt to modify user ${username}`)
       return res.redirect('/')
     }
 
-    function updateUser (err, user) {
-      if (err) { return next(err) }
+    function updateUser (user) {
       const isPassword = x => x === 'password' || x === 'passwordConfirmation'
       const params = R.compose(
         R.pickBy((val, key) => !(!val && isPassword(key))),
@@ -199,47 +196,55 @@ const actions = {
       )
 
       user.set(params(req.body))
-      user.save((err) => {
-        if (err && err.errors) {
-          res.locals.user = user
-          res.locals.errors = err.errors
-          return renderer(res)(view.edit(res.locals))
-        }
 
-        if (err) { return next(err) }
+      user.save()
+        .then(user => {
+          req.session.user = user
+          req.session.flash = { success: 'Profile updated' }
+          return res.redirect('/settings')
+        })
+        .catch(err => {
+          if (err.errors) {
+            res.locals.user = user
+            res.locals.errors = err.errors
+            return renderer(res)(view.edit(res.locals))
+          }
 
-        req.session.flash = { success: 'Profile updated' }
-        return res.redirect(`/users/${user.id}/edit`)
-      })
+          log.warning('User update error: ', err.message)
+          return next(err)
+        })
     }
 
-    return User.findById(id, updateUser)
+    return User.findOne({ username })
+      .then(updateUser)
+      .catch(next)
   },
 
   delete (req, res, next) {
-    const id = req.params.id
-    if (!validator.isMongoId(id)) { return next() }
+    const { username } = req.params
+    const current = req.session.user
 
-    if (!req.session.user) {
+    if (!current) {
       req.session.flash = { danger: 'Please log in' }
       return res.redirect('/login')
     }
 
     if (!req.session.user.admin) {
+      log.warning(`User ${current.username} attempt to delete a user ${username}`)
       return res.redirect('/')
     }
 
-    return Poll.updateMany({ author: id }, { $set: { restricted: true } })
-      .then(() => User.findByIdAndRemove(id))
+    return User.findOne({ username }).lean()
       .then(user => {
-        req.session.flash = { success: `User '${user.username}' is deleted` }
-        return User.findOne({ username: 'neither' }).lean()
+        return Poll.remove({ author: user._id })
       })
-      .then(neither => {
-        return Poll.movePolls(id, neither._id)
+      .then((result) => {
+        console.log('result: ', result)
+        return User.remove({ username })
       })
       .then(() => {
-        return res.redirect(req.session.state.users)
+        req.session.flash = { success: 'User deleted' }
+        res.redirect('/search')
       })
       .catch(next)
   }
@@ -250,14 +255,13 @@ function createUserRouter () {
 
   const router = express.Router()
 
-  router.get('/', to('index'))
-  router.get('/new', to('new'))
-  router.get('/:id', to('show'))
-  router.get('/:id/edit', to('edit'))
+  router.get('/:username', to('show'))
 
   router.post('/', to('create'))
-  router.patch('/:id', to('update'))
-  router.delete('/:id', to('delete'))
+  router.patch('/:username', to('update'))
+  router.delete('/:username', to('delete'))
+
+  router.use('/', polls.router)
 
   return { to, router }
 }

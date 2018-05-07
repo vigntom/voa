@@ -97,7 +97,6 @@
     "node-sass": "^4.7.2",
     "nodemailer": "^4.4.2",
     "open-iconic": "^1.1.1",
-    "pluralize": "^7.0.0",
     "popper.js": "^1.12.9",
     "postcss-loader": "^2.0.8",
     "precss": "^3.1.2",

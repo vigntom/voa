@@ -105,12 +105,15 @@ function VoteDesk ({ poll, isVoted, isAuthenticated }) {
   }, [ VoteBar({ poll, isAuthenticated }) ])
 }
 
-function Header ({ _id, name, author }) {
+function Header ({ poll }) {
+  const author = poll.author.username
+  const pollname = poll.name
+
   return div('.py-3', [
     h1('.h3', [
-      a({ href: `/users/${author._id}` }, author.username),
+      a({ href: `/ui/${author}` }, author),
       span('.slash', ' / '),
-      a({ href: `/polls/${_id}` }, name)
+      a({ href: `/ui/${author}/${pollname}` }, pollname)
     ])
   ])
 }
@@ -133,13 +136,15 @@ function Show ({ poll, isVoted, isAuthenticated }) {
 
 function PollTabNavBar (options) {
   const { poll, active } = options
+  const author = poll.author.username
+  const pollname = poll.name
 
   function Settings ({ canUpdate, poll, active }) {
     if (!canUpdate) return null
 
     return li('.nav-item', [
       a('.nav-link', {
-        href: `/polls/${poll._id}/settings`,
+        href: `/ui/${author}/${pollname}/settings`,
         className: (active === 'Settings') ? 'active' : 'text-muted'
       }, [
         span('.oi.oi-cog.pr-1'),
@@ -151,7 +156,7 @@ function PollTabNavBar (options) {
   return ul('.nav.nav-tabs.container.border-0', [
     li('.nav-item', [
       a('.nav-link', {
-        href: `/polls/${poll._id}`,
+        href: `/ui/${author}/${pollname}`,
         className: (active !== 'Settings') ? 'active' : 'text-muted'
       }, [
         span('.oi.oi-bar-chart.pr-1'),
@@ -168,7 +173,7 @@ module.exports = function Page ({ poll, flash, isVoted, isAuthenticated, canUpda
     div('.border-bottom', [
       div('.container.p-0', [
         w.MessageDesk(flash),
-        Header(poll),
+        Header({ poll }),
         PollTabNavBar({ poll, active: 'Poll', canUpdate })
       ])
     ]),

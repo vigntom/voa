@@ -40,7 +40,7 @@ const actions = {
           req.session.cookie.maxAge = 2 * 365 * 24 * 3600000
         }
 
-        return res.redirect(`/users/${user.id}`)
+        return res.redirect(`/ui/${user.username}`)
       })
     })
   },

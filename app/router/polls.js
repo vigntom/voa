@@ -82,10 +82,6 @@ const actions = {
 
     res.locals.poll = new Poll({ author: user._id })
     res.locals.author = user.username
-    res.locals.action = {
-      link: '/polls',
-      name: 'Create'
-    }
 
     return res.render('application', view.new(res.locals))
   },
@@ -103,17 +99,13 @@ const actions = {
 
     Poll.create(params)
       .then(poll => {
-        return res.redirect(`/polls/${poll._id}`)
+        return res.redirect(`/ui/${user.username}/${poll.name}`)
       })
       .catch(err => {
         if (err.errors) {
           res.locals.poll = params
           res.locals.errors = err.errors
-          res.locals.author = req.session.user.username
-          res.locals.action = {
-            link: '/polls',
-            name: 'Create'
-          }
+          res.locals.author = user.username
 
           return res.render('application', view.new(res.locals))
         }
@@ -121,17 +113,19 @@ const actions = {
   },
 
   show (req, res, next) {
-    const id = req.params.id
+    const author = req.params.author
+    const pollname = req.params.pollname
     const userId = req.session.user ? req.session.user._id : req.session.id
     const isVoted = R.compose(R.contains(userId), R.map(R.prop('voter')))
 
-    if (!validator.isMongoId(id)) { return next() }
-
-    return Poll.findById(id)
-      .populate('author', 'username')
-      .populate('votes', 'voter')
-      .populate({ path: 'options', populate: { path: 'votes' } })
-      .lean()
+    return User.findOne({ username: author })
+      .then(user => {
+        return Poll.findOne({ author: user._id, name: pollname })
+          .populate('author', 'username')
+          .populate('votes', 'voter')
+          .populate({ path: 'options', populate: { path: 'votes' } })
+          .lean()
+      })
       .then((poll) => {
         res.locals.poll = poll
         res.locals.isVoted = isVoted(poll.votes)
@@ -146,18 +140,20 @@ const actions = {
   },
 
   settings (req, res, next) {
-    const id = req.params.id
+    const { author, pollname } = req.params
+    const current = req.session.user
 
-    if (!validator.isMongoId(id)) { return next() }
-
-    if (!req.session.user) {
+    if (!current) {
       req.session.flash = { danger: 'Please log in' }
       return res.redirect('/login')
     }
 
-    return Poll.findById(id).populate('author', 'username').lean()
+    return Poll
+      .findOne({ author: current._id, name: pollname })
+      .populate('author', 'username')
+      .lean()
       .then(poll => {
-        if (!isOwner(req.session.user, poll.author)) {
+        if (poll.author.username !== author) {
           req.session.flash = { danger: "You can't modify this poll" }
           return res.redirect(`/polls/${poll._id}`)
         }
@@ -172,44 +168,42 @@ const actions = {
   },
 
   delete (req, res, next) {
-    const id = req.params.id
+    const { author, pollname } = req.params
+    const current = req.session.user
 
-    if (!validator.isMongoId(id)) { return next() }
-
-    if (!req.session.user) {
+    if (!current) {
       req.session.flash = { danger: 'Please log in' }
       return res.redirect('/login')
     }
 
-    return Poll.findById(id)
+    return Poll.findOne({ author: current._id, name: pollname })
       .populate('author', 'username')
       .then(poll => {
-        if (!poll.author._id.equals(req.session.user._id)) {
+        if (poll.author.username !== author) {
           req.session.flash = { danger: "You can't modify this poll" }
-          return res.redirect(`/polls/${poll._id}`)
+          return res.redirect(`/ui/${author}/${pollname}`)
         }
 
         return poll.remove()
       })
       .then(poll => {
         req.session.flash = { success: 'Poll is deleted' }
-        return res.redirect(`/users/${poll.author._id}`)
+        return res.redirect(`/ui/${author}`)
       })
       .catch(next)
   },
 
   update: {
     settings (req, res, next) {
-      const id = req.params.id
+      const { author, pollname } = req.params
+      const current = req.session.user
 
-      if (!validator.isMongoId(id)) { return next() }
-
-      if (!req.session.user) {
+      if (!current) {
         req.session.flash = { danger: 'Please log in' }
         return res.redirect('/login')
       }
 
-      return Poll.findById(id)
+      return Poll.findOne({ author: current._id, name: pollname })
         .populate('author', 'username')
         .then(poll => {
           if (!poll._id) {
@@ -217,7 +211,7 @@ const actions = {
             return res.redirect('/')
           }
 
-          if (!poll.author._id.equals(req.session.user._id)) {
+          if (poll.author.username !== author) {
             req.session.flash = { danger: "You can't modify this poll" }
             return res.redirect(`/polls/${poll._id}`)
           }
@@ -225,19 +219,19 @@ const actions = {
           const params = R.pick(['name', 'description'], req.body)
 
           if (poll.name === params.name && poll.description === params.description) {
-            return res.redirect(`/polls/${poll._id}/settings`)
+            return res.redirect(`/ui/${author}/${pollname}/settings`)
           }
 
           res.locals.poll = poll
           res.locals.author = poll.author
 
-          return poll.update(
-            { $set: { name: params.name, description: params.description } }
-          ).then(() => poll)
+          poll.set({ name: params.name, description: params.description })
+
+          return poll.save()
         })
         .then(poll => {
           req.session.flash = { success: 'Poll settings updated' }
-          return res.redirect(`/polls/${poll._id}/settings`)
+          return res.redirect(`/ui/${author}/${poll.name}/settings`)
         })
         .catch((err, poll) => {
           if (err.errors) {
@@ -247,7 +241,7 @@ const actions = {
         })
     },
 
-    choices (req, res, next) {
+    options (req, res, next) {
     },
 
     transfer (req, res, next) {
@@ -260,19 +254,16 @@ function createRouter () {
   const to = routing.create(actions, view)
   const router = express.Router()
 
-  router.get('/', to('index'))
-  router.get('/new', to('new'))
-  router.get('/:id', to('show'))
+  router.get('/:author/new', to('new'))
+  router.get('/:author/:pollname', to('show'))
+  router.get('/:author/:pollname/settings', to('settings'))
 
-  router.get('/:id/settings', to('settings'))
-  router.get('/:id/choices', to('choices'))
+  router.post('/:author/', to('create'))
+  router.delete('/:author/:pollname', to('delete'))
 
-  router.post('/', to('create'))
-  router.delete('/:id', to('delete'))
-
-  router.post('/:id/settings', actions.update.settings)
-  router.post('/:id/choices', actions.update.choices)
-  router.post('/:id/transfer', actions.update.transfer)
+  router.post('/:author/:pollname/settings', actions.update.settings)
+  router.post('/:author/:pollname/options', actions.update.options)
+  router.post('/:authro/:pollname/transfer', actions.update.transfer)
 
   return { to, router }
 }

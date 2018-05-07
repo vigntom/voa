@@ -26,7 +26,7 @@ function FilterPools (options) {
 
   return div('.d-flex', [
     form('.w-100.mr-2', {
-      action: `/users/${user._id}`,
+      action: `/ui/${user.username}`,
       method: 'get'
     }, [
       input('.form-control.filter-pools.', {
@@ -41,7 +41,7 @@ function FilterPools (options) {
     ]),
 
     form({
-      action: `/users/${user._id}`,
+      action: `/ui/${user.username}`,
       method: 'get'
     }, [
       input({ type: 'hidden', name: 'q', value: '' }),
@@ -53,11 +53,14 @@ function FilterPools (options) {
   ])
 }
 
-function PollCard ({ poll }) {
+function PollCard ({ user, poll }) {
+  const author = user.username
+  const pollname = poll.name
+
   return div('.card.w-100.border-0', [
     div('.card-body', [
       h3('.h4.font-weight-normal', [
-        a('.card-title.card-link', { href: `/polls/${poll._id}` }, poll.name)
+        a('.card-title.card-link', { href: `/ui/${author}/${pollname}` }, poll.name)
       ]),
       p('.card-text', poll.description),
       p('.card-text.small', [
@@ -76,7 +79,7 @@ function PollList (options) {
 
     user.pollList.map(poll => (
       div('.voa-item', { key: poll._id }, [
-        PollCard({ poll })
+        PollCard({ user, poll })
       ])
     ))
   ])

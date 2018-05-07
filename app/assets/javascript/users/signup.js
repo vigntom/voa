@@ -74,7 +74,7 @@ function Confirmation ({ user, errors }) {
 function SignUp (options) {
   const { csrfToken } = options
 
-  return w.FormFor('#new-user.new-user', { action: '/users' }, [
+  return w.FormFor('#new-user.new-user', { action: '/ui' }, [
     input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
     Username(options),
     Email(options),
