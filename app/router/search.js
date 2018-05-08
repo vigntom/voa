@@ -19,7 +19,7 @@ function createRouter () {
   const to = routing.create(actions, {})
   const router = express.Router()
 
-  router.get('/', actions.search)
+  router.get('/', to('search'))
 
   return { to, router }
 }

@@ -5,7 +5,6 @@ const sessions = require('./sessions')
 const accountActivtions = require('./account-activations')
 const passwordResets = require('./password-resets')
 const search = require('./search')
-const polls = require('./polls')
 const api = require('./api')
 const log = require('../../lib/logger')
 

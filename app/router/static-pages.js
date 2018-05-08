@@ -1,21 +1,15 @@
-const { createView } = require('../helpers/application-helper')
-const staticView = require('../assets/javascript/static')
 const User = require('../models/user')
+const template = require('../view/static')
 const routing = require('../../lib/routing')
+const voaView = require('../../lib/view')
 
-const view = {
-  home (options) {
-    return createView({ title: 'Home', options, page: staticView.home(options) })
-  },
-
-  about (options) {
-    return createView({ title: 'About', options, page: staticView.about(options) })
-  },
-
-  contact (options) {
-    return createView({ title: 'Contact', options, page: staticView.contact(options) })
-  }
+const data = {
+  home: { title: 'Home' },
+  about: { title: 'About' },
+  contact: { title: 'Contact' }
 }
+
+const view = voaView.bind(template, data)
 
 const actions = {
   home (req, res) {

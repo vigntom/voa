@@ -55,7 +55,7 @@ function clean (id) {
     log.info(`Worker ${id} stopped`)
 
     return db.connection.close().then(() => {
-      log.warn(`Mongoose connection terminated`)
+      log.info(`Mongoose connection terminated`)
       return process.exit(0)
     })
   }

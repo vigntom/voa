@@ -1,11 +1,10 @@
 const express = require('express')
-const User = require('../models/user')
-const routing = require('../../lib/routing')
 const validator = require('validator')
-const { logIn } = require('../helpers/sessions-helper')
+const User = require('../models/user')
+const { path } = require('../view/helpers')
+const { logIn } = require('../view/helpers/session')
 const log = require('../../lib/logger')
-
-const view = {}
+const routing = require('../../lib/routing')
 
 const actions = {
   edit (req, res, next) {
@@ -29,7 +28,7 @@ const actions = {
 
         req.session.flash = { success: 'Acctount activated!' }
 
-        return res.redirect(`/ui/${user.username}`)
+        return path({ author: user.username })
       })
     }
 
@@ -54,7 +53,7 @@ const actions = {
 }
 
 module.exports = (function () {
-  const to = routing.create(actions, view)
+  const to = routing.create(actions, {})
   const router = express.Router()
 
   router.get('/:token/edit', to('edit'))

@@ -9,7 +9,7 @@ const createMongoStore = require('connect-mongo')
 const mongoose = require('mongoose')
 const paginate = require('express-paginate')
 const router = require('./router')
-const createAssetsList = require('../lib/assets-list')
+const createAssetsList = require('./view/helpers/assets-list')
 const log = require('../lib/logger')
 const config = require('../config')
 
@@ -21,6 +21,7 @@ function createApp () {
     throw new Error('Broken secret keys')
   }
 
+  // Todo: move to lib/moe-express.js
   const overrideMethods = () => methodOverride((req, res) => {
     if (req.body && typeof req.body === 'object' && '_method' in req.body) {
       const method = req.body._method

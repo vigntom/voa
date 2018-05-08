@@ -1,15 +1,14 @@
-const express = require('express')
 const R = require('ramda')
-const validator = require('validator')
+const express = require('express')
 const paginate = require('express-paginate')
-const User = require('../models/user')
-const Poll = require('../models/poll')
 const polls = require('./polls')
-const { createView } = require('../helpers/application-helper')
-const usersView = require('../assets/javascript/users')
-const routing = require('../../lib/routing')
-const mailer = require('../../lib/mailer')
+const Poll = require('../models/poll')
+const User = require('../models/user')
 const log = require('../../lib/logger')
+const mailer = require('../../lib/mailer')
+const routing = require('../../lib/routing')
+const template = require('../view/users')
+const voaView = require('../../lib/view')
 
 const renderer = res => page => res.render('application', page)
 const defaultParams = [
@@ -22,27 +21,14 @@ const defaultParams = [
 
 const userParams = R.pick(defaultParams)
 
-const view = {
-  index (options) {
-    const page = usersView.index(options)
-    return createView({ title: 'Users', options, page })
-  },
-
-  show (options) {
-    const page = usersView.show(options)
-    return createView({ title: 'Show Users', options, page })
-  },
-
-  new (options) {
-    const page = usersView.new(options)
-    return createView({ title: 'Signup', options, page })
-  },
-
-  edit (options) {
-    const page = usersView.edit(options)
-    return createView({ title: 'Edit User', options, page })
-  }
+const data = {
+  index: { title: 'Users' },
+  show: { title: 'Show users' },
+  new: { title: 'Signup' },
+  edit: { title: 'Edit user' }
 }
+
+const view = voaView.bind(template, data)
 
 const actions = {
   index (req, res, next) {

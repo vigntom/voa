@@ -1,17 +1,19 @@
 const express = require('express')
 const validator = require('validator')
 const User = require('../models/user')
+const template = require('../view/password-resets')
+const { logIn } = require('../view/helpers/session')
 const log = require('../../lib/logger')
 const mailer = require('../../lib/mailer')
 const routing = require('../../lib/routing')
-const template = require('../assets/javascript/password-resets')
-const { defaultView } = require('../helpers/application-helper')
-const { logIn } = require('../helpers/sessions-helper')
+const voaView = require('../../lib/view')
 
-const view = {
-  new: defaultView('Forgot password', template.new),
-  edit: defaultView('Reset password', template.edit)
+const data = {
+  new: { title: 'Forgot password' },
+  edit: { title: 'Reset password' }
 }
+
+const view = voaView.bind(template, data)
 
 function pipe (...fs) {
   return x => {

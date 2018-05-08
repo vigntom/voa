@@ -1,13 +1,12 @@
 const express = require('express')
 const R = require('ramda')
-const validator = require('validator')
-const routing = require('../../lib/routing')
-const v = require('../helpers/application-helper')
-const template = require('../assets/javascript/polls')
-const Poll = require('../models/poll')
-const Option = require('../models/option')
-const User = require('../models/user')
 const paginate = require('express-paginate')
+const routing = require('../../lib/routing')
+const voaView = require('../../lib/view')
+const template = require('../view/polls')
+const Poll = require('../models/poll')
+// const Option = require('../models/option')
+const User = require('../models/user')
 
 const data = {
   index: { title: 'Polls' },
@@ -17,7 +16,7 @@ const data = {
   choices: { title: 'Choices' }
 }
 
-const view = v.initViews(template, data)
+const view = voaView.bind(template, data)
 
 const actions = {
   index (req, res, next) {

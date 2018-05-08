@@ -1,15 +1,14 @@
 const User = require('../models/user')
-const sessionsView = require('../assets/javascript/sessions')
-const { createView } = require('../helpers/application-helper')
+const template = require('../view/sessions')
+const { logIn } = require('../view/helpers/session')
 const routing = require('../../lib/routing')
-const { logIn } = require('../helpers/sessions-helper')
+const voaView = require('../../lib/view')
 
-const view = {
-  new (options) {
-    const page = sessionsView.new(options)
-    return createView({ title: 'Login', options, page })
-  }
+const data = {
+  new: { title: 'LogIn' }
 }
+
+const view = voaView.bind(template, data)
 
 const actions = {
   create (req, res, next) {

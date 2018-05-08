@@ -1,7 +1,7 @@
 const express = require('express')
 const validator = require('validator')
-const Poll = require('../models/poll')
 const Option = require('../models/option')
+const Poll = require('../models/poll')
 const Vote = require('../models/vote')
 const routing = require('../../lib/routing')
 
