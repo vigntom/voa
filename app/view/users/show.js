@@ -1,3 +1,4 @@
+const classnames = require('classnames')
 const w = require('../helpers')
 const h = require('../helpers/hyperscript')
 const dateFormat = require('dateformat')
@@ -44,9 +45,9 @@ function FilterPools (options) {
       method: 'get'
     }, [
       input({ type: 'hidden', name: 'q', value: '' }),
-      button('.btn.btn-outline-secondary', {
+      button({
         type: 'submit',
-        className: query.q ? '' : 'hidden'
+        className: classnames('btn btn-outline-secondary', { hidden: !query.q })
       }, 'Clear Filter')
     ])
   ])

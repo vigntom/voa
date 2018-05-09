@@ -5,9 +5,10 @@ const { h1, div, input, button } = h
 
 module.exports = function New ({ csrfToken, errors }) {
   const options = w.maybeError({
+    className: 'form-control my-3',
     name: 'email',
     placeholder: 'Email'
-  }, errors, { place: 'top' })
+  }, errors)
 
   return div('.main.container.my-5.py-5', [
     div('.w-30.m-auto', [
@@ -16,7 +17,7 @@ module.exports = function New ({ csrfToken, errors }) {
       w.FormFor('#new-password-resets.new-password-resets', { action: '/passwordResets' }, [
         input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
         div('.form-group', [
-          input('#password-resets-email.form-control.my-3', options)
+          input('#password-resets-email', options)
         ]),
         button('.btn.btn-block.btn-primary.my-3', { type: 'submit' }, 'Submit')
       ])

@@ -5,38 +5,41 @@ const { div, label, input, button, a } = h
 
 function Username ({ user, errors }) {
   const options = w.maybeError({
+    className: 'form-control',
     name: 'username',
     defaultValue: user.username
-  }, errors, { placement: 'top' })
+  }, errors)
 
   return div('.form-group', [
     label({ htmlFor: 'edit-username' }, 'Username'),
-    input('#edit-username.form-control', options)
+    input('#edit-username', options)
   ])
 }
 
 function Email ({ user, errors }) {
   const options = w.maybeError({
+    className: 'form-control',
     name: 'email',
     type: 'email',
     defaultValue: user.email
-  }, errors, { placement: 'top' })
+  }, errors)
 
   return div('.form-group', [
     label({ htmlFor: 'edit-email' }, 'Email'),
-    input('#edit-email.form-control', options)
+    input('#edit-email', options)
   ])
 }
 
 function Password ({ user, errors, name }) {
   const options = w.maybeError({
+    className: 'form-control',
     name,
     type: 'password'
-  }, errors, { placement: 'top' })
+  }, errors)
 
   return div('.form-group', [
     label({ htmlFor: 'edit-password' }, 'Password'),
-    input(`#edit-${name}.form-control`, options)
+    input(`#edit-${name}`, options)
   ])
 }
 

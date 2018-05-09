@@ -4,10 +4,15 @@ const h = require('../helpers/hyperscript')
 const { div, h1, input, button } = h
 
 function EditPassword ({ name, placeholder, errors }) {
-  const options = { type: 'password', name, placeholder }
-  const elemOptions = w.maybeError(options, errors, { placement: 'top' })
+  const options = w.maybeError({
+    className: 'form-control',
+    type: 'password',
+    name,
+    placeholder
+  }, errors)
+
   return div('.form-group', [
-    input('#edit-password.form-control', elemOptions)
+    input('#edit-password', options)
   ])
 }
 

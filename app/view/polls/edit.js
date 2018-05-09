@@ -33,6 +33,7 @@ function PollTabNavBar ({ poll }) {
 
 function PollNameOption ({ poll, errors }) {
   const options = w.maybeError({
+    className: 'form-control',
     name: 'name',
     defaultValue: poll.name
   }, errors, { placement: 'top' })
@@ -40,7 +41,7 @@ function PollNameOption ({ poll, errors }) {
   return div('.form-row', [
     div('.col-auto', [
       label({ htmlFor: 'edit-pollname' }, 'Poll name'),
-      input('#edit-pollname.form-control', options)
+      input('#edit-pollname', options)
     ]),
 
     div('.col-auto.align-self-end', [

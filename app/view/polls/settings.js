@@ -122,6 +122,7 @@ function DangerZone () {
 
 function Name ({ poll, errors }) {
   const options = w.maybeError({
+    className: 'form-control',
     name: 'name',
     defaultValue: poll.name
   }, errors, { placement: 'top' })
@@ -129,20 +130,21 @@ function Name ({ poll, errors }) {
   return div('.form-row', [
     div('.col-auto', [
       label({ htmlFor: 'settings-name' }, 'Name'),
-      input('#settings-name.form-control', options)
+      input('#settings-name', options)
     ])
   ])
 }
 
 function Description ({ poll, errors }) {
   const options = w.maybeError({
+    className: 'form-control',
     name: 'description',
     defaultValue: poll.description
   }, errors)
 
   return div('.form-group.my-4', [
     label({ htmlFor: 'settings-description' }, 'Description'),
-    input('#settings-description.form-control', options)
+    input('#settings-description', options)
   ])
 }
 

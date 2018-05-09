@@ -24,6 +24,7 @@ function Slash () {
 
 function Name ({ name, errors }) {
   const options = w.maybeError({
+    className: 'form-control',
     type: 'text',
     name: 'name',
     defaultValue: name,
@@ -32,27 +33,22 @@ function Name ({ name, errors }) {
 
   return div('.form-group.col-auto', [
     label({ htmlFor: 'poll-name' }, 'Name'),
-    input(
-      '#poll-name.form-control',
-      w.maybeError(options, errors, { placement: 'right' })
-    )
+    input('#poll-name', options)
   ])
 }
 
 function Description ({ poll, errors }) {
   const { description } = poll
-  const options = {
+  const options = w.maybeError({
+    className: 'form-control',
     type: 'text',
     name: 'description',
     defaultValue: description
-  }
+  }, errors)
 
   return div('.form-group', [
     label({ htmlFor: 'poll-description' }, 'Question'),
-    input(
-      '#poll-description.form-control',
-      w.maybeError(options, errors, { placement: 'top' })
-    )
+    input('#poll-description', options)
   ])
 }
 

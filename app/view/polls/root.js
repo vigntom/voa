@@ -1,3 +1,4 @@
+const PaginationBar = require('../helpers/pagination')
 const w = require('../helpers')
 const h = require('../helpers/hyperscript')
 const dateFormat = require('dateformat')
@@ -57,6 +58,6 @@ module.exports = function Index (options) {
       div('.col-3', [ w.SortGroup(options) ]),
       div('.col-7', [ PollsList(options) ])
     ]),
-    w.PaginationStdBar(options)
+    PaginationBar(options)
   ])
 }
