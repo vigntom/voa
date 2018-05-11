@@ -1,6 +1,6 @@
 const classnames = require('classnames')
-const w = require('../helpers')
-const h = require('../helpers/hyperscript')
+const w = require('../../helpers')
+const h = require('../../helpers/hyperscript')
 
 const { div, input, button, span } = h
 

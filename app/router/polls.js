@@ -12,8 +12,7 @@ const data = {
   index: { title: 'Polls' },
   show: { title: 'Show polls' },
   new: { title: 'New poll' },
-  settings: { title: 'Settings' },
-  choices: { title: 'Choices' }
+  settings: { title: 'Settings' }
 }
 
 const view = voaView.bind(template, data)

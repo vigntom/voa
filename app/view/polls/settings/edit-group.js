@@ -1,5 +1,5 @@
-const { div } = require('../helpers/hyperscript')
-const { GroupLink, path } = require('../helpers')
+const { div } = require('../../helpers/hyperscript')
+const { GroupLink, path } = require('../../helpers')
 
 module.exports = function EditGroup (options) {
   const { settings, choices, contributors, poll } = options
