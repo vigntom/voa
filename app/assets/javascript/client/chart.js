@@ -59,13 +59,13 @@ export default function () {
       const $btn = $(e.target).closest('button')
 
       $btn.on('hidden.bs.tooltip', () => {
-        const choice = $btn.val()
-        const id = $('#vote-container').data('pollId')
+        const option = $btn.val()
+        const poll = $('#vote-container').data('pollId')
 
         return $.ajax({
-          url: `/api/poll/${id}/choice/${choice}`,
+          url: `/api/vote/${poll}/${option}`,
           dataType: 'json',
-          method: 'patch'
+          method: 'post'
         }).done(res => {
           if (res.success) {
             chart.destroy()
@@ -87,11 +87,10 @@ export default function () {
 
       $.ajax({
         dataType: 'json',
-        url: `/api/poll/${pollId}/choice`,
+        url: `/api/option/${pollId}`,
         data: { name, description },
         method: 'post'
       }).done(res => {
-        console.log('res: ', res)
         const error = res.err
         if (res.success) {
           chart.destroy()
@@ -99,7 +98,6 @@ export default function () {
         }
 
         if (error && error.errors) {
-          console.log('err: ', res.err)
           const $el = $('[name=name]')
 
           if (error.errors.name) {

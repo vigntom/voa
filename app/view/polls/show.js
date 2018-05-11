@@ -20,7 +20,7 @@ function ChoicesButton (options) {
       'data-placement': 'right',
       title: item.description,
       key: index,
-      value: item._id,
+      value: item._id.toString(),
       style: { background: scale.color(item.votes.length) }
     }, div(item.name))
   }
