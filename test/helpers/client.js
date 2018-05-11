@@ -30,8 +30,9 @@ function logInAsUser (agent, user = {}) {
 function signUpAsUser (agent, user = {}) {
   return res => {
     if (!res) throw new Error("Can't send signup information without session data")
+
     return agent
-      .post('/users').send({
+      .post('/ui/').send({
         _csrf: csrf(res.text),
         username: user.username || '',
         email: user.email || '',

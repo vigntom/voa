@@ -14,7 +14,7 @@ test('Login with valid information followed by logout', t => {
     .then(ua.logInAsUser(agent, login))
     .then(res => {
       t.is(res.statusCode, 302)
-      t.regex(res.header.location, /users\//)
+      t.regex(res.header.location, new RegExp(`/ui/${login.username}`))
 
       return agent.get(res.header.location)
     })
@@ -24,7 +24,6 @@ test('Login with valid information followed by logout', t => {
       t.is(res.statusCode, 200)
       t.is(doc.querySelectorAll('a[href="/login"]').length, 0)
       t.truthy(doc.querySelector('a[href="/logout"]'))
-      t.truthy(doc.querySelector('a[href^="/users/"]'))
 
       return agent.delete('/logout').send({ _csrf: csrf(res.text) })
     })
@@ -51,10 +50,6 @@ test('Login with remembering', t => {
     .then(res => {
       const session = res.headers['set-cookie']
 
-      // const expires = Date.parse(cookie.parse(session[0]).Expires)
-      // const date = Date.parse(res.header.date)
-      // t.true(expires - date >= 2 * 365 * 24 * 3600 * 1000)
-
       t.truthy(session)
     })
 })
@@ -72,7 +67,7 @@ test('Login without remembering', t => {
     })
 })
 
-test.only('Should remember user when invalid login', t => {
+test('Should remember user when invalid login', t => {
   const agent = request.agent(app)
   const username = 'wrongLogin'
   const failLogin = Object.assign({}, login, { username })
@@ -84,7 +79,6 @@ test.only('Should remember user when invalid login', t => {
     })
     .then(ua.logInAsUser(agent, failLogin))
     .then(res => {
-      console.log(res.text)
       const doc = createDoc(res.text)
       t.is(res.statusCode, 200)
       t.is(doc.querySelector('input[name=user]').value, username)

@@ -86,20 +86,4 @@ function createRouter () {
   return { router }
 }
 
-function summVotes (poll) {
-  const result = Object.assign({}, poll)
-  console.log(poll)
-
-  result.options = poll.options.map(x => {
-    const y = Object.assign({}, x)
-    y.votes = x.votes.length
-
-    return y
-  })
-
-  console.log('result: ', result)
-
-  return result
-}
-
 module.exports = createRouter()

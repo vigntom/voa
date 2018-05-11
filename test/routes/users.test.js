@@ -122,7 +122,7 @@ test('should redirect delete when not logged in', t => {
     })
 })
 
-test('should redirect delete when logged in as a non admin', t => {
+test.serial('should redirect delete when logged in as a non admin', t => {
   const agent = request.agent(app)
 
   return User.count({})

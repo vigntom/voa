@@ -5,10 +5,8 @@ import { createDoc, ua } from '../helpers/client'
 import request from 'supertest'
 import test from 'ava'
 
-test('Invalid singup', t => {
+test.only('Invalid singup', t => {
   const agent = request.agent(app)
-
-  t.plan(3)
 
   function assertNoDiff (expected) {
     return (err, value) => {
@@ -20,7 +18,7 @@ test('Invalid singup', t => {
   return User.count({})
     .then(count => {
       return agent
-        .get('/signup')
+        .get('/users/new')
         .then(ua.signUpAsUser(agent))
         .then(res => {
           const doc = createDoc(res.text)
@@ -40,8 +38,6 @@ test('Invalid singup', t => {
 test('Valid signup', t => {
   const agent = request.agent(app)
 
-  t.plan(5)
-
   function assertDiff (expected) {
     return (err, value) => {
       t.ifError(err)
@@ -59,7 +55,7 @@ test('Valid signup', t => {
       }
 
       return agent
-        .get('/signup')
+        .get('/users/new')
         .then(ua.signUpAsUser(agent, loginData))
         .then(res => {
           t.is(res.statusCode, 302)

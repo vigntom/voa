@@ -4,7 +4,6 @@ const h = require('../helpers/hyperscript')
 const { div, h1, span, a, label, input, button } = h
 
 module.exports = function New ({ csrfToken, user, flash }) {
-  console.log('*** ', user)
   return div('.main.cointainer.mt-3.mb-5', [
     div('.w-30.m-auto', [
       h1('.page-header', 'Log in'),
