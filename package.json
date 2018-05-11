@@ -13,7 +13,7 @@
   "scripts": {
     "start": "heroku local",
     "build": "webpack --env.production",
-    "dev:start": "nodemon --watch './' --ext 'js,ejs,json' --exec 'heroku local' --signal SIGTERM --delay 0.5",
+    "dev:start": "nodemon --exec 'heroku local'",
     "dev:build": "webpack --env.development --progress",
     "dev:build:watch": "webpack --env.development --progress --watch",
     "dev:build:vendor": "webpack --env.development --env.vendor",
@@ -42,6 +42,7 @@
     "cookie": "^0.3.1",
     "dotenv": "^5.0.1",
     "faker": "^4.1.0",
+    "html2hyperscript": "^1.0.1",
     "jsctags": "^5.2.0",
     "jsdom": "^11.5.1",
     "mongodb-memory-server": "^1.7.3",
@@ -58,6 +59,16 @@
     "require": [
       "./test/helpers/setup-env.js"
     ]
+  },
+  "nodemonConfig": {
+    "watch": "./",
+    "ext": "js,ejs,json",
+    "ignore": [
+      "test/*",
+      "scripts/*"
+    ],
+    "delay": "2500",
+    "signal": "SIGTERM"
   },
   "dependencies": {
     "autoprefixer": "^8.2.0",

@@ -124,7 +124,7 @@ function Name ({ poll, errors }) {
   const options = w.maybeError({
     className: 'form-control',
     name: 'name',
-    defaultValue: poll.name
+    value: poll.name
   }, errors, { placement: 'top' })
 
   return div('.form-row', [
@@ -139,7 +139,7 @@ function Description ({ poll, errors }) {
   const options = w.maybeError({
     className: 'form-control',
     name: 'description',
-    defaultValue: poll.description
+    value: poll.description
   }, errors)
 
   return div('.form-group.my-4', [

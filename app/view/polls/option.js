@@ -10,7 +10,7 @@ function Option ({ errors, isDeletable, value = {} }) {
     type: 'text',
     name: `name`,
     placeholder: 'Name',
-    defaultValue: value.name
+    value: value.name
   }, errors, { path: 'name', placement: 'left' })
 
   return div({
@@ -25,7 +25,7 @@ function Option ({ errors, isDeletable, value = {} }) {
         type: 'text',
         name: 'description',
         placeholder: 'description (optional)',
-        defaultValue: value.description
+        value: value.description
       })
     ]),
 

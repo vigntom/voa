@@ -7,7 +7,7 @@ function Username ({ user, errors }) {
   const options = w.maybeError({
     className: 'form-control',
     name: 'username',
-    defaultValue: user.username
+    value: user.username
   }, errors)
 
   return div('.form-group', [
@@ -21,7 +21,7 @@ function Email ({ user, errors }) {
     className: 'form-control',
     name: 'email',
     type: 'email',
-    defaultValue: user.email
+    value: user.email
   }, errors)
 
   return div('.form-group', [

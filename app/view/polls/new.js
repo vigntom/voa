@@ -27,7 +27,7 @@ function Name ({ name, errors }) {
     className: 'form-control',
     type: 'text',
     name: 'name',
-    defaultValue: name,
+    value: name,
     autoFocus: true
   }, errors, { placement: 'right' })
 
@@ -43,7 +43,7 @@ function Description ({ poll, errors }) {
     className: 'form-control',
     type: 'text',
     name: 'description',
-    defaultValue: description
+    value: description
   }, errors)
 
   return div('.form-group', [

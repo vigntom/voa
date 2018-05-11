@@ -35,7 +35,7 @@ function PollNameOption ({ poll, errors }) {
   const options = w.maybeError({
     className: 'form-control',
     name: 'name',
-    defaultValue: poll.name
+    value: poll.name
   }, errors, { placement: 'top' })
 
   return div('.form-row', [

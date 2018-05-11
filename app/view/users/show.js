@@ -34,7 +34,7 @@ function FilterPools (options) {
         placeholder: 'Search user pools...',
         'aria-label': 'Search',
         name: 'q',
-        defaultValue: query.q
+        value: query.q
       }),
 
       input('.hidden', { type: 'submit' })

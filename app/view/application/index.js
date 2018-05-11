@@ -60,7 +60,7 @@ function Header (options) {
               placeholder: 'Search ...',
               'aria-label': 'Search',
               name: 'q',
-              defaultValue: query.q
+              value: query.q
             }),
             input('.hidden', { type: 'submit' })
           ]),

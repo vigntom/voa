@@ -1,11 +1,11 @@
 const express = require('express')
-const staticPages = require('./static-pages')
-const users = require('./users')
-const sessions = require('./sessions')
 const accountActivtions = require('./account-activations')
+const api = require('./api')
 const passwordResets = require('./password-resets')
 const search = require('./search')
-const api = require('./api')
+const sessions = require('./sessions')
+const staticPages = require('./static-pages')
+const users = require('./users')
 const log = require('../../lib/logger')
 
 function routes (csrfProtection) {
@@ -26,7 +26,6 @@ function routes (csrfProtection) {
   router.get('/about', staticPages.to('about'))
   router.get('/contact', staticPages.to('contact'))
   router.get('/signup', users.to('new'))
-  router.get('/search', search.to('search'))
   router.get('/settings', users.to('edit'))
 
   router.get('/login', sessions.to('new'))
@@ -38,6 +37,7 @@ function routes (csrfProtection) {
 
   router.use('/api', api.router)
   router.use('/ui', users.router)
+  router.use('/search', search.router)
 
   return router
 }

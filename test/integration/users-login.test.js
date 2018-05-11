@@ -72,14 +72,19 @@ test('Login without remembering', t => {
     })
 })
 
-test('Should remember user when invalid login', t => {
+test.only('Should remember user when invalid login', t => {
   const agent = request.agent(app)
   const username = 'wrongLogin'
   const failLogin = Object.assign({}, login, { username })
 
   return agent.get('/')
+    .then(res => {
+      t.is(res.statusCode, 200)
+      return res
+    })
     .then(ua.logInAsUser(agent, failLogin))
     .then(res => {
+      console.log(res.text)
       const doc = createDoc(res.text)
       t.is(res.statusCode, 200)
       t.is(doc.querySelector('input[name=user]').value, username)

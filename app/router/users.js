@@ -150,7 +150,7 @@ const actions = {
     return User.findOne({ username: current.username })
       .then(user => {
         if (!user._id.equals(current._id)) {
-          log.warning('User %s does not have privileges to edit other users', current.username)
+          log.warn('User %s does not have privileges to edit other users', current.username)
           return res.redirect('/')
         }
 
@@ -170,7 +170,7 @@ const actions = {
     }
 
     if (current.username !== username) {
-      log.warning(`User ${current.username} attampt to modify user ${username}`)
+      log.warn(`User ${current.username} attampt to modify user ${username}`)
       return res.redirect('/')
     }
 
@@ -196,7 +196,7 @@ const actions = {
             return renderer(res)(view.edit(res.locals))
           }
 
-          log.warning('User update error: ', err.message)
+          log.warn('User update error: ', err.message)
           return next(err)
         })
     }
@@ -216,7 +216,7 @@ const actions = {
     }
 
     if (!req.session.user.admin) {
-      log.warning(`User ${current.username} attempt to delete a user ${username}`)
+      log.warn(`User ${current.username} attempt to delete a user ${username}`)
       return res.redirect('/')
     }
 
@@ -225,10 +225,9 @@ const actions = {
         return Poll.remove({ author: user._id })
       })
       .then((result) => {
-        console.log('result: ', result)
         return User.remove({ username })
       })
-      .then(() => {
+      .then(result => {
         req.session.flash = { success: 'User deleted' }
         res.redirect('/search')
       })

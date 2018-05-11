@@ -24,6 +24,9 @@ module.exports = function developmentConfig ({ root, dstPath }) {
         loader: 'url-loader'
       }]
     },
+    watchOptions: {
+      ignored: /node_modules/
+    },
     plugins: [
       new CleanWebpackPlugin(dstPath, { root, exclude: ['vendor'] }),
       new DefinePlugin({
