@@ -320,7 +320,7 @@ const actions = {
               ).then(() => {
                 return Promise.all(
                   R.map(
-                    id => Vote.findOneAndDelete({ option: id }),
+                    id => Vote.remove({ option: id }),
                     R.keys(options.remove)
                   )
                 )
