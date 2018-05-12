@@ -5,7 +5,8 @@ const routing = require('../../lib/routing')
 const voaView = require('../../lib/view')
 const template = require('../view/polls')
 const Poll = require('../models/poll')
-// const Option = require('../models/option')
+const Option = require('../models/option')
+const Vote = require('../models/vote')
 const User = require('../models/user')
 
 const data = {
@@ -146,23 +147,54 @@ const actions = {
       return res.redirect('/login')
     }
 
-    return Poll
-      .findOne({ author: current._id, name: pollname })
+    return Poll.findOne({ author: current._id, name: pollname })
       .populate('author', 'username')
       .lean()
       .then(poll => {
         if (poll.author.username !== author) {
-          req.session.flash = { danger: "You can't modify this poll" }
-          return res.redirect(`/polls/${poll._id}`)
+          req.session.flash = { danger: 'Insufficient privileges' }
+          return res.redirect(`/ui/${author}/${pollname}`)
         }
 
         res.locals.poll = poll
         res.locals.author = poll.author.username
         res.locals.settings = true
+        // res.locals.activePage = template.pollSettings
 
         return res.render('application', view.settings(res.locals))
       })
       .catch(next)
+  },
+
+  options (req, res, next) {
+    const { author, pollname } = req.params
+    const current = req.session.user
+
+    if (!current) {
+      req.session.flash = { danger: 'Please log in' }
+      return res.redirect('/login')
+    }
+
+    return Poll.findOne({ author: current._id, name: pollname })
+      .populate('author', 'username')
+      .populate('options')
+      .lean()
+      .then(poll => {
+        if (poll.author.username !== author) {
+          req.session.flash = { danger: 'Insufficient privileges' }
+          return res.redirect(`/ui/${author}/${pollname}`)
+        }
+
+        res.locals.poll = poll
+        res.locals.author = poll.author.username
+        res.locals.options = true
+        // res.locals.activePage = template.pollOptions
+
+        return res.render('application', view.settings(res.locals))
+      })
+  },
+
+  contributors (req, res, next) {
   },
 
   delete (req, res, next) {
@@ -222,6 +254,7 @@ const actions = {
 
           res.locals.poll = poll
           res.locals.author = poll.author
+          res.locals.settings = true
 
           poll.set({ name: params.name, description: params.description })
 
@@ -236,14 +269,101 @@ const actions = {
             res.locals.errors = err.errors
             return res.render('application', view.settings(res.locals))
           }
+
+          return next(err)
         })
     },
 
     options (req, res, next) {
+      const { author, pollname } = req.params
+      const current = req.session.user
+      const options = req.body.options
+
+      if (!current) {
+        req.session.flash = { danger: 'Please log in' }
+        return res.redirect('/login')
+      }
+
+      return Poll.findOne({ author: current._id, name: pollname })
+        .populate('author', 'username')
+        .then(poll => {
+          if (!poll._id) {
+            req.session.flash = { warning: "Can't find pool" }
+            return res.redirect('/')
+          }
+
+          if (poll.author.username !== author) {
+            req.session.flash = { danger: 'Insufficient privileges' }
+            return res.redirect(`/ui/${author}/${pollname}/options`)
+          }
+
+          res.locals.poll = poll
+          res.locals.author = poll.author
+          res.locals.options = true
+
+          return Promise.all(
+            R.map(
+              id => Option.findByIdAndUpdate(id, options.update[id]),
+              R.keys(options.update)
+            )
+          ).then(() => {
+            if (options.new) {
+              return Option.insertMany(R.map(R.merge({ poll: poll._id }), options.new))
+            }
+          }).then(() => {
+            if (options.remove) {
+              return Promise.all(
+                R.map(
+                  id => Option.findByIdAndDelete(id),
+                  R.keys(options.remove)
+                )
+              ).then(() => {
+                return Promise.all(
+                  R.map(
+                    id => Vote.findOneAndDelete({ option: id }),
+                    R.keys(options.remove)
+                  )
+                )
+              })
+            }
+          }).catch(next)
+        })
+        .then(() => {
+          req.session.flash = { success: 'Options updated' }
+          return res.redirect(`/ui/${author}/${pollname}/options`)
+        })
+        .catch((err, poll) => {
+          if (err.errors) {
+            res.locals.errors = err.errors
+            return res.render('application', view.settings(res.locals))
+          }
+
+          return next(err)
+        })
+    },
+
+    contributors (req, res, next) {
+      const { author, pollname } = req.params
+      const current = req.session.user
+
+      if (!current) {
+        req.session.flash = { danger: 'Please log in' }
+        return res.redirect('/login')
+      }
+
+      return res.redirect(`/ui/${author}/${pollname}/contributors`)
     },
 
     transfer (req, res, next) {
+      const { author, pollname } = req.params
+      const current = req.session.user
 
+      if (!current) {
+        req.session.flash = { danger: 'Please log in' }
+        return res.redirect('/login')
+      }
+
+      return res.redirect(`/ui/${author}/${pollname}/transfer`)
     }
   }
 }
@@ -255,12 +375,15 @@ function createRouter () {
   router.get('/:author/new', to('new'))
   router.get('/:author/:pollname', to('show'))
   router.get('/:author/:pollname/settings', to('settings'))
+  router.get('/:author/:pollname/options', to('options'))
+  router.get('/:author/:pollname/contributors', to('contributors'))
 
   router.post('/:author/', to('create'))
   router.delete('/:author/:pollname', to('delete'))
 
   router.post('/:author/:pollname/settings', actions.update.settings)
   router.post('/:author/:pollname/options', actions.update.options)
+  router.post('/:author/:pollname/contributors', actions.update.contributors)
   router.post('/:authro/:pollname/transfer', actions.update.transfer)
 
   return { to, router }
