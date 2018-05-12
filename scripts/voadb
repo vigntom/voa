@@ -3,31 +3,42 @@
 cmd=${1}
 env=${2:-development}
 containerName="voa-mongodb-development"
-db="voa-${env}"
+config=$(dirname ${0})/../.env
+
 
 createContainer () {
-  port=$1
-  engine=$2
+  local port=$1
   
   docker run --name ${containerName} \
     -v /srv/docker/mongo:/data/db \
     --expose ${port} -p ${port}:${port} \
-    -d mongo --storageEngine ${engine} \
+    -d mongo \
     --auth
 }
 
 createContainerByEnv () {
   if [ "$env" = "development" ]; then
-    createContainer 27017 wiredTiger
-  # elif [ "$env" = "test" ]; then
-  #   createContainer 27018 wiredTiger
+    createContainer 27017
   else
     die "Unknown environment ${env}"
   fi
 }
 
 runShell () {
-  docker exec -it ${containerName} mongo ${db}
+  while read LINE; do
+    [[ -z $LINE ]] && continue
+    [[ $LINE = \#* ]] && continue
+
+    declare "$LINE"
+  done < $config 
+
+  local ENV=$(echo $env | tr [:lower:] [:upper:])
+
+  eval local DB=\${MONGO_NAME_${ENV}}
+  eval local USER=\${MONGO_USER_${ENV}}
+  eval local PASS=\${MONGO_PASS_${ENV}}
+
+  docker exec -it ${containerName} mongo -u ${USER} -p ${PASS} ${DB}
 }
 
 die () {
