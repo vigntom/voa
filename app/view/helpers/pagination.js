@@ -12,7 +12,7 @@ function PaginationNavBar (options, nest) {
 
 function StandardBar (options) {
   const { paginate, pageCount, pages } = options
-  const className = classnames('paginate', options.className)
+  const className = classnames('pagination', options.className)
 
   return ul({ className }, [].concat(
     PaginationPrevious({ paginate, pageCount }),
