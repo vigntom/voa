@@ -133,7 +133,14 @@ const users = (function () {
       activated: true,
       createdAt,
       activatedAt
-    }).catch(fakeUser)
+    }).catch(err => {
+      if (err.name === 'ValidationError') {
+        return fakeUser()
+      }
+
+      console.error(err)
+      return process.exit(1)
+    })
   }
 
   function randomCommonUsers (users) {
@@ -201,8 +208,13 @@ const polls = (function () {
       author: user._id,
       stargazers: faker.random.number(maxGazers),
       createdAt
-    }).catch(() => {
-      return fakePoll(user)
+    }).catch(err => {
+      if (err.name === 'ValidationError') {
+        return fakePoll(user)
+      }
+
+      console.error(err)
+      return process.exit(1)
     })
   }
 
@@ -229,8 +241,13 @@ const options = (function () {
       name: faker.lorem.word(),
       description: faker.lorem.sentence(),
       poll: poll._id
-    }).catch(() => {
-      return fakeOption(poll)
+    }).catch(err => {
+      if (err.name === 'ValidationError') {
+        return fakeOption(poll)
+      }
+
+      console.error(err)
+      return process.exit(1)
     })
   }
 
@@ -252,6 +269,8 @@ const votes = (function () {
       option: option._id,
       voter: mongoose.Types.ObjectId(),
       type: 'User'
+    }).catch(err => {
+      console.log('votes error: ', err)
     })
   }
 

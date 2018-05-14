@@ -36,9 +36,9 @@ $(function () {
   }
 
   $('.confirmable').on('change keyup blur', 'input[required]', e => {
-    const $form = $(e.target).closest('form')
-    const $btn = $form.find('[data-disable-invalid]')
-    const $required = $form.find('input[required]')
+    const $block = $(e.target).closest('.confirmable')
+    const $btn = $block.find('[data-disable-invalid]')
+    const $required = $block.find('input[required]')
     const isVerified = $.makeArray($required).map(checkValidation).every(x => x === true)
 
     if (isVerified) {
