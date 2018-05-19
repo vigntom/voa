@@ -6,6 +6,7 @@ const Vote = require('../models/vote')
 const routing = require('../../lib/routing')
 const log = require('../../lib/logger')
 const OptionsGroupBlock = require('../view/polls/options-group')
+const VoteDesk = require('../view/polls/show/vote-desk')
 
 function checkOwner (user) {
   return poll => {
@@ -17,8 +18,20 @@ function checkOwner (user) {
   }
 }
 
-function sendOptionGroup (req, res) {
-  return poll => {
+function sendOptionGroup (req, res, freeChoice) {
+  return inPoll => {
+    if (freeChoice) {
+      const isVoted = false
+      const isAuthenticated = !!req.session.user
+      const noModal = true
+      const sortByCreation = R.sortBy(R.prop('createdAt'))
+      const poll = R.merge(inPoll, { options: sortByCreation(inPoll.options) })
+      const voteDesk = VoteDesk({ poll, isVoted, isAuthenticated, noModal }).outerHTML
+
+      return res.json({ success: true, voteDesk })
+    }
+
+    const poll = inPoll
     const options = OptionsGroupBlock({ poll }).outerHTML
     return res.json({ success: true, options })
   }
@@ -71,11 +84,16 @@ const actions = {
 
   option: {
     create (req, res, next) {
-      const { poll, name, description } = req.body
+      const { poll, name, description, freeChoice } = req.body
 
       Option.create({ poll, name, description })
-        .then(() => Poll.findById(poll).populateOptions())
-        .then(sendOptionGroup(req, res))
+        .then(() => Poll.findById(poll)
+          .populate('author', 'username')
+          .populate('votes', 'voter')
+          .populateOptionsAndVotes()
+          .lean()
+        )
+        .then(sendOptionGroup(req, res, freeChoice))
         .catch(err => {
           log.error(err)
           return res.json({ success: false, errors: err.errors })

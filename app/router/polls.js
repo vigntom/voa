@@ -158,7 +158,6 @@ const actions = {
         res.locals.poll = poll
         res.locals.author = poll.author.username
         res.locals.settings = true
-        // res.locals.activePage = template.pollSettings
 
         return res.render('application', view.settings(res.locals))
       })
@@ -190,9 +189,6 @@ const actions = {
 
         return res.render('application', view.settings(res.locals))
       })
-  },
-
-  contributors (req, res, next) {
   },
 
   delete (req, res, next) {

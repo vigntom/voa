@@ -54,6 +54,12 @@ export default function () {
     })
   }
 
+  function updateVoteDesk (voteDesk) {
+    $('.vote-col').replaceWith($(voteDesk))
+    bindVoteButton()
+    bindFreeVoteButton()
+  }
+
   function bindVoteButton () {
     $('.choices-voted').on('click', e => {
       const $btn = $(e.target).closest('button')
@@ -80,22 +86,27 @@ export default function () {
   }
 
   function bindFreeVoteButton () {
-    $('.choice-free-submit').on('click', e => {
+    $('#choice-free-form').on('submit', e => {
       const poll = $('#vote-container').data('pollId')
       const name = $('.choice-name').val()
       const description = $('.choice-description').val()
 
+      e.preventDefault()
+
       $.ajax({
         dataType: 'json',
         url: '/api/option',
-        data: { poll, name, description },
+        data: { poll, name, description, freeChoice: true },
         method: 'post'
       }).done(res => {
         const errors = res.errors
 
         if (res.success) {
           chart.destroy()
-          $('.modal').modal('toggle')
+          fetchChart()
+          updateVoteDesk(res.voteDesk)
+
+          $('.modal').modal('hide')
         }
 
         if (errors) {
@@ -113,8 +124,6 @@ export default function () {
 
           return null
         }
-
-        window.location.reload()
       })
     })
   }

@@ -9,9 +9,9 @@ function UpdateOrDeleteButtons (id) {
   const deleteOptions = w.modalBtnAttributes('#delete-option-modal')
 
   return div('.btn-accept-group.accept-update',
-    button('.btn-edit-option.btn.btn-outline-primary.mx-1',
+    button('.btn-edit-option.btn.btn-outline-success.mx-1',
       editOptions,
-      span('.oi.voa-oi-sm.oi-pencil')
+      span('.oi.voa-oi-sm.oi-check')
     ),
 
     button('.btn-del-option.btn.btn-outline-danger.mx-1',

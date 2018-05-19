@@ -1,51 +1,8 @@
 const R = require('ramda')
-const classnames = require('classnames')
 const h = require('../../helpers/hyperscript')
-const w = require('../../helpers')
 const pollChart = require('../../../../lib/poll-chart')
 
-const { div, button, span, input } = h
-
-function NewOption ({ errors, isDeletable, value = {} }) {
-  const options = w.maybeError({
-    className: 'choice-name form-control',
-    type: 'text',
-    name: `name`,
-    placeholder: 'Name',
-    value: value.name,
-    autoFocus: true,
-    required: true,
-    pattern: '\\S+'
-  }, errors, { path: 'name', placement: 'left' })
-
-  return div('.confirmable', [
-    div({
-      className: classnames('choice form-row pb-1', { 'choice-core': !isDeletable })
-    }, [
-      div('.col-4', [
-        input(options)
-      ]),
-
-      div('.col', [
-        input('.choice-description.form-control', {
-          type: 'text',
-          name: 'description',
-          placeholder: 'description (optional)',
-          value: value.description
-        })
-      ]),
-
-      button('.btn-del-choice.btn.btn-outline-danger', {
-        type: 'button'
-      }, [ span('.oi.voa-oi-sm.oi-x') ])
-    ]),
-
-    button('.choice-free-submit.btn.btn-outline-primary.btn-block',
-      { type: 'submit', disabled: true, 'data-disable-invalid': true },
-      'Create'
-    )
-  ])
-}
+const { div, button } = h
 
 function FreeChoice ({ isAuthenticated }) {
   if (!isAuthenticated) return null
@@ -55,12 +12,7 @@ function FreeChoice ({ isAuthenticated }) {
       type: 'button',
       'data-toggle': 'modal',
       'data-target': '#new-choice'
-    }, 'New option'),
-
-    w.Modal({
-      id: 'new-choice',
-      title: 'Create new option'
-    }, NewOption({ isDeletable: false }))
+    }, 'New option')
   ])
 }
 
@@ -93,7 +45,7 @@ function ChoicesGroup ({ options }) {
   ])
 }
 
-function VoteDesk ({ poll, isVoted, isAuthenticated }) {
+function VoteDesk ({ poll, isVoted, isAuthenticated, noModal }) {
   if (isVoted) return null
 
   const { options } = poll
