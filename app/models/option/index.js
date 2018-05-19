@@ -25,7 +25,7 @@ const schema = new Schema({
     trim: true,
     maxlength: 254
   }
-})
+}, { timestamps: true })
 
 schema.plugin(uniqueValidator)
 schema.plugin(beautifyUnique)

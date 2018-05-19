@@ -1,47 +1,14 @@
 const h = require('../../helpers/hyperscript')
 const w = require('../../helpers')
-const { div, label, input, button, h5, span } = h
-
-function Modal ({ id, title }, nest) {
-  const options = {
-    id,
-    tabIndex: '-1',
-    role: 'dialog',
-    'aria-labelledby': title,
-    'aria-hidden': true
-  }
-
-  return div('.modal.fade', options, [
-    div('.modal-dialog.modal-dialog-centered', { role: 'document' }, [
-      div('.modal-content', [
-        div('.modal-header', [
-          h5('.modal-title', title),
-
-          button('.close', {
-            type: 'button',
-            'data-dismiss': 'modal',
-            'aria-label': 'Close'
-          }, [ span({ 'aria-hidden': true }, '×') ])
-        ]),
-
-        div('.modal-body', nest)
-      ])
-    ])
-  ])
-}
-
-function createPattern (str) {
-  const regexp = str.split('').map(x => `[${x.toLowerCase()}${x.toUpperCase()}]`).join('')
-  return `^${regexp}$`
-}
+const { div, label, input, button } = h
 
 function TransferModal ({ poll, csrfToken }) {
   const author = poll.author.username
   const pollname = poll.name
 
-  return Modal({ id: 'transfer-modal', title: 'Transfer Poll' }, [
+  return w.Modal({ id: 'transfer-modal', title: 'Transfer Poll' }, [
     w.FormFor('#transfer-poll.confirmable', {
-      action: w.path({ author, pollname, rest: 'transerf' })
+      action: w.path({ author, pollname, rest: 'transfer' })
     }, [
       input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
 
@@ -56,7 +23,7 @@ function TransferModal ({ poll, csrfToken }) {
           name: 'confirmation',
           autoFocus: true,
           required: true,
-          pattern: createPattern(poll.name)
+          pattern: w.createConfirmPattern(poll.name)
         })
       ]),
 
@@ -69,7 +36,8 @@ function TransferModal ({ poll, csrfToken }) {
         input('#transfer-receiver.form-control', {
           type: 'text',
           name: 'author',
-          required: true
+          required: true,
+          pattern: '\\S+'
         })
       ]),
 
@@ -85,7 +53,7 @@ function DeleteModal ({ poll, csrfToken }) {
   const author = poll.author.username
   const pollname = poll.name
 
-  return Modal({ id: 'delete-modal', title: 'Delete Poll' }, [
+  return w.Modal({ id: 'delete-modal', title: 'Delete Poll' }, [
     w.FormFor('#delete-poll.confirmable', { action: w.path({ author, pollname }) }, [
       input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
       input({ type: 'hidden', name: '_method', value: 'delete' }),
@@ -101,7 +69,7 @@ function DeleteModal ({ poll, csrfToken }) {
           name: 'confirmation',
           autoFocus: true,
           required: true,
-          pattern: createPattern(poll.name)
+          pattern: w.createConfirmPattern(poll.name)
         })
       ]),
 

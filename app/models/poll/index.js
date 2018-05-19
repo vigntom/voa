@@ -91,4 +91,20 @@ schema.statics.findVoter = function (cond) {
   return h.findVoter(this, cond)
 }
 
+schema.query.populateOptions = function () {
+  return this.populate({
+    path: 'options',
+    options: { sort: 'createdAt' }
+  })
+}
+
+schema.query.populateOptionsAndVotes = function () {
+  return this.populate({
+    path: 'options',
+    populate: {
+      path: 'votes'
+    }
+  })
+}
+
 module.exports = mongoose.model('Poll', schema)

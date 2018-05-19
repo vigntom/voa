@@ -4,7 +4,7 @@ const h = require('../../helpers/hyperscript')
 const w = require('../../helpers')
 const pollChart = require('../../../../lib/poll-chart')
 
-const { div, button, h5, span, input } = h
+const { div, button, span, input } = h
 
 function NewOption ({ errors, isDeletable, value = {} }) {
   const options = w.maybeError({
@@ -14,62 +14,36 @@ function NewOption ({ errors, isDeletable, value = {} }) {
     placeholder: 'Name',
     value: value.name,
     autoFocus: true,
-    required: true
+    required: true,
+    pattern: '\\S+'
   }, errors, { path: 'name', placement: 'left' })
 
-  return div({
-    className: classnames('choice form-row pb-1', { 'choice-core': !isDeletable })
-  }, [
-    div('.col-4', [
-      input(options)
+  return div('.confirmable', [
+    div({
+      className: classnames('choice form-row pb-1', { 'choice-core': !isDeletable })
+    }, [
+      div('.col-4', [
+        input(options)
+      ]),
+
+      div('.col', [
+        input('.choice-description.form-control', {
+          type: 'text',
+          name: 'description',
+          placeholder: 'description (optional)',
+          value: value.description
+        })
+      ]),
+
+      button('.btn-del-choice.btn.btn-outline-danger', {
+        type: 'button'
+      }, [ span('.oi.voa-oi-sm.oi-x') ])
     ]),
 
-    div('.col', [
-      input('.choice-description.form-control', {
-        type: 'text',
-        name: 'description',
-        placeholder: 'description (optional)',
-        value: value.description
-      })
-    ]),
-
-    button('.btn-del-choice.btn.btn-outline-danger', {
-      type: 'button'
-    }, [ span('.oi.voa-oi-sm.oi-x') ])
-  ])
-}
-
-function NewOptionModal () {
-  return div('#new-choice.modal.fade', {
-    tabIndex: '-1',
-    role: 'dialog',
-    'aria-labelledby': 'Create New Option',
-    'aria-hidden': true
-  }, [
-    div('.modal-dialog.modal-dialog-centered', { role: 'document' }, [
-      div('.modal-content.confirmable', [
-        div('.modal-header', [
-          h5('.modal-title', 'Add your option'),
-
-          button('.close', {
-            type: 'button',
-            'data-dismiss': 'modal',
-            'aria-label': 'Close'
-          }, [ span({ 'aria-hidden': true }, '×') ])
-        ]),
-
-        div('.modal-body', [
-          NewOption({ isDeletable: false })
-        ]),
-
-        div('.modal-footer', [
-          button('.btn.btn-outline-secondary.btn-block',
-            { type: 'submit', disabled: true, 'data-disable-invalid': true },
-            'Create'
-          )
-        ])
-      ])
-    ])
+    button('.choice-free-submit.btn.btn-outline-primary.btn-block',
+      { type: 'submit', disabled: true, 'data-disable-invalid': true },
+      'Create'
+    )
   ])
 }
 
@@ -83,7 +57,10 @@ function FreeChoice ({ isAuthenticated }) {
       'data-target': '#new-choice'
     }, 'New option'),
 
-    NewOptionModal()
+    w.Modal({
+      id: 'new-choice',
+      title: 'Create new option'
+    }, NewOption({ isDeletable: false }))
   ])
 }
 

@@ -1,8 +1,11 @@
 import rest from './client/rest'
 import dinput from './client/dynamic-input.js'
 import chart from './client/chart.js'
+import voa from './client/voa'
 
 $(function () {
+  const $tooltip = $('[data-toggle=tooltip]')
+
   $.ajaxSetup({
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -12,40 +15,20 @@ $(function () {
   rest()
   dinput()
   chart()
+  voa.enableConfirmableInputs()
+  $tooltip.tooltip()
+  $tooltip.focus(() => $tooltip.tooltip('hide'))
 
   $('.alert-fadable').delay(3000).fadeTo(1000, 0.5, () => {
     $('.alert-fadable').alert('close')
   })
 
-  const $tooltip = $('[data-toggle=tooltip]')
-
-  $tooltip.tooltip()
-  $tooltip.focus(() => $tooltip.tooltip('hide'))
-
   $('.modal').on('shown.bs.modal', () => {
     $('[autofocus]').trigger('focus')
   })
 
-  function checkValidation (e) {
-    if (e.pattern) {
-      const regex = new RegExp(e.pattern)
-      return regex.test(e.value)
-    }
-
-    return e.value.length > 0
-  }
-
-  $('.confirmable').on('change keyup blur', 'input[required]', e => {
-    const $block = $(e.target).closest('.confirmable')
-    const $btn = $block.find('[data-disable-invalid]')
-    const $required = $block.find('input[required]')
-    const isVerified = $.makeArray($required).map(checkValidation).every(x => x === true)
-
-    if (isVerified) {
-      return $btn.prop('disabled', false)
-    }
-
-    return $btn.prop('disabled', true)
+  $('.modal').on('hidden.bs.modal', () => {
+    $('.modal').find('input[type=text]').val('')
   })
 })
 

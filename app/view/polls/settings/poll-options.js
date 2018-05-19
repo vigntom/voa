@@ -1,37 +1,14 @@
-const R = require('ramda')
+const modal = require('../modal')
 const h = require('../../helpers/hyperscript')
-const w = require('../../helpers')
-const ChoiceItem = require('../choice-item')
+const OptionsGroupBlock = require('../options-group')
 
-const { div, h2, input, button, span } = h
+const { div, h2 } = h
 
 function Options ({ poll, csrfToken, errors }) {
-  const author = poll.author.username
-  const pollname = poll.name
-  const options = poll.options
-  const count = options.length
-  const isDeletable = count > 2
-
-  return w.FormFor('#options.voa-board', {
-    action: w.path({ author, pollname, rest: 'options' })
-  }, [
-    input('#csrf', { type: 'hidden', name: '_csrf', value: csrfToken }),
-
+  return div('.mt-3', [
     div('.voa-item.clearfix', [
-      div('.choice-group',
-        R.map(
-          i => ChoiceItem({ item: options[i], isDeletable }),
-          R.range(0, count)
-        )
-      ),
-
-      button('.btn.btn-outline-primary.btn-sm.btn-add-choice.float-left.mt-1', {
-        type: 'button'
-      }, [ span('.oi.voa-oi-sm.oi-plus') ])
-    ]),
-
-    div('.voa-item', [
-      button('.btn.btn-success', { type: 'submit' }, 'Update')
+      div('.choice-group', { 'data-poll-id': poll._id }, OptionsGroupBlock({ poll })),
+      modal.Delete({ poll, csrfToken })
     ])
   ])
 }

@@ -1,24 +1,37 @@
 const R = require('ramda')
 const express = require('express')
-const validator = require('validator')
 const Option = require('../models/option')
 const Poll = require('../models/poll')
 const Vote = require('../models/vote')
 const routing = require('../../lib/routing')
 const log = require('../../lib/logger')
+const OptionsGroupBlock = require('../view/polls/options-group')
+
+function checkOwner (user) {
+  return poll => {
+    if (!poll.author.equals(user._id)) {
+      return Promise.reject(new Error('Permisssion denied'))
+    }
+
+    return poll
+  }
+}
+
+function sendOptionGroup (req, res) {
+  return poll => {
+    const options = OptionsGroupBlock({ poll }).outerHTML
+    return res.json({ success: true, options })
+  }
+}
 
 const actions = {
   poll: {
     show (req, res, next) {
       const id = req.params.id
 
-      if (!validator.isMongoId(id)) {
-        return res.json({ error: "Request param doesn't look like mongoId" })
-      }
-
       return Poll.findById(id)
         .populate('author', 'username')
-        .populate({ path: 'options', populate: { path: 'votes' } })
+        .populateOptionsAndVotes()
         .lean()
         .then(poll => {
           const result = R.clone(poll)
@@ -58,18 +71,61 @@ const actions = {
 
   option: {
     create (req, res, next) {
-      const { pollId } = req.params
-      const { name, description } = req.body
+      const { poll, name, description } = req.body
 
-      Poll.findById(pollId)
-        .then(poll => {
-          return Option.create({ poll: poll._id, name, description })
-        })
-        .then(result => {
-          return res.json({ success: true })
-        })
+      Option.create({ poll, name, description })
+        .then(() => Poll.findById(poll).populateOptions())
+        .then(sendOptionGroup(req, res))
         .catch(err => {
-          return res.json({ success: false, err })
+          log.error(err)
+          return res.json({ success: false, errors: err.errors })
+        })
+    },
+
+    update (req, res, next) {
+      const id = req.params.optionId
+      const { poll, description } = req.body
+      const name = req.body.name.trim()
+
+      if (!req.session.user) {
+        return res.json({ success: false, err: 'Not authenticated' })
+      }
+
+      return Poll.findById(poll)
+        .then(checkOwner(req.session.user))
+        .then(() => Option.findByIdAndUpdate(
+          id,
+          { name, description },
+          { runValidators: true }
+        ))
+        .then(option => Poll.findById(option.poll).populateOptions())
+        .then(sendOptionGroup(req, res))
+        .catch(err => {
+          log.error(err)
+          res.json({ success: false, errors: err.errors })
+        })
+    },
+
+    delete (req, res, next) {
+      const id = req.params.optionId
+      const { poll } = req.body
+
+      if (!req.session.user) {
+        return res.json({ success: false, err: 'Not authenticated' })
+      }
+
+      Poll.findById(poll)
+        .then(checkOwner(req.session.user))
+        .then(() => Option.findByIdAndDelete(id))
+        .then(option => {
+          return Vote.remove({ option: id })
+            .then(() => option)
+        })
+        .then(option => Poll.findById(option.poll).populateOptions())
+        .then(sendOptionGroup(req, res))
+        .catch(err => {
+          log.error(err)
+          return res.json({ success: false })
         })
     }
   }
@@ -80,9 +136,11 @@ function createRouter () {
 
   router.get('/poll/:id', actions.poll.show)
 
-  router.post('/option/:pollId', actions.option.create)
+  router.post('/option', actions.option.create)
   router.post('/vote/:pollId/:optionId', actions.vote.create)
 
+  router.patch('/option/:optionId', actions.option.update)
+  router.delete('/option/:optionId', actions.option.delete)
   return { router }
 }
 

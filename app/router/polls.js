@@ -5,8 +5,6 @@ const routing = require('../../lib/routing')
 const voaView = require('../../lib/view')
 const template = require('../view/polls')
 const Poll = require('../models/poll')
-const Option = require('../models/option')
-const Vote = require('../models/vote')
 const User = require('../models/user')
 
 const data = {
@@ -116,17 +114,18 @@ const actions = {
     const pollname = req.params.pollname
     const userId = req.session.user ? req.session.user._id : req.session.id
     const isVoted = R.compose(R.contains(userId), R.map(R.prop('voter')))
+    const sortByCreation = R.sortBy(R.prop('createdAt'))
 
     return User.findOne({ username: author })
       .then(user => {
         return Poll.findOne({ author: user._id, name: pollname })
           .populate('author', 'username')
           .populate('votes', 'voter')
-          .populate({ path: 'options', populate: { path: 'votes' } })
+          .populateOptionsAndVotes()
           .lean()
       })
       .then((poll) => {
-        res.locals.poll = poll
+        res.locals.poll = R.merge(poll, { options: sortByCreation(poll.options) })
         res.locals.isVoted = isVoted(poll.votes)
         res.locals.canUpdate = isOwner(req.session.user, poll.author)
         res.locals.isAuthenticated = !!req.session.user
@@ -177,7 +176,7 @@ const actions = {
 
     return Poll.findOne({ author: current._id, name: pollname })
       .populate('author', 'username')
-      .populate('options')
+      .populateOptions()
       .lean()
       .then(poll => {
         if (poll.author.username !== author) {
@@ -188,7 +187,6 @@ const actions = {
         res.locals.poll = poll
         res.locals.author = poll.author.username
         res.locals.options = true
-        // res.locals.activePage = template.pollOptions
 
         return res.render('application', view.settings(res.locals))
       })
@@ -274,74 +272,6 @@ const actions = {
         })
     },
 
-    options (req, res, next) {
-      const { author, pollname } = req.params
-      const current = req.session.user
-      const options = req.body.options
-
-      if (!current) {
-        req.session.flash = { danger: 'Please log in' }
-        return res.redirect('/login')
-      }
-
-      return Poll.findOne({ author: current._id, name: pollname })
-        .populate('author', 'username')
-        .then(poll => {
-          if (!poll._id) {
-            req.session.flash = { warning: "Can't find pool" }
-            return res.redirect('/')
-          }
-
-          if (poll.author.username !== author) {
-            req.session.flash = { danger: 'Insufficient privileges' }
-            return res.redirect(`/ui/${author}/${pollname}/options`)
-          }
-
-          res.locals.poll = poll
-          res.locals.author = poll.author
-          res.locals.options = true
-
-          return Promise.all(
-            R.map(
-              id => Option.findByIdAndUpdate(id, options.update[id]),
-              R.keys(options.update)
-            )
-          ).then(() => {
-            if (options.new) {
-              return Option.insertMany(R.map(R.merge({ poll: poll._id }), options.new))
-            }
-          }).then(() => {
-            if (options.remove) {
-              return Promise.all(
-                R.map(
-                  id => Option.findByIdAndDelete(id),
-                  R.keys(options.remove)
-                )
-              ).then(() => {
-                return Promise.all(
-                  R.map(
-                    id => Vote.remove({ option: id }),
-                    R.keys(options.remove)
-                  )
-                )
-              })
-            }
-          }).catch(next)
-        })
-        .then(() => {
-          req.session.flash = { success: 'Options updated' }
-          return res.redirect(`/ui/${author}/${pollname}/options`)
-        })
-        .catch((err, poll) => {
-          if (err.errors) {
-            res.locals.errors = err.errors
-            return res.render('application', view.settings(res.locals))
-          }
-
-          return next(err)
-        })
-    },
-
     contributors (req, res, next) {
       const { author, pollname } = req.params
       const current = req.session.user
@@ -382,7 +312,6 @@ function createRouter () {
   router.delete('/:author/:pollname', to('delete'))
 
   router.post('/:author/:pollname/settings', actions.update.settings)
-  router.post('/:author/:pollname/options', actions.update.options)
   router.post('/:author/:pollname/contributors', actions.update.contributors)
   router.post('/:authro/:pollname/transfer', actions.update.transfer)
 

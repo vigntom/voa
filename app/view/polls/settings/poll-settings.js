@@ -48,17 +48,11 @@ function MainOptions ({ poll, csrfToken, errors }) {
 }
 
 function DangerZone () {
-  const modalButton = target => ({
-    type: 'button',
-    'data-toggle': 'modal',
-    'data-target': target
-  })
-
   return div('.border.border-danger.rounded.p-1', [
     ul('.list-group.list-group-flush', [
       li('.list-group-item', [
         button('.btn.btn-outline-danger.float-right.w-15',
-          modalButton('#transfer-modal'),
+          w.modalBtnAttributes('#transfer-modal'),
           'Transfer'
         ),
 
@@ -68,7 +62,7 @@ function DangerZone () {
 
       li('.list-group-item', [
         button('.btn.btn-outline-danger.float-right.w-15',
-          modalButton('#delete-modal'),
+          w.modalBtnAttributes('#delete-modal'),
           'Delete'
         ),
 

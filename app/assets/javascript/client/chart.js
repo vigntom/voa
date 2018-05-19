@@ -81,30 +81,34 @@ export default function () {
 
   function bindFreeVoteButton () {
     $('.choice-free-submit').on('click', e => {
-      const pollId = $('#vote-container').data('pollId')
+      const poll = $('#vote-container').data('pollId')
       const name = $('.choice-name').val()
       const description = $('.choice-description').val()
 
       $.ajax({
         dataType: 'json',
-        url: `/api/option/${pollId}`,
-        data: { name, description },
+        url: '/api/option',
+        data: { poll, name, description },
         method: 'post'
       }).done(res => {
-        const error = res.err
+        const errors = res.errors
+
         if (res.success) {
           chart.destroy()
-          $('#new-choice').modal('toggle')
+          $('.modal').modal('toggle')
         }
 
-        if (error && error.errors) {
+        if (errors) {
           const $el = $('[name=name]')
 
-          if (error.errors.name) {
+          if (errors.name) {
+            const msg = errors.name.kind === 'unique'
+              ? 'Name must be unique'
+              : errors.name.message
             $el.data('toggle', 'tooltip')
             $el.addClass('is-invalid')
             $el.tooltip('dispose')
-            $el.tooltip({ title: error.errors.name.message })
+            $el.tooltip({ title: msg })
           }
 
           return null

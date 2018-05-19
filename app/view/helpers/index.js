@@ -3,12 +3,26 @@ const classnames = require('classnames')
 const crypto = require('crypto')
 const h = require('./hyperscript')
 const querystring = require('querystring')
-const { form, div, a, img, span, h2, button, i, p } = h
+const { form, div, a, img, span, h2, h5, button, i, p } = h
 
 function md5 (string) {
   return crypto.createHash('md5')
     .update(string)
     .digest('hex')
+}
+
+function createConfirmPattern (str, option = {}) {
+  const transform = transormation(option)
+  const regexp = str.split('').map(transform).join('')
+
+  function transormation (option) {
+    if (option.lowerCase) { return x => `[${x.toLowerCase()}]` }
+    if (option.upperCase) { return x => `[${x.toUpperCase()}]` }
+
+    return x => `[${x.toLowerCase()}${x.toUpperCase()}]`
+  }
+
+  return `^${regexp}$`
 }
 
 function path ({ author, pollname, rest }) {
@@ -159,6 +173,42 @@ function SortGroup (options) {
   ])
 }
 
+function modalBtnAttributes (target) {
+  return {
+    type: 'button',
+    'data-toggle': 'modal',
+    'data-target': target
+  }
+}
+
+function Modal ({ id, title }, nest) {
+  const options = {
+    id,
+    tabIndex: '-1',
+    role: 'dialog',
+    'aria-labelledby': title,
+    'aria-hidden': true
+  }
+
+  return div('.modal.fade', options, [
+    div('.modal-dialog.modal-dialog-centered', { role: 'document' }, [
+      div('.modal-content', [
+        div('.modal-header', [
+          h5('.modal-title', title),
+
+          button('.close', {
+            type: 'button',
+            'data-dismiss': 'modal',
+            'aria-label': 'Close'
+          }, [ span({ 'aria-hidden': true }, '×') ])
+        ]),
+
+        div('.modal-body', nest)
+      ])
+    ])
+  ])
+}
+
 module.exports = {
   FormFor,
   MessageDesk,
@@ -168,5 +218,8 @@ module.exports = {
   SortGroup,
   InfoBar,
   GroupLink,
-  path
+  path,
+  createConfirmPattern,
+  modalBtnAttributes,
+  Modal
 }

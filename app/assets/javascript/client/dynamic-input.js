@@ -1,48 +1,98 @@
 export default function () {
-  $('.btn-add-choice').on('click', () => {
-    const $choiceGroup = $('.choice-group')
-    const $choices = $choiceGroup.find('.choice')
-    const $el = $choices.first().clone()
-    const index = $choices.length
+  const $choiceGroup = $('.choice-group')
+  const $deleteOption = $('#delete-option')
+  const $deleteModal = $('#delete-option-modal')
+  const $deleteBtn = $('#delete-option-button')
 
-    const $choiceName = $el.find('.choice-name')
-
-    $el.attr('data-option-new', true)
-
-    $choiceName.val('')
-    $choiceName.attr('name', `options[new][${index}][name]`)
-
-    const $choiceDesc = $el.find('.choice-description')
-    $choiceDesc.val('')
-    $choiceDesc.attr('name', `options[new][${index}][description]`)
-
-    $choiceGroup.append($el)
-
-    // remove button shows only if more than 2 choices
-    if ($('.choice').length === 3) {
-      $('.choice').removeClass('choice-core')
+  function errMessage (error, path) {
+    if (error.kind === 'unique') {
+      return `${path} must be unique`
     }
+
+    return error.message
+  }
+
+  function updateChoiceGroup (options) {
+    $choiceGroup.empty().append($(options))
+  }
+
+  $deleteModal.on('show.bs.modal', e => {
+    const $btn = $(e.relatedTarget)
+    const id = $btn.closest('.choice').data('option-id')
+    $deleteBtn.data('option-id', id)
   })
 
-  $('.choice-group').on('click', '.btn-del-choice', (e) => {
-    const $el = $(e.target).closest('.choice')
-    const isNew = $el.attr('data-option-new')
+  $deleteOption.on('submit', e => {
+    const id = $deleteBtn.data('option-id')
+    const data = { poll: $choiceGroup.data('poll-id') }
 
-    if (!isNew) {
-      const $choiceName = $el.find('.choice-name')
-      const $choiceDesc = $el.find('.choice-description')
-      const id = $el.attr('data-options-id')
+    e.preventDefault()
 
-      $choiceName.attr('name', `options[remove][${id}][name]`)
-      $choiceDesc.attr('name', `options[remove][${id}][description]`)
-    }
+    $.ajax({
+      dataType: 'json',
+      url: `/api/option/${id}`,
+      method: 'delete',
+      data
+    }).done(res => {
+      if (res.success) updateChoiceGroup(res.options)
+    }).always(() => {
+      $deleteModal.modal('toggle')
+    })
+  })
 
-    $el.hide()
+  $choiceGroup.on('click', '.btn-edit-option', e => {
+    const $choice = $(e.target).closest('.choice')
+    const poll = $choiceGroup.data('poll-id')
+    const id = $choice.data('option-id')
+    const $name = $choice.find('.choice-name')
+    const name = $name.val()
+    const description = $choice.find('.choice-description').val()
 
-    // need at least 2 choices to show remove button
-    if ($('.choice').length === 2) {
-      $('.choice').addClass('choice-core')
-    }
+    $.ajax({
+      dataType: 'json',
+      url: `/api/option/${id}`,
+      method: 'patch',
+      data: { poll, name, description }
+    }).done(res => {
+      const { errors } = res
+      if (res.success) updateChoiceGroup(res.options)
+
+      if (errors && errors.name) {
+        const message = errMessage(errors.name, 'Name')
+
+        $name.data('toggle', 'tooltip')
+        $name.addClass('is-invalid')
+        $name.tooltip('dispose')
+        $name.tooltip({ title: message })
+      }
+    })
+  })
+
+  $choiceGroup.on('click', '.btn-add-choice', e => {
+    const $choice = $(e.target).closest('.choice')
+    const poll = $choiceGroup.data('poll-id')
+    const $name = $choice.find('.choice-name')
+    const name = $name.val()
+    const description = $choice.find('.choice-description').val()
+
+    $.ajax({
+      dataType: 'json',
+      url: `/api/option`,
+      method: 'post',
+      data: { poll, name, description }
+    }).done(res => {
+      const { errors } = res
+      if (res.success) updateChoiceGroup(res.options)
+
+      if (errors && errors.name) {
+        const message = errMessage(errors.name, 'Name')
+
+        $name.data('toggle', 'tooltip')
+        $name.addClass('is-invalid')
+        $name.tooltip('dispose')
+        $name.tooltip({ title: message })
+      }
+    })
   })
 }
 

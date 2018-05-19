@@ -1,5 +1,6 @@
 const w = require('../helpers')
 const h = require('../helpers/hyperscript')
+const OptionsGroup = require('./options-group')
 
 const { div, h2, label, input, button, span } = h
 
@@ -13,12 +14,6 @@ function Author (value) {
       name: 'author',
       value
     })
-  ])
-}
-
-function Slash () {
-  return div('.col-auto', [
-    div('.slash', [ span('/') ])
   ])
 }
 
@@ -57,7 +52,11 @@ function PollName ({ author, poll, errors }) {
 
   return div('.form-row', [
     Author(author),
-    Slash(),
+
+    div('.col-auto', [
+      div('.slash', [ span('/') ])
+    ]),
+
     Name({ name, errors })
   ])
 }
@@ -72,6 +71,8 @@ function Settings (options) {
       PollName({ author, poll, errors }),
       Description({ poll, errors })
     ]),
+
+    OptionsGroup({ poll }),
 
     div('.voa-item', [
       button('.btn.btn-success', { type: 'submit' }, 'Create')
