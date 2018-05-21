@@ -7,6 +7,7 @@ const routing = require('../../lib/routing')
 const log = require('../../lib/logger')
 const OptionsGroupBlock = require('../view/polls/options-group')
 const VoteDesk = require('../view/polls/show/vote-desk')
+const { MessageDesk } = require('../view/helpers')
 
 function checkOwner (user) {
   return poll => {
@@ -19,21 +20,29 @@ function checkOwner (user) {
 }
 
 function sendOptionGroup (req, res, freeChoice) {
-  return inPoll => {
+  const flash = MessageDesk({ success: 'Options updated' }).outerHTML
+
+  function content (poll) {
     if (freeChoice) {
       const isVoted = false
       const isAuthenticated = !!req.session.user
       const noModal = true
-      const sortByCreation = R.sortBy(R.prop('createdAt'))
-      const poll = R.merge(inPoll, { options: sortByCreation(inPoll.options) })
-      const voteDesk = VoteDesk({ poll, isVoted, isAuthenticated, noModal }).outerHTML
 
-      return res.json({ success: true, voteDesk })
+      return VoteDesk({ poll, isVoted, isAuthenticated, noModal })
     }
 
-    const poll = inPoll
-    const options = OptionsGroupBlock({ poll }).outerHTML
-    return res.json({ success: true, options })
+    return OptionsGroupBlock({ poll })
+  }
+
+  return poll => {
+    const sortByCreation = R.sortBy(R.prop('createdAt'))
+    const pollSorted = R.merge(poll, { options: sortByCreation(poll.options) })
+
+    return res.json({
+      success: true,
+      content: content(pollSorted).outerHTML,
+      flash
+    })
   }
 }
 

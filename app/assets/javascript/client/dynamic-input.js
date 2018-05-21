@@ -3,6 +3,7 @@ export default function () {
   const $deleteOption = $('#delete-option')
   const $deleteModal = $('#delete-option-modal')
   const $deleteBtn = $('#delete-option-button')
+  const $mainBody = $('.main-body')
 
   function errMessage (error, path) {
     if (error.kind === 'unique') {
@@ -12,8 +13,16 @@ export default function () {
     return error.message
   }
 
-  function updateChoiceGroup (options) {
-    $choiceGroup.empty().append($(options))
+  function updateChoiceGroup ({ content, flash }) {
+    $choiceGroup.empty().append($(content))
+
+    if (flash) {
+      $mainBody.append($(flash))
+
+      $('.alert-fadable').delay(3000).fadeTo(1000, 0.5, () => {
+        $('.alert-fadable').alert('close')
+      })
+    }
   }
 
   $deleteModal.on('show.bs.modal', e => {
@@ -34,7 +43,7 @@ export default function () {
       method: 'delete',
       data
     }).done(res => {
-      if (res.success) updateChoiceGroup(res.options)
+      if (res.success) updateChoiceGroup(res)
     }).always(() => {
       $deleteModal.modal('toggle')
     })
@@ -55,7 +64,7 @@ export default function () {
       data: { poll, name, description }
     }).done(res => {
       const { errors } = res
-      if (res.success) updateChoiceGroup(res.options)
+      if (res.success) updateChoiceGroup(res)
 
       if (errors && errors.name) {
         const message = errMessage(errors.name, 'Name')
@@ -82,7 +91,7 @@ export default function () {
       data: { poll, name, description }
     }).done(res => {
       const { errors } = res
-      if (res.success) updateChoiceGroup(res.options)
+      if (res.success) updateChoiceGroup(res)
 
       if (errors && errors.name) {
         const message = errMessage(errors.name, 'Name')

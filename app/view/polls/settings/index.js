@@ -19,7 +19,7 @@ function Page (options) {
   }
 
   return div('.bg-light.main', [
-    div('.border-bottom', [
+    div('.main-header.border-bottom', [
       div('.container.p-0', [
         div('.py-3', [
           h1('.h3', [
@@ -33,9 +33,9 @@ function Page (options) {
       ])
     ]),
 
-    div('.bg-white', [
+    div('.main-body.bg-white', [
+      w.MessageDesk(options.flash),
       div('.container.py-5', [
-        w.MessageDesk(options.flash),
         div('.row.justify-content-center.bg-white', [
           div('.col-3', [ EditGroup(options) ]),
           div('.col-7', [ activePage(options) ])
