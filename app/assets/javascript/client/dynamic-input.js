@@ -27,12 +27,12 @@ export default function () {
 
   $deleteModal.on('show.bs.modal', e => {
     const $btn = $(e.relatedTarget)
-    const id = $btn.closest('.choice').data('option-id')
-    $deleteBtn.data('option-id', id)
+    const id = $btn.closest('.choice').find('[name=id]').val()
+    $deleteOption.find('[name=id]').val(id)
   })
 
   $deleteOption.on('submit', e => {
-    const id = $deleteBtn.data('option-id')
+    const id = $deleteOption.find('[name=id]').val()
     const data = { poll: $choiceGroup.data('poll-id') }
 
     e.preventDefault()
@@ -49,13 +49,13 @@ export default function () {
     })
   })
 
-  $choiceGroup.on('click', '.btn-edit-option', e => {
+  $choiceGroup.on('submit', '.update-option', e => {
     const $choice = $(e.target).closest('.choice')
     const poll = $choiceGroup.data('poll-id')
-    const id = $choice.data('option-id')
-    const $name = $choice.find('.choice-name')
+    const id = $choice.find('[name=id]').val()
+    const $name = $choice.find('[name=name]')
     const name = $name.val()
-    const description = $choice.find('.choice-description').val()
+    const description = $choice.find('[name=description]').val()
 
     e.preventDefault()
 
@@ -79,12 +79,12 @@ export default function () {
     })
   })
 
-  $choiceGroup.on('click', '.btn-add-choice', e => {
+  $choiceGroup.on('submit', '.add-option', e => {
     const $choice = $(e.target).closest('.choice')
     const poll = $choiceGroup.data('poll-id')
-    const $name = $choice.find('.choice-name')
+    const $name = $choice.find('[name=name]')
     const name = $name.val()
-    const description = $choice.find('.choice-description').val()
+    const description = $choice.find('[name=description]').val()
 
     e.preventDefault()
 

@@ -1,4 +1,5 @@
 const R = require('ramda')
+const classnames = require('classnames')
 const h = require('../helpers/hyperscript')
 const w = require('../helpers')
 
@@ -33,15 +34,23 @@ function AddButton () {
 
 function OptionsItem (options) {
   const { item } = options
+  const id = item._id && item._id.toString()
+  const Button = id ? UpdateOrDeleteButtons(id) : AddButton()
+  const baseClass = 'choice form-row pb-1 confirmable'
+  const className = classnames(
+    baseClass, {
+      'update-option': !!id,
+      'add-option': !id
+    }
+  )
 
-  return w.FormFor('.choice.form-row.pb-1.confirmable', {
-    action: '#',
-    'data-option-id': item._id || 'null'
-  }, [
+  return w.FormFor('', { action: '#', className }, [
     div('.col-4', [
-      input('.choice-name.form-control', {
+      input({ type: 'hidden', name: 'id', value: id }),
+      input('.form-control', {
         type: 'text',
         placeholder: 'Choice name',
+        name: 'name',
         value: item.name,
         required: true,
         pattern: '\\S+'
@@ -49,14 +58,15 @@ function OptionsItem (options) {
     ]),
 
     div('.col', [
-      input('.choice-description.form-control', {
+      input('.form-control', {
         type: 'text',
         placeholder: 'description (optional)',
+        name: 'description',
         value: item.description
       })
     ]),
 
-    item._id ? UpdateOrDeleteButtons(item._id) : AddButton()
+    Button
   ])
 }
 

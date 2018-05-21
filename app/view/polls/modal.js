@@ -6,6 +6,7 @@ function Delete ({ poll, csrfToken }) {
   return w.Modal({ id: 'delete-option-modal', title: 'Deleto option' }, [
     w.FormFor('#delete-option.confirmable', { action: '#' }, [
       div('.form-group', [
+        input({ type: 'hidden', name: 'id' }),
         label(
           { htmlFor: '#delete-option-confirmation' },
           'Type "DELETE" to confirm'
