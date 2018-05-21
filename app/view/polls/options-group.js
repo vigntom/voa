@@ -5,7 +5,7 @@ const w = require('../helpers')
 const { div, input, button, span } = h
 
 function UpdateOrDeleteButtons (id) {
-  const editOptions = { type: 'button' }
+  const editOptions = { type: 'submit' }
   const deleteOptions = w.modalBtnAttributes('#delete-option-modal')
 
   return div('.btn-accept-group.accept-update',
@@ -24,6 +24,7 @@ function UpdateOrDeleteButtons (id) {
 function AddButton () {
   return div('.btn-accept-group.accept-new.px-1',
     button('.btn.btn-add-choice.btn-primary.btn-block', {
+      type: 'submit',
       disabled: true,
       'data-disable-invalid': true
     }, 'Add')
@@ -33,7 +34,8 @@ function AddButton () {
 function OptionsItem (options) {
   const { item } = options
 
-  return div('.choice.form-row.pb-1.confirmable', {
+  return w.FormFor('.choice.form-row.pb-1.confirmable', {
+    action: '#',
     'data-option-id': item._id || 'null'
   }, [
     div('.col-4', [

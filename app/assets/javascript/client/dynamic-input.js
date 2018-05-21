@@ -57,6 +57,8 @@ export default function () {
     const name = $name.val()
     const description = $choice.find('.choice-description').val()
 
+    e.preventDefault()
+
     $.ajax({
       dataType: 'json',
       url: `/api/option/${id}`,
@@ -83,6 +85,8 @@ export default function () {
     const $name = $choice.find('.choice-name')
     const name = $name.val()
     const description = $choice.find('.choice-description').val()
+
+    e.preventDefault()
 
     $.ajax({
       dataType: 'json',
