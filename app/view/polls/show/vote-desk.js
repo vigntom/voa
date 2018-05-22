@@ -45,7 +45,7 @@ function ChoicesGroup ({ options }) {
   ])
 }
 
-function VoteDesk ({ poll, isVoted, isAuthenticated, noModal }) {
+function VoteDesk ({ poll, isVoted, isAuthenticated }) {
   if (isVoted) return null
 
   const { options } = poll

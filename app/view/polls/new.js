@@ -1,6 +1,5 @@
 const w = require('../helpers')
 const h = require('../helpers/hyperscript')
-const OptionsGroup = require('./options-group')
 
 const { div, h2, label, input, button, span } = h
 
@@ -71,8 +70,6 @@ function Settings (options) {
       PollName({ author, poll, errors }),
       Description({ poll, errors })
     ]),
-
-    OptionsGroup({ poll }),
 
     div('.voa-item', [
       button('.btn.btn-success', { type: 'submit' }, 'Create')

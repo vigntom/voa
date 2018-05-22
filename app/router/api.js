@@ -26,9 +26,8 @@ function sendOptionGroup (req, res, freeChoice) {
     if (freeChoice) {
       const isVoted = false
       const isAuthenticated = !!req.session.user
-      const noModal = true
 
-      return VoteDesk({ poll, isVoted, isAuthenticated, noModal })
+      return VoteDesk({ poll, isVoted, isAuthenticated })
     }
 
     return OptionsGroupBlock({ poll })

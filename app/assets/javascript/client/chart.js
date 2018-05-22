@@ -54,8 +54,8 @@ export default function () {
     })
   }
 
-  function updateVoteDesk (voteDesk) {
-    $('.vote-col').replaceWith($(voteDesk))
+  function updateVoteDesk (content) {
+    $('.vote-col').replaceWith($(content))
     bindVoteButton()
     bindFreeVoteButton()
   }
@@ -63,25 +63,22 @@ export default function () {
   function bindVoteButton () {
     $('.choices-voted').on('click', e => {
       const $btn = $(e.target).closest('button')
-
-      $btn.on('hidden.bs.tooltip', () => {
-        const option = $btn.val()
-        const poll = $('#vote-container').data('pollId')
-
-        return $.ajax({
-          url: `/api/vote/${poll}/${option}`,
-          dataType: 'json',
-          method: 'post'
-        }).done(res => {
-          if (res.success) {
-            chart.destroy()
-            fetchChart()
-            $('.vote-col').remove()
-          }
-        })
-      })
+      const option = $btn.val()
+      const poll = $('#vote-container').data('pollId')
 
       $btn.tooltip('hide')
+
+      return $.ajax({
+        url: `/api/vote/${poll}/${option}`,
+        dataType: 'json',
+        method: 'post'
+      }).done(res => {
+        if (res.success) {
+          chart.destroy()
+          fetchChart()
+          $('.vote-col').remove()
+        }
+      })
     })
   }
 
@@ -104,7 +101,7 @@ export default function () {
         if (res.success) {
           chart.destroy()
           fetchChart()
-          updateVoteDesk(res.voteDesk)
+          updateVoteDesk(res.content)
 
           $('.modal').modal('hide')
         }
