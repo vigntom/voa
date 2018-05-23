@@ -3,6 +3,7 @@ const validator = require('validator')
 const User = require('../models/user')
 const template = require('../view/password-resets')
 const { logIn } = require('../view/helpers/session')
+const { path } = require('../view/helpers')
 const log = require('../../lib/logger')
 const mailer = require('../../lib/mailer')
 const routing = require('../../lib/routing')
@@ -147,8 +148,8 @@ const actions = {
 
         return logIn(req, user, err => {
           if (err) { return next(err) }
-          req.session.flash = { success: 'Password has been reset.' }
-          return res.redirect(`/users/${user._id}`)
+          req.session.flash = { success: 'Password has been changed.' }
+          return res.redirect(path({ author: user.username }))
         })
       })
     })
