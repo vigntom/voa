@@ -53,7 +53,7 @@ function OptionsItem (options) {
         name: 'name',
         value: item.name,
         required: true,
-        pattern: '\\S+'
+        pattern: '\\S(.*\\S)?'
       })
     ]),
 

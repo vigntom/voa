@@ -34,7 +34,7 @@ function NewOption ({ errors, isDeletable, value = {} }) {
     value: value.name,
     autoFocus: true,
     required: true,
-    pattern: '\\S+'
+    pattern: '\\S(.*\\S)?'
   }, errors, { path: 'name', placement: 'left' })
 
   return w.FormFor('#choice-free-form.confirmable', { action: '#' }, [
