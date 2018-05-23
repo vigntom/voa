@@ -57,7 +57,6 @@ export default function () {
   function updateVoteDesk (content) {
     $('.vote-col').replaceWith($(content))
     bindVoteButton()
-    bindFreeVoteButton()
   }
 
   function bindVoteButton () {

@@ -39,12 +39,6 @@ const schema = new Schema({
     default: false
   },
 
-  contributors: [{
-    _id: false,
-    type: Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-
   stargazers: {
     count: { type: Number, default: 0 },
 

@@ -4,7 +4,6 @@ const EditGroup = require('./edit-group')
 const NavBar = require('../nav-bar')
 const Settings = require('./poll-settings')
 const Options = require('./poll-options')
-const Contributors = require('./poll-contributors')
 const { div, h1, a, span } = h
 
 function Page (options) {
@@ -14,7 +13,6 @@ function Page (options) {
 
   function activePage (options) {
     if (options.options) return Options(options)
-    if (options.contrubotors) return Contributors(options)
     return Settings(options)
   }
 

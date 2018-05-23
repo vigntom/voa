@@ -1,11 +1,12 @@
 const express = require('express')
 const R = require('ramda')
 const paginate = require('express-paginate')
-const routing = require('../../lib/routing')
-const voaView = require('../../lib/view')
-const template = require('../view/polls')
 const Poll = require('../models/poll')
 const User = require('../models/user')
+const template = require('../view/polls')
+const { path } = require('../view/helpers')
+const routing = require('../../lib/routing')
+const voaView = require('../../lib/view')
 
 const data = {
   index: { title: 'Polls' },
@@ -96,7 +97,7 @@ const actions = {
 
     Poll.create(params)
       .then(poll => {
-        return res.redirect(`/ui/${user.username}/${poll.name}`)
+        return res.redirect(path({ author: user.username, pollname: poll.name }))
       })
       .catch(err => {
         if (err.errors) {
@@ -152,7 +153,7 @@ const actions = {
       .then(poll => {
         if (poll.author.username !== author) {
           req.session.flash = { danger: 'Insufficient privileges' }
-          return res.redirect(`/ui/${author}/${pollname}`)
+          return res.redirect(path({ author, pollname }))
         }
 
         res.locals.poll = poll
@@ -180,7 +181,7 @@ const actions = {
       .then(poll => {
         if (poll.author.username !== author) {
           req.session.flash = { danger: 'Insufficient privileges' }
-          return res.redirect(`/ui/${author}/${pollname}`)
+          return res.redirect(path({ author, pollname }))
         }
 
         res.locals.poll = poll
@@ -205,14 +206,14 @@ const actions = {
       .then(poll => {
         if (poll.author.username !== author) {
           req.session.flash = { danger: "You can't modify this poll" }
-          return res.redirect(`/ui/${author}/${pollname}`)
+          return res.redirect(path({ author, pollname }))
         }
 
         return poll.remove()
       })
       .then(poll => {
         req.session.flash = { success: 'Poll is deleted' }
-        return res.redirect(`/ui/${author}`)
+        return res.redirect(path({ author }))
       })
       .catch(next)
   },
@@ -243,7 +244,7 @@ const actions = {
           const params = R.pick(['name', 'description'], req.body)
 
           if (poll.name === params.name && poll.description === params.description) {
-            return res.redirect(`/ui/${author}/${pollname}/settings`)
+            return res.redirect(path({ author, pollname, rest: 'settings' }))
           }
 
           res.locals.poll = poll
@@ -256,7 +257,7 @@ const actions = {
         })
         .then(poll => {
           req.session.flash = { success: 'Poll settings updated' }
-          return res.redirect(`/ui/${author}/${poll.name}/settings`)
+          return res.redirect(path({ author, pollname: poll.name, rest: 'settings' }))
         })
         .catch((err, poll) => {
           if (err.errors) {
@@ -268,18 +269,6 @@ const actions = {
         })
     },
 
-    contributors (req, res, next) {
-      const { author, pollname } = req.params
-      const current = req.session.user
-
-      if (!current) {
-        req.session.flash = { danger: 'Please log in' }
-        return res.redirect('/login')
-      }
-
-      return res.redirect(`/ui/${author}/${pollname}/contributors`)
-    },
-
     transfer (req, res, next) {
       const { author, pollname } = req.params
       const current = req.session.user
@@ -289,7 +278,7 @@ const actions = {
         return res.redirect('/login')
       }
 
-      return res.redirect(`/ui/${author}/${pollname}/transfer`)
+      return res.redirect(path({ author, pollname, rest: 'transfer' }))
     }
   }
 }
@@ -302,13 +291,11 @@ function createRouter () {
   router.get('/:author/:pollname', to('show'))
   router.get('/:author/:pollname/settings', to('settings'))
   router.get('/:author/:pollname/options', to('options'))
-  router.get('/:author/:pollname/contributors', to('contributors'))
 
   router.post('/:author/', to('create'))
   router.delete('/:author/:pollname', to('delete'))
 
   router.post('/:author/:pollname/settings', actions.update.settings)
-  router.post('/:author/:pollname/contributors', actions.update.contributors)
   router.post('/:authro/:pollname/transfer', actions.update.transfer)
 
   return { to, router }
