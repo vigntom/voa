@@ -296,7 +296,7 @@ function createRouter () {
   router.delete('/:author/:pollname', to('delete'))
 
   router.post('/:author/:pollname/settings', actions.update.settings)
-  router.post('/:authro/:pollname/transfer', actions.update.transfer)
+  router.post('/:author/:pollname/transfer', actions.update.transfer)
 
   return { to, router }
 }

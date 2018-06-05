@@ -58,7 +58,7 @@ const actions = {
           const result = R.clone(poll)
 
           result.options = R.map(opt => {
-            const result = R.clone(opt.toObject())
+            const result = R.clone(opt)
             result.votes = opt.votes.length
             return result
           }, poll.options)
@@ -167,6 +167,7 @@ function createRouter () {
 
   router.patch('/option/:optionId', actions.option.update)
   router.delete('/option/:optionId', actions.option.delete)
+
   return { router }
 }
 
