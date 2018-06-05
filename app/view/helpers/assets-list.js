@@ -6,7 +6,7 @@ function StyleSheetLink ({ href }) {
 
 function createAssetsList (env) {
   if (env === 'production') {
-    const manifest = require('../public/assets/manifest.json')
+    const manifest = require('../../../public/assets/manifest.json')
     const manifestList = Object.values(manifest)
 
     const js = manifestList.filter(x => /.jsx?$/.test(x))
