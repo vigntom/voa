@@ -16,7 +16,7 @@ test.after.always(() => {
   return User.remove()
 })
 
-test('friendship from request', t => {
+test.skip('friendship from request', t => {
   const { bob, sara } = t.context
 
   const request = () => User.findOne({ username: bob })
@@ -74,7 +74,7 @@ test('friendship from request', t => {
     .then(accept)
 })
 
-test('should create friendship connection and drop after', t => {
+test.skip('should create friendship connection and drop after', t => {
   const { den, samanta } = t.context
 
   const addFriend = () => User.findOne({ username: den })

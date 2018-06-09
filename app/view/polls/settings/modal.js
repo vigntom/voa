@@ -35,7 +35,7 @@ function TransferModal ({ poll, csrfToken }) {
 
         input('#transfer-receiver.form-control', {
           type: 'text',
-          name: 'author',
+          name: 'recipient',
           required: true,
           pattern: '\\S+'
         })

@@ -3,8 +3,10 @@ const R = require('ramda')
 const paginate = require('express-paginate')
 const Poll = require('../models/poll')
 const User = require('../models/user')
+const Mailbox = require('../models/mailbox')
 const template = require('../view/polls')
 const { path } = require('../view/helpers')
+const log = require('../../lib/logger')
 const routing = require('../../lib/routing')
 const voaView = require('../../lib/view')
 
@@ -271,6 +273,7 @@ const actions = {
 
     transfer (req, res, next) {
       const { author, pollname } = req.params
+      const { recipient } = req.body
       const current = req.session.user
 
       if (!current) {
@@ -278,7 +281,23 @@ const actions = {
         return res.redirect('/login')
       }
 
-      return res.redirect(path({ author, pollname, rest: 'transfer' }))
+      if (author !== current.username) {
+        req.session.flash = { danger: 'Access Denied' }
+        return res.redirect('/')
+      }
+
+      return Mailbox.transferNotify({
+        from: current._id,
+        to: recipient,
+        pollname
+      }).then(() => {
+        req.session.flash = { success: 'Transfer request sent' }
+      }).catch(err => {
+        req.session.flash = { warning: 'Wrong transfer request' }
+        log.warning(err.message)
+      }).then(() => {
+        return res.redirect(path({ author, pollname, rest: 'settings' }))
+      })
     }
   }
 }

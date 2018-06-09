@@ -2,10 +2,10 @@ const mongoose = require('mongoose')
 const { isEmail } = require('validator')
 const uniqueValidator = require('mongoose-unique-validator')
 const beautifyUnique = require('mongoose-beautiful-unique-validation')
-const authenticationPlugin = require('./plugins/authentication')
-const pollsPlugin = require('./plugins/polls')
-const friendsPlugin = require('./plugins/friends')
+const authentication = require('./plugins/authentication')
+const polls = require('./plugins/polls')
 const helpers = require('./plugins/helpers')
+const notifications = require('./plugins/notifications')
 
 const Schema = mongoose.Schema
 
@@ -50,9 +50,9 @@ const schema = new Schema({
 schema.path('email').validate(emailValidator)
 schema.path('username').validate(usernameValidator)
 
-schema.plugin(authenticationPlugin)
-schema.plugin(friendsPlugin, { ref: 'User' })
-schema.plugin(pollsPlugin)
+schema.plugin(authentication)
+schema.plugin(polls)
+schema.plugin(notifications)
 schema.plugin(helpers)
 schema.plugin(uniqueValidator)
 schema.plugin(beautifyUnique)

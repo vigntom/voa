@@ -40,7 +40,7 @@
   "devDependencies": {
     "ava": "^0.25.0",
     "cookie": "^0.3.1",
-    "dotenv": "^5.0.1",
+    "dotenv": "^6.0.0",
     "faker": "^4.1.0",
     "html2hyperscript": "^1.0.1",
     "jsctags": "^5.2.0",

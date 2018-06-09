@@ -11,7 +11,7 @@ const Vote = require('../../app/models/vote')
 const createDbConnection = require('../../lib/db')
 
 const db = createDbConnection()
-const fakeAccounts = 100
+const fakeAccounts = 30
 const pollsPerUser = 3
 const maxGazers = 100
 const fakeChoicesLimits = { min: 2, max: 5 }
@@ -90,33 +90,6 @@ const accounts = (function () {
 const users = (function () {
   const genUsers = () => R.times(fakeUser, fakeAccounts)
 
-  const createFriendship = (users) => {
-    R.times(
-      () => randomFriendship(users),
-      users.length * 2
-    )
-
-    return users
-  }
-
-  const createPending = (users) => {
-    R.times(
-      () => randomPending(users),
-      users.length
-    )
-
-    return users
-  }
-
-  const createRequests = (users) => {
-    R.times(
-      () => randomRequest(users),
-      users.length
-    )
-
-    return users
-  }
-
   function fakeUser () {
     const currentDate = faker.date.recent()
     const manyYearsAgo = faker.date.past(5, currentDate)
@@ -143,51 +116,8 @@ const users = (function () {
     })
   }
 
-  function randomCommonUsers (users) {
-    const u1 = faker.random.number(users.length - 1)
-    const u2 = faker.random.number(users.length - 1)
-
-    if (u1 === u2) { return randomCommonUsers(users) }
-    if (users[u1].protected) { return randomCommonUsers(users) }
-    if (users[u2].protected) { return randomCommonUsers(users) }
-    return [ users[u1], users[u2] ]
-  }
-
-  function randomFriendship (users) {
-    const [u1, u2] = randomCommonUsers(users)
-
-    return User.findById(u1._id).addFriend({ _id: u2._id })
-      .catch(err => {
-        if (!err.errors) console.log(err.message)
-      })
-  }
-
-  function randomPending (users) {
-    const [u1, u2] = randomCommonUsers(users)
-
-    return User.findById(u1._id).acceptFriendship({ _id: u2._id })
-      .catch(err => {
-        if (!err.errors) console.log(err.message)
-      })
-  }
-
-  function randomRequest (users) {
-    const [u1, u2] = randomCommonUsers(users)
-
-    return User.findById(u1._id).requestFriendship({ _id: u2._id })
-      .catch(err => {
-        if (!err.errors) console.log(err.message)
-      })
-  }
-
   return {
-    generate () {
-      return Promise.all(genUsers())
-        .then(() => User.find())
-        .then(users => Promise.all(createRequests(users)))
-        .then(users => Promise.all(createPending(users)))
-        .then(users => Promise.all(createFriendship(users)))
-    }
+    generate () { return Promise.all(genUsers()).then(() => User.find()) }
   }
 })()
 
@@ -224,10 +154,17 @@ const polls = (function () {
     return fakePoll(users[userIdx])
   }
 
+  function generateFoobarPools (users) {
+    const foobar = R.find(R.propEq('username', 'foobar'))(users)
+    return Promise.all(
+      R.times(() => fakePoll(foobar), pollsPerUser)
+    )
+  }
+
   return {
-    generate: (users) => Promise.all(
-      genPolls(users)
-    ).then(() => Poll.find())
+    generate: (users) => Promise.all(genPolls(users))
+      .then(() => generateFoobarPools(users))
+      .then(() => Poll.find())
   }
 })()
 
