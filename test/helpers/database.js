@@ -4,18 +4,13 @@ import MongoServer from 'mongodb-memory-server'
 import User from '../../app/models/user'
 import users from '../fixtures/users'
 import R from 'ramda'
-// import createConnection from '../../lib/db'
-
-// const connection = createConnection()
 
 const fixture = {
   user: obj => R.merge(obj, { passwordConfirmation: obj.password })
 }
 
 test.before('Start MongoDB Server', t => {
-  const mongod = new MongoServer({
-    binary: { version: '3.6.4' }
-  })
+  const mongod = new MongoServer()
   return mongod.getConnectionString()
     .then(uri => {
       mongoose.Promise = Promise
@@ -27,9 +22,6 @@ test.before('Start MongoDB Server', t => {
     .then(data => {
       return User.insertMany(data)
     })
-
-  // const data = R.map(fixture.user, R.values(users))
-  // return User.insertMany(data)
 })
 
 module.exports = { fixture }

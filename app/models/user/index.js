@@ -5,7 +5,6 @@ const beautifyUnique = require('mongoose-beautiful-unique-validation')
 const authentication = require('./plugins/authentication')
 const polls = require('./plugins/polls')
 const helpers = require('./plugins/helpers')
-const notifications = require('./plugins/notifications')
 
 const Schema = mongoose.Schema
 
@@ -52,7 +51,6 @@ schema.path('username').validate(usernameValidator)
 
 schema.plugin(authentication)
 schema.plugin(polls)
-schema.plugin(notifications)
 schema.plugin(helpers)
 schema.plugin(uniqueValidator)
 schema.plugin(beautifyUnique)

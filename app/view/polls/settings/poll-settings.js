@@ -52,16 +52,6 @@ function DangerZone () {
     ul('.list-group.list-group-flush', [
       li('.list-group-item', [
         button('.btn.btn-outline-danger.float-right.w-15',
-          w.modalBtnAttributes('#transfer-modal'),
-          'Transfer'
-        ),
-
-        h6('Transfer ownership'),
-        p('Transfer this poll to another user')
-      ]),
-
-      li('.list-group-item', [
-        button('.btn.btn-outline-danger.float-right.w-15',
           w.modalBtnAttributes('#delete-modal'),
           'Delete'
         ),
@@ -81,7 +71,6 @@ function Page (options) {
     div('.mt-5.py-3', [ h2('Danger Zone') ]),
     DangerZone(),
 
-    modal.Transfer(options),
     modal.Delete(options)
   ])
 }

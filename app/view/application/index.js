@@ -9,9 +9,12 @@ function SignNavbar () {
   ])
 }
 
-function AccountMenu ({ username }) {
+function AccountMenu ({ user }) {
+  const { username } = user
+
   return div('.navbar-nav', [
     a('.nav-link', { href: `/ui/${username}/new` }, 'Create Poll'),
+
     div('.dropdown', [
       a('#profileDropdown.nav-link.dropdown-toggle', {
         href: '#',
@@ -29,6 +32,7 @@ function AccountMenu ({ username }) {
         }, 'Logout')
       ])
     ])
+
   ])
 }
 
@@ -65,7 +69,7 @@ function Header (options) {
             input('.hidden', { type: 'submit' })
           ]),
 
-          user ? AccountMenu(user) : SignNavbar()
+          user ? AccountMenu({ user }) : SignNavbar()
         ])
       ])
     ])

@@ -45,7 +45,7 @@
     "html2hyperscript": "^1.0.1",
     "jsctags": "^5.2.0",
     "jsdom": "^11.5.1",
-    "mongodb-memory-server": "^1.7.3",
+    "mongodb-memory-server": "^1.8.0",
     "nodemon": "^1.14.8",
     "reload": "^2.2.2",
     "standard": "^11.0.1",
