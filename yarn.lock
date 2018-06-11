@@ -101,13 +101,7 @@ acorn-jsx@^3.0.0:
   dependencies:
     acorn "^3.0.4"
 
-acorn-jsx@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-4.1.1.tgz#e8e41e48ea2fe0c896740610ab6a4ffd8add225e"
-  dependencies:
-    acorn "^5.0.3"
-
-acorn-jsx@ramitos/acorn-jsx#9da2ca0:
+acorn-jsx@^4.1.1, acorn-jsx@ramitos/acorn-jsx#9da2ca0:
   version "4.1.1"
   resolved "https://codeload.github.com/ramitos/acorn-jsx/tar.gz/9da2ca0e1e0b360bb49fce17dabcef8b6dc7235d"
   dependencies:
@@ -121,7 +115,7 @@ acorn@^4.0.3, acorn@^4.0.9:
   version "4.0.13"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-4.0.13.tgz#105495ae5361d697bd195c825192e1ad7f253787"
 
-acorn@^5.0.0, acorn@^5.0.3, acorn@^5.3.0, acorn@^5.5.0, acorn@^5.5.3, acorn@^5.6.1:
+acorn@^5.0.0, acorn@^5.3.0, acorn@^5.5.0, acorn@^5.5.3, acorn@^5.6.1:
   version "5.6.2"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.6.2.tgz#b1da1d7be2ac1b4a327fb9eab851702c5045b4e7"
 
@@ -7830,7 +7824,7 @@ term-size@^1.2.0:
   dependencies:
     execa "^0.7.0"
 
-tern-jsx@ramitos/tern-jsx#8587d84:
+"tern-jsx@github:ramitos/tern-jsx#8587d84":
   version "1.0.0"
   resolved "https://codeload.github.com/ramitos/tern-jsx/tar.gz/8587d849cbf451d19d33c5cf29b757702d713130"
   dependencies:

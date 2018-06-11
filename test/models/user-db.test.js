@@ -11,7 +11,7 @@ test.after.always(() => {
   return User.remove()
 })
 
-test.only.cb('username should be unique', t => {
+test.cb('username should be unique', t => {
   const signup = db.fixture.user(login)
   const user = new User(signup)
 
