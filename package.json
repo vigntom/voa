@@ -25,7 +25,7 @@
     "test": "ava",
     "test:watch": "ava --watch",
     "secret": "node ./scripts/secret",
-    "heroku-postbuild": "yarn build && yarn db:addAdmin",
+    "heroku-postbuild": "yarn build && yarn db:addAdmin && yarn db:seed",
     "s": "yarn start",
     "b": "yarn build",
     "d:s": "yarn dev:start",
