@@ -8,7 +8,7 @@
   },
   "author": "Aleksandr Ignatyev <vigntom.2708@gmail.com>",
   "engines": {
-    "node": "9.11.1"
+    "node": "8.11.3"
   },
   "scripts": {
     "start": "heroku local",
@@ -71,11 +71,11 @@
     "signal": "SIGTERM"
   },
   "dependencies": {
-    "autoprefixer": "^8.2.0",
+    "autoprefixer": "^9.1.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
-    "bcrypt": "^2.0.0",
+    "bcrypt": "^3.0.0",
     "bootstrap": "^4.1.0",
     "bunyan": "^1.8.12",
     "bunyan-debug-stream": "^1.0.8",
@@ -103,7 +103,7 @@
     "jquery": "^3.2.1",
     "js-yaml": "^3.10.0",
     "kefir": "^3.8.1",
-    "method-override": "^2.3.10",
+    "method-override": "^3.0.0",
     "mongoose": "^5.0.17",
     "mongoose-beautiful-unique-validation": "^7.1.1",
     "mongoose-unique-validator": "^2.0.1",

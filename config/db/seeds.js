@@ -10,12 +10,46 @@ const Option = require('../../app/models/option')
 const Vote = require('../../app/models/vote')
 const createDbConnection = require('../../lib/db')
 
+const password = process.env.DEMOPASS || '123qwe'
 const db = createDbConnection()
 const fakeAccounts = 30
 const pollsPerUser = 3
 const maxGazers = 100
 const fakeChoicesLimits = { min: 2, max: 5 }
 const fakeVotesLimits = { min: 0, max: fakeAccounts / 3 }
+
+const admin = {
+  username: 'admin',
+  email: 'admin@example.com',
+  password,
+  passwordConfirmation: password,
+  admin: true,
+  protected: true,
+  activated: true,
+  activatedAt: Date.now()
+}
+
+const tester1 = {
+  username: 'foo',
+  email: 'foo@example.com',
+  emailProtected: false,
+  password,
+  passwordConfirmation: password,
+  admin: false,
+  activated: true,
+  activatedAt: Date.now()
+}
+
+const tester2 = {
+  username: 'bar',
+  email: 'bar@example.com',
+  emailProtected: true,
+  password,
+  passwordConfirmation: password,
+  admin: false,
+  activated: true,
+  activatedAt: Date.now()
+}
 
 function cleanDB () {
   console.time('Clean DB')
@@ -33,54 +67,13 @@ function cleanDB () {
 }
 
 const accounts = (function () {
-  const createAdmin = () => User.create({
-    username: 'admin',
-    email: 'admin@example.com',
-    password: 'qwe321',
-    passwordConfirmation: 'qwe321',
-    admin: true,
-    protected: true,
-    activated: true,
-    activatedAt: Date.now()
-  })
-
-  const createServiceUser = () => User.create({
-    username: 'neither',
-    email: 'service@example.com',
-    password: '*',
-    passwordConfirmation: '*',
-    admin: false,
-    protected: true,
-    activated: true,
-    activatedAt: Date.now()
-  })
-
-  const createTesterUser1 = () => User.create({
-    username: 'foobar',
-    email: 'foobar@example.com',
-    emailProtected: false,
-    password: 'qwe321',
-    passwordConfirmation: 'qwe321',
-    admin: false,
-    activated: true,
-    activatedAt: Date.now()
-  })
-
-  const createTesterUser2 = () => User.create({
-    username: 'barfoo',
-    email: 'barfoo@example.com',
-    emailProtected: true,
-    password: 'qwe321',
-    passwordConfirmation: 'qwe321',
-    admin: false,
-    activated: true,
-    activatedAt: Date.now()
-  })
+  const createAdmin = () => User.create(admin)
+  const createTesterUser1 = () => User.create(tester1)
+  const createTesterUser2 = () => User.create(tester2)
 
   return {
     generate: () => Promise.all([
       createAdmin(),
-      createServiceUser(),
       createTesterUser1(),
       createTesterUser2()
     ])
@@ -101,8 +94,8 @@ const users = (function () {
     return User.create({
       username: faker.internet.userName().replace(/(\.)|(_)/, '-'),
       email: faker.internet.email(),
-      password: 'password',
-      passwordConfirmation: 'password',
+      password,
+      passwordConfirmation: password,
       activated: true,
       createdAt,
       activatedAt
@@ -154,16 +147,18 @@ const polls = (function () {
     return fakePoll(users[userIdx])
   }
 
-  function generateFoobarPools (users) {
-    const foobar = R.find(R.propEq('username', 'foobar'))(users)
+  function generateTesterPools (users, tester) {
+    const testerUser = R.find(R.propEq('username', tester))(users)
+
     return Promise.all(
-      R.times(() => fakePoll(foobar), pollsPerUser)
+      R.times(() => fakePoll(testerUser), pollsPerUser)
     )
   }
 
   return {
     generate: (users) => Promise.all(genPolls(users))
-      .then(() => generateFoobarPools(users))
+      .then(() => generateTesterPools(users, tester1.username))
+      .then(() => generateTesterPools(users, tester2.username))
       .then(() => Poll.find())
   }
 })()

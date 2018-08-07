@@ -7,22 +7,14 @@ if (process.env.NODE_ENV !== 'production') {
 const db = require('../lib/db')
 const User = require('../app/models/user')
 
+const password = process.env.DEMO ? process.env.DEMOPASS : '*'
+
 const createAdmin = () => User.create({
   username: 'admin',
-  email: 'vigntom.2708@gmail.com',
-  password: '*',
-  passwordConfirmation: '*',
+  email: process.env.ADMIN_EMAIL,
+  password,
+  passwordConfirmation: password,
   admin: true,
-  protected: true,
-  activated: true,
-  activatedAt: Date.now()
-})
-
-const createNeitherUser = () => User.create({
-  username: 'neither',
-  email: 'vigntom@mail.ru',
-  password: '*',
-  passwordConfirmation: '*',
   protected: true,
   activated: true,
   activatedAt: Date.now()
@@ -32,11 +24,6 @@ User.findOne({ username: 'admin' })
   .then(user => {
     if (user) return null
     return createAdmin()
-  })
-  .then(() => User.findOne({ username: 'neither' }))
-  .then(user => {
-    if (user) return null
-    return createNeitherUser()
   })
   .catch(err => {
     console.error(err.message)

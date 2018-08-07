@@ -10,6 +10,7 @@ const mailDir = path.join(__dirname, '..', 'emails', 'mailer')
 const config = {
   env,
   port: port,
+  demo: process.env.DEMO,
 
   app: {
     name: 'VoA',
