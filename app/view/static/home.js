@@ -33,7 +33,7 @@ module.exports = function Home (params) {
 
                   tbody([
                     tr([
-                      td('Admin'),
+                      td('admin'),
                       td('123qwe'),
                       td('admin')
                     ]),
