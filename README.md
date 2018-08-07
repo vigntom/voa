@@ -4,9 +4,9 @@ This project is a part of freeCodeCamp Back End Project.
 
 ## Demo
 
-A working demo <https://vgm-voa.herokuapp.com/>
+Live app <https://vgm-voa.herokuapp.com/>
 
-###  Accounts
+###  Demo Accounts
 
 | Username | Password | Privileged |
 | -------- | -------- | ---------- |
