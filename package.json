@@ -101,7 +101,7 @@
     "hyperscript": "^2.0.2",
     "hyperscript-helpers": "^3.0.3",
     "jquery": "^3.5.0",
-    "js-yaml": "^3.10.0",
+    "js-yaml": "^3.13.1",
     "kefir": "^3.8.1",
     "method-override": "^3.0.0",
     "mongoose": "^5.0.17",
