@@ -79,7 +79,7 @@
     "bootstrap": "^4.1.0",
     "bunyan": "^1.8.12",
     "bunyan-debug-stream": "^1.0.8",
-    "chart.js": "^2.7.2",
+    "chart.js": "^2.9.4",
     "chunk-manifest-webpack-plugin": "^1.1.2",
     "classnames": "^2.2.5",
     "clean-webpack-plugin": "^0.1.17",
